@@ -1,0 +1,8 @@
+{{- $summary := .Get "summary" | default "点击展开/折叠" -}}
+<details class="collapse-details">
+  <summary class="collapse-summary">{{ $summary | markdownify }}</summary>
+  <div class="collapse-content">
+    {{ .Inner | markdownify }}
+  </div>
+</details>
+

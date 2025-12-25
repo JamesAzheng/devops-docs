@@ -7,3 +7,202 @@ https://www.docsy.dev/docs/content/lookandfeel/#project-style-files
 @import 'td/color-adjustments-dark';
 @import 'td/code-dark';
 @import 'td/gcs-search-dark';
+
+// Collapse shortcode styles
+.collapse-details {
+  margin: 1rem 0;
+  border: 1px solid var(--bs-border-color, #dee2e6);
+  border-radius: 0.375rem;
+  background-color: var(--bs-body-bg, #fff);
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: var(--bs-primary, #0d6efd);
+  }
+
+  .collapse-summary {
+    display: block;
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    background-color: var(--bs-light, #f8f9fa);
+    color: var(--bs-body-color, #212529);
+    transition: background-color 0.2s ease;
+    list-style: none; // Remove default marker
+
+    &::-webkit-details-marker {
+      display: none; // Remove default marker in WebKit browsers
+    }
+
+    &::before {
+      content: "▶";
+      display: inline-block;
+      margin-right: 0.5rem;
+      transition: transform 0.2s ease;
+      color: var(--bs-primary, #0d6efd);
+    }
+
+    &:hover {
+      background-color: var(--bs-secondary-bg, #e9ecef);
+    }
+  }
+
+  &[open] .collapse-summary::before {
+    transform: rotate(90deg);
+  }
+
+  .collapse-content {
+    padding: 1rem;
+    border-top: 1px solid var(--bs-border-color, #dee2e6);
+    background-color: var(--bs-body-bg, #fff);
+    animation: slideDown 0.3s ease;
+
+    // Style nested content
+    p {
+      margin-bottom: 0.75rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    ul, ol {
+      margin-bottom: 0.75rem;
+    }
+
+    code {
+      background-color: var(--bs-secondary-bg, #f8f9fa);
+      padding: 0.125rem 0.25rem;
+      border-radius: 0.25rem;
+      font-size: 0.875em;
+    }
+
+    pre {
+      margin: 0.75rem 0;
+    }
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Dark mode adjustments
+[data-bs-theme="dark"] .collapse-details {
+  border-color: var(--bs-border-color, #495057);
+
+  .collapse-summary {
+    background-color: var(--bs-dark, #212529);
+    color: var(--bs-body-color, #fff);
+  }
+
+  .collapse-content {
+    background-color: var(--bs-body-bg, #1a1a1a);
+    border-top-color: var(--bs-border-color, #495057);
+  }
+}
+
+// Hide taxonomy cloud and categories
+// Target common Docsy theme class names
+.td-sidebar-taxonomy,
+.td-sidebar-taxonomy-cloud,
+.taxonomy-cloud,
+.taxonomy-cloud-section,
+.taxonomy-cloud-wrapper,
+#taxonomy-cloud,
+.td-sidebar__taxonomy,
+.td-sidebar-taxonomy-cloud-section,
+.td-sidebar-categories,
+.categories-section,
+.categories-wrapper,
+#categories,
+.td-sidebar__categories,
+.td-sidebar-tags,
+.tags-section,
+.tags-wrapper,
+#tags,
+.td-sidebar__tags {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+// Hide taxonomy-related sections in sidebar using attribute selectors
+.td-sidebar section[class*="taxonomy"],
+.td-sidebar section[class*="category"],
+.td-sidebar section[class*="tag"],
+.td-sidebar div[class*="taxonomy"],
+.td-sidebar div[class*="category"],
+.td-sidebar div[class*="tag"] {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+// Hide sections containing taxonomy links
+.td-sidebar a[href*="/tags/"],
+.td-sidebar a[href*="/categories/"],
+.td-sidebar a[href*="/tag/"],
+.td-sidebar a[href*="/category/"],
+.td-sidebar a[href*="tags"],
+.td-sidebar a[href*="categories"] {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+// Hide any section that contains taxonomy links as children (using :has selector where supported)
+.td-sidebar section:has(a[href*="/tags/"]),
+.td-sidebar section:has(a[href*="/categories/"]),
+.td-sidebar section:has(a[href*="/tag/"]),
+.td-sidebar section:has(a[href*="/category/"]) {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+// Hide sections that contain taxonomy badges/pills
+.td-sidebar .badge[href*="/tags/"],
+.td-sidebar .badge[href*="/categories/"],
+.td-sidebar span[href*="/tags/"],
+.td-sidebar span[href*="/categories/"] {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+// Hide parent containers of taxonomy elements
+.td-sidebar section:has(.badge[href*="/tags/"]),
+.td-sidebar section:has(.badge[href*="/categories/"]) {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+// More aggressive: Hide any section in sidebar that might contain taxonomy
+// This is a catch-all for any section that contains taxonomy-related content
+.td-sidebar > section:not(:first-child):not(:nth-child(2)) {
+  // This targets sections that are likely taxonomy sections (usually at the bottom)
+  // We'll be more specific below
+}
+
+// Hide sections containing specific text patterns (requires JavaScript, but CSS helps)
+// Target common patterns in Docsy sidebar
+.td-sidebar section h5,
+.td-sidebar section h4 {
+  // Check if heading contains taxonomy keywords via JavaScript
+}
+
+// Ultimate fallback: Hide all sections after the main navigation
+// This is more aggressive and might hide other content, so use with caution
+// Uncomment only if nothing else works
+// .td-sidebar section:nth-child(n+3) {
+//   display: none !important;
+// }

@@ -1,0 +1,8 @@
+{{- /* 引入自定义 JavaScript 以实现侧边栏默认折叠 */ -}}
+{{- $js := resources.Get "js/collapse-sidebar.js" | minify | fingerprint -}}
+<script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
+
+{{- /* 引入自定义 JavaScript 以隐藏标签云和分类 */ -}}
+{{- $hideTaxonomyJs := resources.Get "js/hide-taxonomy.js" | minify | fingerprint -}}
+<script src="{{ $hideTaxonomyJs.RelPermalink }}" integrity="{{ $hideTaxonomyJs.Data.Integrity }}" defer></script>
+
