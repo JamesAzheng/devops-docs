@@ -1,0 +1,671 @@
+# 事务日志
+
+- transaction log
+- 事务日志只有Inodb这种支持事务的存储引擎才有，分为 redo log 和 undo log
+- **事务日志的写入类型为“追加”，因此其操作为“顺序IO”**；通常也被称为：预写式日志（**日志写入先于数据前**） write ahead logging
+- 事务日志通常是循环覆盖的
+- PS：建议事务日志和数据文件分开存放
+
+## redo log
+
+- redo log 负责确保事务的持久性，记录数据修改之后的值，当数据写入到内存，但还没写到磁盘时，服务器出现故障，重启MySQL后，会从redo log恢复发生故障之前的数据，叫做crash-safe
+  - redo log 写入成功才会通知用户成功
+- redo log 还可以提高速度，在更新数据时，为了减少磁盘IO次数，每次操作都会先将数据写入到内存中，再根据策略将redo log中的数据写入到磁盘（通过**innodb_flush_log_at_trx_commit** 值来控制写入策略）
+  - **0**，每次提交后都会先**写入Log Buffer**，然后每秒将Log Buffer的内容刷新到磁盘文件中 ，**性能很好 但mysql宕机有可能会导致最后一秒的事务丢失**
+  - **1**，此为默认值，日志缓冲区将写入日志文件，并在**每次事务后执行后立刻刷新到磁盘**。 这是完全遵守ACID特性，**性能最差 但容错性最好，如果设置为1，同时sync_binlog = 1表示最高级别的容错**
+  - **2**，每次提交后都会先**写入OS cache**，然后每秒将OS cache的内容刷新到磁盘文件中，性能比0略差一些，**性能很好 但OS宕机有可能会导致最后一秒的事务丢失**
+  - 总结：2和0 因为都是将事务写入内存，虽然跨越用户态与内核态，但毕竟只是内存的数据拷贝，所以性能差异并不大，但通常建议设置为2，因为操作系统崩溃的概率相比MySQL应用程序崩溃的概率小很多只要操作系统不奔溃 也绝对不会丢数据
+    - OS buffer：操作系统的缓存
+    - log buffer：MySQL的缓存
+    - 通过show variables like '%innodb_log%' ;可以查看redo log的文件大小等信息
+
+
+
+
+## undo log
+
+- 作用：确保事务的原子性，同时可以实现多版本并发控制（MVCC）
+
+- 内容：undo log是逻辑日志，会通过逻辑将数据恢复到事务开始之前的的状态
+
+- 产生时间：在事务开始之前就会产生
+
+- 存储位置：默认存储在共享空间中，可通过以下语法查看
+
+  - ```SQL
+    show global variables like "innodb_data_file_path%";
+    ```
+
+
+
+
+
+## 事务日志相关配置
+
+- 参阅：https://dev.mysql.com/doc/refman/8.0/en/server-option-variable-reference.html
+
+```sql
+#查看事务日志相关变量
+mysql> show variables like '%innodb_log%';
++------------------------------------+----------+
+| Variable_name                      | Value    |
++------------------------------------+----------+
+| innodb_log_buffer_size             | 16777216 #buffer缓存大小
+| innodb_log_checksums               | ON       
+| innodb_log_compressed_pages        | ON       
+| innodb_log_file_size               | 50331648 #每个日志文件大小
+| innodb_log_files_in_group          | 2 #日志文件个数，第一个写满了写第二个，然后在回滚写第一个       
+| innodb_log_group_home_dir          | ./ #事务文件路径，默认路径为数据库的默认目录下的 ib_logfile0 和 ib_logfile1文件，建议和数据文件分开存放，redo log和undo log 
+| innodb_log_spin_cpu_abs_lwm        | 80       
+| innodb_log_spin_cpu_pct_hwm        | 50       
+| innodb_log_wait_for_flush_spin_hwm | 400      
+| innodb_log_write_ahead_size        | 8192     
+| innodb_log_writer_threads          | ON       
++------------------------------------+----------+
+
+mysql> select @@innodb_flush_log_at_trx_commit;
++----------------------------------+
+| @@innodb_flush_log_at_trx_commit |
++----------------------------------+
+|                                1 | #默认值为1，建议设为2，详情参阅下面的说明
++----------------------------------+
+```
+
+- 
+
+## 事务日志性能优化
+
+```sql
+# mkdir -p /data/mysql_log/transaction_log
+# chown -R mysql.mysql /data/mysql_log/
+# vim /etc/my.cnf
+[mysqld]
+######transaction-log######
+innodb_log_group_home_dir = /data/mysql_log/transaction_log
+innodb_log_file_size = 200M
+innodb_log_files_in_group = 3
+innodb_flush_log_at_trx_commit=2 #如果设置为1，同时sync_binlog = 1表示最高级别的容错
+
+
+# systemctrl restart mariadb|mysqld
+```
+
+
+
+
+
+
+
+
+
+# 错误日志
+
+参阅：https://dev.mysql.com/doc/refman/8.0/en/error-log.html
+
+**错误日志记录的内容包括：**
+
+- mysqld启动和关闭过程中输出的事件信息 以及 错误信息
+- event scheduler运行一个event时产生的日志信息
+- 在主从复制架构中的从服务器上启动从服务器线程时产生的信息
+
+## 错误日志相关配置
+
+### 错误日志存放路径
+
+```sql
+MariaDB [hellodb]> SHOW GLOBAL VARIABLES LIKE 'log_error'; 
++---------------+------------------------------+
+| Variable_name | Value                       |
++---------------+------------------------------+
+| log_error     | /var/log/mariadb/mariadb.log |
++---------------+------------------------------+
+
+mysql> SHOW GLOBAL VARIABLES LIKE 'log_error'; 
++---------------+-----------------------+
+| Variable_name | Value                 |
++---------------+-----------------------+
+| log_error     | /data/mysql/mysql.log |
++---------------+-----------------------+
+```
+
+### 错误日志记录级别
+
+- 指定处理用于错误日志的事件的详细程度
+
+#### Mariadb
+
+```sql
+MariaDB [hellodb]> SHOW GLOBAL VARIABLES LIKE 'log_warnings'; 
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| log_warnings  | 2    #可以为0|1|2|3
++---------------+-------+
+1 row in set (0.001 sec)
+```
+
+#### MySQL
+
+- 参考文档：https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_log_error_verbosity
+
+```sql
+mysql> select @@log_error_verbosity;
++-----------------------+
+| @@log_error_verbosity |
++-----------------------+
+|                     2 |
++-----------------------+
+
+#可以为1、2、3，数值越大则记录的越详细
+#1 ERROR
+#2 ERROR, WARNING
+#3 ERROR, WARNING, INFORMATION
+```
+
+## 错误日志配置范例
+
+```bash
+# mkdir -p /data/mysql_log/
+# chown -R mysql.mysql /data/mysql_log/
+# vim /etc/my.cnf
+[mysqld]
+######error-log######
+log_error=/data/mysql_log/mysql_error.log
+log-error-verbosity=2
+```
+
+
+
+
+
+
+
+
+
+# 通用日志
+
+**通用日志记录的内容：**
+
+- 记录对数据库的通用操作，包括执行的SQL语句等内容
+
+**通用日志保存的位置可以是：**
+
+
+- file（默认值）
+- table（mysql.general_log表）
+
+## 通用日志相关配置
+
+### 查看通用日志是否开启
+
+- 默认没有开启通用日志,开启后会在家目录中生成一个HOSTNAME.log的文件
+
+```sql
+mysql> show variables like 'general_log';
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| general_log   | OFF   |
++---------------+-------+
+mysql> select @@general_log;
++---------------+
+| @@general_log |
++---------------+
+|             0 | #0也代表未开启
++---------------+
+```
+
+### 查看通用日志输出格式
+
+```sql
+mysql> select @@log_output;
++--------------+
+| @@log_output |
++--------------+
+| FILE         |
++--------------+
+```
+
+### 查看通用日志存放位置
+
+- 默认存放在默认安装目录的主机名.log文件中
+
+```sql
+mysql> select @@general_log_file;
++--------------------+
+| @@general_log_file |
++--------------------+
+| /data/mysql/8.log  |
++--------------------+
+```
+
+## 通用日志配置范例
+
+### 存放到文件中
+
+```sql
+# mkdir -p /data/mysql_log/
+# chown -R mysql.mysql /data/mysql_log/
+# vim /etc/my.cnf
+[mysqld]
+######General-log######
+general_log=ON
+log_output=FILE
+general_log_file=/data/mysql_log/mysql_general.log
+```
+
+#### 测试输出
+
+```sql
+#执行内容
+[root@centos8 ~]# mysql
+...
+mysql> select * from hellodb.students;
+
+
+#日志输出
+[root@centos8 ~]# tail -f /data/mysql_log/mysql_general.log 
+/usr/local/mysql/bin/mysqld, Version: 8.0.29 (MySQL Community Server - GPL). started with:
+Tcp port: 3306  Unix socket: /data/mysql/mysql.sock
+Time                 Id Command    Argument
+2022-05-21T16:25:32.686483Z	    8 Connect	root@localhost on  using Socket
+2022-05-21T16:25:32.687538Z	    8 Query	select @@version_comment limit 1
+2022-05-21T16:26:02.909748Z	    8 Query	select * from hellodb.students
+```
+
+### 存放到数据库中
+
+```sql
+# vim /etc/my.cnf
+[mysqld]
+general_log=ON
+log_output=TABLE
+```
+
+#### 测试输出
+
+```sql
+mysql> select * from mysql.general_log\G
+*************************** 1. row ***************************
+  event_time: 2022-05-22 00:30:25.445958
+   user_host: [root] @ localhost []
+   thread_id: 8
+   server_id: 1
+command_type: Connect
+    argument: 0x726F6F74406C6F63616C686F7374206F6E20207573696E6720536F636B6574 #加密的内容
+```
+
+#### 对数据库中的日志过滤
+
+- MySQL直接查看是经过BASE64编码加密的，但是通过过滤会显示原本执行的语句
+
+```bash
+mysql -e 'select argument from mysql.general_log' | awk '{sql[$0]++}END{for(i in sql){print sql[i],i}}'|sort -nr
+#或
+mysql -e 'select argument from mysql.general_log' |sort |uniq -c |sort -nr
+```
+
+
+
+
+
+# 慢查询日志
+
+- 记录执行查询时长超出指定时长的操作
+
+
+- 默认慢查询日志不开启
+
+
+## 慢查询日志相关配置
+
+- 以下参数同时也是变量
+
+
+```bash
+# vim /etc/my.cnf
+[mysqld]
+slow_query_log=ON|OFF #开启或关闭慢查询，支持全局和会话，只有全局设置才会生成慢查询文件
+slow_query_log_file=PATH #慢查询日志存放路径，默认存放在数据库根目录中的HOSTNAME-slow.log文件中（自定义存放同样要考虑日志目录权限问题）
+long_query_time=N #慢查询的阀值，单位秒，默认超过十秒的操作将记录到慢查询日志中,生产中设置2-3秒就已经很慢了
+log_queries_not_using_indexes=ON #不使用索引或使用全索引扫描是否也记录慢查询日志，默认OFF，即不记录
+
+log_slow_rate_limit=1 #多少次查询才记录，mariadb特有
+min_examined_row_limit=0 #检查少于此行数的查询不会记录到慢速查询日志中,默认为0 表示即使1行也记录
+
+#下述查询类型且查询时长超过long_query_time，则记录日志???
+log_slow_filter=admin,filesort,filesort_on_disk,full_join,full_scan,query_cache,query_cache_miss,tmp_table,tmp_table_on_disk
+
+#在写入慢速查询日志的语句中包括慢速管理语句。管理语句包括变更表、分析表、检查表、创建索引、删除索引、优化表和修复表。 (ALTER TABLE, ANALYZE TABLE, CHECK TABLE, CREATE INDEX, DROP INDEX, OPTIMIZE TABLE, and REPAIR TABLE.) 默认为OFF，即不开启
+log_slow_admin_statements=ON
+```
+
+## 慢查询日志配置范例
+
+```bash
+# mkdir -p /data/mysql_log/
+# chown -R mysql.mysql /data/mysql_log/
+# vim /etc/my.cnf
+[mysqld]
+######slow-query-log######
+slow_query_log=ON
+slow_query_log_file=/data/mysql_log/mysql_slow_query.log
+long_query_time=3
+```
+
+## 测试慢查询方法
+
+```sql
+#每秒钟对一行查询一次，例：表中有十行即查询时间为十秒
+select sleep(1) from teachers;
+```
+
+## 慢查询分析工具
+
+### profile
+
+- 显示命令的详细执行过程
+- SHOW PROFILES命令未来版本将弃用
+  - 'SHOW PROFILES' is deprecated and will be removed in a future release. Please use Performance Schema instead
+  - 参考文档：https://dev.mysql.com/doc/refman/8.0/en/performance-schema-query-profiling.html
+
+
+
+```sql
+MariaDB [hellodb]> select @@profiling; #默认值为0，即不启用
++-------------+
+| @@profiling |
++-------------+
+|           0 |
++-------------+
+
+MariaDB [hellodb]>set profiling=on; #临时启用，永久启用需写到配置文件中
+
+#使用show profiles来观察命令的详细执行过程，
+MariaDB [hellodb]> show profiles;
++----------+------------+-------------------------------------+
+| Query_ID | Duration   | Query                               |
++----------+------------+-------------------------------------+
+|        1 | 0.00019238 | select  @@profiling                 |
+|        2 | 0.00115590 | select * from students where age=20 |
+|        3 | 0.00006616 | show profiles for query 2           |
+|        4 | 4.00319568 | select sleep(1) from teachers       |
++----------+------------+-------------------------------------+
+
+#显示语句的详细执行步骤和时长
+Show profile for query #  
+MariaDB [hellodb]> show profile for query 4;
++------------------------+----------+
+| Status                 | Duration |
++------------------------+----------+
+| Starting               | 0.000157 |
+| Checking permissions   | 0.000009 |
+| Opening tables         | 0.000025 |
+| After opening tables   | 0.000005 |
+| System lock            | 0.000004 |
+| Table lock             | 0.000006 |
+| Init                   | 0.000017 |
+| Optimizing             | 0.000009 |
+| Statistics             | 0.000018 |
+| Preparing              | 0.000028 |
+| Executing              | 0.000003 |
+| Sending data           | 0.000070 |
+| User sleep             | 1.001128 |
+| User sleep             | 1.000313 |
+| User sleep             | 1.000834 |
+| User sleep             | 1.000348 |
+| End of update loop     | 0.000032 |
+| Query end              | 0.000003 |
+| Commit                 | 0.000014 |
+| Closing tables         | 0.000004 |
+| Unlocking tables       | 0.000003 |
+| Closing tables         | 0.000012 |
+| Starting cleanup       | 0.000003 |
+| Freeing items          | 0.000056 |
+| Updating status        | 0.000024 |
+| Logging slow query     | 0.000069 |
+| Reset for next command | 0.000004 |
++------------------------+----------+
+
+#显示cpu使用情况
+#语法：Show profile cpu for query #
+MariaDB [hellodb]> Show profile cpu for query 4;
++------------------------+----------+----------+------------+
+| Status                 | Duration | CPU_user | CPU_system |
++------------------------+----------+----------+------------+
+| Starting               | 0.000157 | 0.000090 |   0.000065 |
+| Checking permissions   | 0.000009 | 0.000005 |   0.000004 |
+| Opening tables         | 0.000025 | 0.000014 |   0.000010 |
+| After opening tables   | 0.000005 | 0.000003 |   0.000002 |
+| System lock            | 0.000004 | 0.000002 |   0.000002 |
+| Table lock             | 0.000006 | 0.000004 |   0.000002 |
+| Init                   | 0.000017 | 0.000010 |   0.000007 |
+| Optimizing             | 0.000009 | 0.000005 |   0.000004 |
+| Statistics             | 0.000018 | 0.000010 |   0.000007 |
+| Preparing              | 0.000028 | 0.000016 |   0.000012 |
+| Executing              | 0.000003 | 0.000002 |   0.000002 |
+| Sending data           | 0.000070 | 0.000059 |   0.000000 |
+| User sleep             | 1.001128 | 0.000665 |   0.000000 |
+| User sleep             | 1.000313 | 0.000716 |   0.000000 |
+| User sleep             | 1.000834 | 0.000379 |   0.000100 |
+| User sleep             | 1.000348 | 0.000319 |   0.000231 |
+| End of update loop     | 0.000032 | 0.000017 |   0.000012 |
+| Query end              | 0.000003 | 0.000002 |   0.000002 |
+| Commit                 | 0.000014 | 0.000008 |   0.000005 |
+| Closing tables         | 0.000004 | 0.000002 |   0.000002 |
+| Unlocking tables       | 0.000003 | 0.000002 |   0.000001 |
+| Closing tables         | 0.000012 | 0.000007 |   0.000005 |
+| Starting cleanup       | 0.000003 | 0.000001 |   0.000001 |
+| Freeing items          | 0.000056 | 0.000034 |   0.000024 |
+| Updating status        | 0.000024 | 0.000013 |   0.000010 |
+| Logging slow query     | 0.000069 | 0.000040 |   0.000029 |
+| Reset for next command | 0.000004 | 0.000002 |   0.000001 |
++------------------------+----------+----------+------------+
+```
+
+### mysqldumpslow
+
+分析慢查询日志
+
+- https://dev.mysql.com/doc/refman/8.0/en/mysqldumpslow.html
+
+```bash
+mysqldumpslow -s c -t 10 /data/mysql/slow.log
+```
+
+
+
+
+
+
+
+# 二进制日志(备份)
+
+- 记录导致数据改变或潜在导致数据改变的SQL语句
+- 记录已提交的日志
+- 不依赖于存储引擎类型
+- 功能：通过“重放”日志文件中的事件来生成数据副本
+- **注意：为了数据安全，建议把二进制日志单独存放**
+
+
+
+## 二进制日志文件的构成
+
+- **日志文件**：mysql|mariadb-bin.文件名后缀，二进制格式,如： mariadb-bin.000001
+- **索引文件**：mysql|mariadb-bin.index，文本格式
+
+
+
+## 二进制日志记录格式
+
+**语句 statement**
+
+- 记录语句，日志量较少，不建议使用 因为如执行了一条当前时间戳的语句 那么在恢复时将恢复的是当前的时间 而非事件发生的时间
+
+**行 row**
+
+- 记录详细的数据，日志量较大，更加安全，**建议使用的格式**
+
+**混合模式 mixed**
+
+- 让系统自行判定该基于哪种方式进行
+
+
+
+## 二进制日志相关配置
+
+```sql
+#查看二进制日志是否开启，只是变量，不是服务器选项，可以动态修改
+show variables like 'sql_log_bin';
+
+#查看当前的二进制日志记录格式
+show variables like 'binlog_format';
+
+#单个二进制日志文件的最大体积，到达最大值会自动滚动，默认为1G
+show variables like 'max_binlog_size';
+
+#此变量确定在每次事务中保存二进制日志更改记录的缓存的大小（每次连接）
+show variables like 'binlog_cache_size';
+
+#限制用于缓存多事务查询的字节大小，默认基本上没有约束，生产中建议调小 即加以限制
+show variables like 'max_binlog_cache_size';
+
+#二进制日志自动删除的天数，秒为单位，默认为2592000 即30天
+show variables like 'binlog_expire_logs_seconds';
+
+#设定是否启动二进制日志即时同步磁盘功能，0表示由操作系统负责同步日志到磁盘，1为立即写入磁盘（但会影响性能）
+show variables like 'sync_binlog';
+```
+
+
+
+## 二进制日志配置范例
+
+- **注意：开启二进制日志选项并指定二进制日志路径才可生效**
+
+```bash
+# mkdir -p /data/mysql_bin_log/
+# chown -R mysql.mysql /data/mysql_bin_log/
+# vim /etc/my.cnf
+[mysqld]
+######bin-log######
+binlog_format=ROW
+log_bin=/data/mysql_bin_log/mysql_bin_log
+max_binlog_size=1073741824
+binlog_cache_size=4m
+max_binlog_cache_size=512m
+sync_binlog=1
+binlog_expire_logs_seconds=2592000
+```
+
+
+
+## 动态开启或关闭二进制日志
+
+- 某些情况不需要开启二进制日志 如：恢复备份
+
+```sql
+set @@sql_log_bin={on|off};
+```
+
+
+
+## 二进制日志其他操作
+
+### 查看二进制日志
+
+```sql
+#查看使用中的二进制日志文件
+SHOW MASTER STATUS;
+
+#查看mariadb自行管理使用中的二进制日志文件列表，及大小
+SHOW {BINARY | MASTER} LOGS;
+```
+
+#### 在线查看
+
+- 在线查看二进制文件中的指定内容
+
+```sql
+#语法
+SHOW BINLOG EVENTS [IN 'log_name'] [FROM pos] [LIMIT [offset,] row_count]
+
+#范例
+show binlog events in 'mysql-bin.000001' from 6516 limit 2,3
+```
+
+#### 离线查看
+
+- **mysqlbinlog**：二进制日志的客户端命令工具，支持离线查看二进制日志
+
+```sql
+#命令格式
+mysqlbinlog [OPTIONS] log_file…
+ --start-position=# 指定开始位置
+ --stop-position=#
+ --start-datetime=  #时间格式：YYYY-MM-DD hh:mm:ss
+ --stop-datetime= 
+ --base64-output[=name]
+        -v -vvv
+        
+#范例
+mysqlbinlog --start-position=678 --stop-position=752 /var/lib/mysql/mariadbbin.000003 -v
+mysqlbinlog  --start-datetime="2018-01-30 20:30:10"   --stop-datetime="2018-01-
+30 20:35:22" mariadb-bin.000003 -vvv
+```
+
+### 刷新二进制日志
+
+```sql
+#日志滚动,生成新文件/var/lib/mysql/mariadb-bin.00000N
+shell > mysqladmin -uroot -pcentos flush-logs
+#或
+mysql > FLUSH LOGS;
+```
+
+### 删除二进制日志
+
+- **语法：**
+
+```sql
+PURGE { BINARY | MASTER } LOGS { TO 'log_name' | BEFORE datetime_expr }
+```
+
+- **范例：**
+
+```sql
+PURGE BINARY LOGS TO 'mariadb-bin.000003'; #删除mariadb-bin.000003之前的日志
+PURGE BINARY LOGS BEFORE '2017-01-23';
+PURGE BINARY LOGS BEFORE '2017-03-22 09:25:30';
+```
+
+##### 删除所有二进制日志，index文件重新记数
+
+- 慎用！MariaDB-10.3.28有BUG，刷新日志后不会根据配置文件中定义的二进制日志重新删除生成，而是在MySQL默认目录中生成新的二进制日志
+
+```sql
+RESET MASTER [TO #]; #删除所有二进制日志文件，并重新生成日志文件，文件名从#开始记数，默认从1开始，一般是master主机第一次启动时执行，MariaDB 10.1.6开始支持TO #
+```
+
+
+
+## 二进制日志输出格式说明
+
+```sql
+# at 328
+#151105 16:31:40 server id 1 end_log_pos 431   Query   thread_id=1     
+exec_time=0     error_code=0
+use `mydb`/*!*/;
+SET TIMESTAMP=1446712300/*!*/;
+CREATE TABLE tb1 (id int, name char(30))
+/*!*/;  
+事件发生的日期和时间：151105 16:31:40
+事件发生的服务器标识：server id 1
+事件的结束位置：end_log_pos 431
+事件的类型：Query 
+事件发生时所在服务器执行此事件的线程的ID：thread_id=1
+语句的时间戳与将其写入二进制文件中的时间差：exec_time=0
+错误代码：error_code=0
+事件内容：
+GTID：Global Transaction ID，mysql5.6以mariadb10以上版本专属属性：GTID
+```

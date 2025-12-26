@@ -1,0 +1,678 @@
+# 备份前言
+
+## 备份方式
+
+**完全备份：**
+
+- 全部备份
+
+**部分备份：**
+
+- 只备份数据子集，如部分库或表
+
+**增量备份：**
+
+- 仅备份最近一次完全备份或增量备份（如果存在增量）以来变化的数据，备份较快，还原复杂
+- 还原方式：完全备份 > 增1 > 增2 > 增3
+
+**差异备份：**
+
+- 仅备份最近一次完全备份以来变化的数据，备份较慢，还原简单
+- 还原方式：完全备份 > 最后一次的差异备份
+
+**物理备份：**
+
+- 直接复制数据文件进行备份，与存储引擎有关，占用较多的空间，速度快
+
+**逻辑备份：**
+
+- 从数据库中“导出”数据另存而进行的备份，与存储引擎无关，占用空间少，速度慢，可能丢失精度
+
+
+
+## 备份模式
+
+**冷备：**
+
+- 读、写操作均不可进行，数据库停止服务
+
+**温备：**
+
+- 读操作可执行，但写操作不可执行
+
+**热备**：
+
+- 读、写操作均可执行
+
+**MyISAM：**
+
+- 温备，不支持热备（温备时加写锁，因为不支持事务，导致每次看到的数据是变化的，所以不支持热备）
+
+**InnoDB：**
+
+- 都支持（因为支持事务，而事务具有隔离性，所以热备份时看到的数据是不变的）
+
+
+
+## 备份工具
+
+**cp, tar**
+
+- 等复制归档工具：物理备份工具，适用所有存储引擎；只支持冷备；完全和部分备份
+
+**LVM的快照**：
+
+- 先加读锁，做快照后解锁，几乎热备；借助文件系统工具进行备份
+
+**mysqldump**：
+
+- 逻辑备份工具，适用所有存储引擎，对MyISAM存储引擎进行温备；支持完全或部分备份；对InnoDB存储引擎支持热备，结合binlog的增量备份
+
+**xtrabackup**：
+
+- 由Percona提供支持对InnoDB做热备(物理备份)的工具，支持完全备份、增量备份
+
+**MariaDB Backup**： 
+
+- 从MariaDB 10.1.26开始集成，基于Percona XtraBackup 2.3.8实现
+
+**mysqlbackup**：
+
+- 热备份， MySQL Enterprise Edition组件
+
+**mysqlhotcopy**：
+
+- PERL 语言实现，几乎冷备，仅适用于MyISAM存储引擎，使用LOCK TABLES、FLUSH TABLES和cp或scp来快速备份数据库
+
+
+
+
+
+# 备份
+
+## 备份前注意事项
+
+- 远程拷贝时使用rsync -a（可以保留文件的属性权限等信息），双方主机都要rsync
+- 备份产生的负载 以及 备份过程的时长
+- 需要备份哪些数据？
+  - **数据库数据本身、二进制日志、InnoDB的事务日志、服务器的配置文件**、用户帐号，权限设置，程序代码（存储过程、函数、触发器、事件调度器）
+- **备份完成后 做还原测试，用于测试备份的可用性，还原演练，写成规范的技术文档**
+
+##  mysqldump备份数据库
+
+- mysqldump是MySQL的客户端命令，通过mysql协议连接至mysql服务器进行备份
+- 参考文档：https://dev. mysql.com/doc/refman/5.7/en/mysqldump.html
+- **注意：此工具仅备份数据的内容，MySQL配置文件、二进制日志需另备份**
+
+### 语法
+
+```mysql
+#语法一，支持指定数据库和指定多表的备份，但数据库本身定义不备份
+mysqldump [OPTIONS] database [tables]
+
+#语法二，支持指定数据库备份，包含数据库本身定义也会备份
+mysqldump [OPTIONS] –B DB1 [DB2 DB3...]
+
+#语法三，常用，备份所有数据库，包含数据库本身定义也会备份
+mysqldump [OPTIONS] –A [OPTIONS]
+```
+
+### **常见通用选项说明**
+
+
+
+`mysqldump` 是 MySQL 提供的备份工具，它可以将一个或多个数据库备份成 SQL 脚本或压缩文件。以下是 `mysqldump` 常用的选项：
+
+- `-u`：指定要用于备份的 MySQL 用户名。
+- `-p`：提示输入密码。
+- `--host`：指定要备份的数据库所在的主机名或 IP 地址。
+- `--port`：指定要备份的数据库所在的端口号。
+- `--default-character-set`：指定备份的字符集。
+- `--single-transaction`：在备份期间使用事务，确保备份一致性。
+- `--routines`：备份存储过程和函数。
+- `--triggers`：备份触发器。
+- `--events`：备份事件。
+- `--add-drop-database`：在备份脚本中添加 DROP DATABASE 语句。
+- `--add-drop-table`：在备份脚本中添加 DROP TABLE 语句。
+- `--add-locks`：备份数据表时加锁。
+- `--compress`：在备份过程中使用压缩。
+- `--result-file`：指定备份文件的输出路径和名称。
+
+以上是 `mysqldump` 常用的选项，使用时可以根据需要选择适当的选项组合。
+
+#### -A 
+
+- 备份所有数据库，含create database语句
+
+#### -B
+
+- 指定备份的数据库，包括create database语句
+
+#### -E
+
+- 备份相关的所有event scheduler
+
+#### -R
+
+- 备份所有存储过程和自定义函数（单独备份某个库时建议加，备份mysql库的话就不用加了）
+
+#### --triggers
+
+- 备份表相关触发器，默认启用，--skip-triggers表示不备份触发器
+
+#### -F
+
+- 备份前滚动日志，锁定表完成后，执行flush logs命令,生成新的二进制日志文件，配合-A 或 -B 选项时，会导致刷新多次数据库。建议在同一时刻执行转储和日志刷新，可通过和--single-transaction或-x，--master-data 一起使用实现，此时只刷新一次二进制日志
+
+#### -q
+
+- 不缓存查询，直接输出，加快备份速度
+
+#### --hex-blob
+
+- 使用十六进制符号转储二进制列，当有包括BINARY， VARBINARY，BLOB，BIT的数据类型的列时使用，避免乱码
+
+#### --single-transaction
+
+- 开启事务进行备份，在开始备份前发出BEGIN SQL语句开启事务 从而实现热备，此选项适用于Innodb存储引擎
+- 此选项通过在单个事务中转储所有表来创建一致的快照。 仅适用于存储在支持多版本控制的存储引擎中的表（目前只有InnoDB可以）; 转储不保证与其他存储引擎保持一致。 在进行单事务转储时，要确保有效的转储文件（正确的表内容和二进制日志位置），没有其他连接应该使用以下语句：ALTER TABLE，DROP TABLE，RENAME TABLE，TRUNCATE TABLE,此选项和--lock-tables（此选项隐含提交挂起的事务）选项是相互排斥,备份大型表时，建议将--single-transaction选项和--quick结合一起使用
+
+#### --source-data[=#]
+
+- **8.0.26版本以后将master改为slave了**
+
+- **必须使用项**
+
+- **此选项需开启二进制日志，记录备份时二进制日志所处的位置以便加以区分哪些是已经备份的数据（记录位置后面发生的更改是没有备份的数据）**
+
+- **#：**
+
+  - 1 **默认值**，所备份的数据之前加一条记录为CHANGE MASTER TO语句
+  - 2，记录为被注释的#CHANGE MASTER TO语句(注释备份时二进制日志存储位置)
+
+- 配合-F 备份前滚动日志，更便于恢复和管理
+
+- 此选项会自动关闭--lock-tables功能，自动打开-x | --lock-all-tables功能（除非开启--single-transaction）
+
+- 范例：
+
+  - ```bash
+    [root@backup ~]# mysqldump -A --master-data=2 > all.sql 
+    [root@backup ~]# vim all.sql
+    -- CHANGE MASTER TO MASTER_LOG_FILE='log_bin.000004', MASTER_LOG_POS=575;
+    #表示此次备份备份到了log_bin.000004这个文件的575位置 
+    ```
+
+#### --default-character-set=utf8mb4
+
+- 不指定则此选项默认值就是utf8mb4
+
+#### --compact
+
+- 去掉注释，适合调试，生产不使用
+
+#### -d
+
+- 只备份表结构,不备份数据
+
+#### -t
+
+- 只备份数据,不备份表结构,即create table
+
+#### -n
+
+- 不备份create database，可被-A或-B覆盖
+
+#### --flush-privileges
+
+- 转储mysql数据库后，发出一个FLUSH PRIVILEGES语句
+- FLUSH PRIVILEGES 表示mysql从系统数据库 的授权表中重新读取权限 
+
+#### -f
+
+- 忽略SQL错误，继续执行
+
+
+
+### 建议使用的备份选项
+
+- 下面以InnoDB存储引擎举例
+
+- **注意：备份大型表时，建议将--single-transaction选项和-q结合一起使用**
+
+#### 完全备份
+
+```bash
+#不压缩
+mysqldump -uroot -p -A -F --single-transaction --source-data=2 --hex-blob > mysql_bak_`date +%F_%H-%M-%S`.sql
+
+#压缩
+mysqldump -uroot -p -A -F --single-transaction --source-data=2 --hex-blob | gzip > mysql_bak_`date +%F_%H-%M-%S.sql.gz
+```
+
+#### 分库备份
+
+- **注意：分库备份还需使用`–E –R --triggers`选项来备份存储引擎、触发器、函数(如果存在的情况下) 或 分库备份时同时备份mysql库也可以**
+
+```bash
+#正常分库备份
+mysqldump -B hellodb > hellodb.sql
+mysqldump -B hellodb2 > hellodb2.sql
+
+#利用脚本实现分库备份
+#方法一
+#利用for循环
+for db in `mysql -uroot -e 'show databases'|grep -Ev '^(Database|information_schema|performance_schema)'`;do mysqldump -B ${db} > /opt/${db}_`date +%F`.sql;done
+
+#方法二，利用sed
+mysql -uroot -e 'show databases'|sed -rn  '/^(Database|information_schema|performance_schema)$/!s#(.*)#mysqldump -B \1 | gzip > /opt/\1.sql.gz#p' |bash
+
+#方法三，利用grep
+mysql -uroot -e 'show databases'|grep -Ev 
+'^(Database|information_schema|performance_schema)$'|while read db;do mysqldump 
+-B $db | gzip > /data/$db.sql.gz;done
+
+#方法四，利用grep+sed
+mysql -uroot -e 'show databases'|grep -Ev 
+'^(Database|information_schema|performance_schema)$' | sed -rn 's#
+(.*)#mysqldump -B \1 | gzip > /data/\1.sql.gz#p' |bash
+```
+
+#### 增量备份
+
+- 增量备份依赖于完全备份
+
+```bash
+#先进行完全备份
+# mysqldump -uroot -p -A -F --single-transaction --source-data=2 |gzip > /backup/all-`date +%F`.sql.gz
+
+#观察完全备份文件中的二进制文件和位置，将之后的二进制日志进行复制备份
+# cp /var/lib/mysql/mariadb-bin.000003 /backup
+# mysqlbinlog --start-position=389 /backup/mariadb-bin.000003 > /backup/inc.sql
+```
+
+
+
+
+
+
+
+## 其他数据的备份
+
+### 二进制日志备份
+
+- **为了数据安全，建议把二进制日志单独存放**
+
+```bash
+#
+```
+
+### 事务日志备份
+
+```bash
+#
+```
+
+### MySQL配置文件备份
+
+```bash
+#
+```
+
+
+
+
+
+
+
+# 还原
+
+## **还原前注意事项**
+
+- 因为还原操作没有必要使用二进制日志，所以可以先**关闭二进制日志**
+
+
+- 还原前要发送通知，告知用户数据维护或临时升级等
+
+- 加读、写锁、停服务等方式禁止用户访问
+
+- 考虑好需要恢复哪些数据（数据库内容、配置文件、二进制日志等...）
+- 还原至新的数据库要保证和原有数据库版本一致
+
+- 下面表述的是将数据还原至新的MySQL中
+
+```
+rm -fr /var/lib/mysql/* #清理还原服务器上mysql文件夹里残留的内容，（刚安装服务未启动，目录是干净的话可省略
+systemctl start mariadb
+```
+
+
+
+## 完全备份还原
+
+- 方法一，使用mysql客户端工具还原
+
+```bash
+[root@centos8 ~]# mysql -uroot -p'12345' < /backup/all_bak/all_backup.sql
+```
+
+- 方法二，在mysql中，使用 source命令还原
+
+```sql
+mysql> set sql_log_bin=off   #还原前关闭二进制日志
+mysql> source /backup/all_bak/all_backup.sql #还原
+mysql> set sql_log_bin=on   #还原后打开二进制日志
+```
+
+
+
+## 二进制日志(增量备份)还原
+
+- 利用二进制日志 将完全备份以来所有变化的数据进行还原
+
+```bash
+#获取备份文件中记录的二进制文件地址
+[root@centos8 ~]#grep '^-- CHANGE MASTER TO' /data/all_2019-11-25.sql
+-- CHANGE MASTER TO MASTER_LOG_FILE='mysql-bin.000001', MASTER_LOG_POS=328;
+
+#取二进制日志中的地址，并生成sql文件
+mysqlbinlog /data/logbin/mysql-bin.000001 --start-position=跳过前多少字节 > /backup/inc.sql
+#多个二进制文件可以>>追加成一个文件然后倒入
+
+#二进制日志中的一段内容不想要可以用sed来删除(针对文件比较大，打开缓慢的情况)
+
+#还原
+#先进入MySQL客户端，然后执行
+set sql_log_bin=OFF #恢复操作没有必要开启二进制日志，可暂时关闭
+source /backup/full_backup_file.sql #将完全备份导入
+source /backup/inc.sql    #将过滤完误操作内容的二进制文件导入
+set sql_log_bin=ON #开启二进制日志
+#虽然此方法能还原误操作前后的数据，但是如果被删除的表后后续的操作有一定关联，就有可能出现问题，如果出现这种问题，则只能将误操作前的数据还原，而误操作之后的数据就只能舍弃
+```
+
+## 配置文件还原
+
+```bash
+#
+```
+
+
+
+
+
+# 备份还原实战案例
+
+## 完全备份和还原
+
+### 完全备份
+
+- 生产中一般都是备份到本机和远程服务器
+
+```bash
+#创建备份目录
+[root@mysql-master ~]# mkdir -p /backup
+
+#完全备份数据库
+[root@mysql-master ~]# mysqldump -uroot -p -A -F --single-transaction --source-data=2 --flush-privileges --hex-blob | gzip > /backup/mysql_bak_1.sql.gz
+
+#备份二进制日志
+[root@mysql-master ~]# cp -a /data/mysql_log/bin_log /backup/
+
+#备份配置文件
+[root@mysql-master ~]# mkdir -p /backup/etc/
+[root@mysql-master ~]# cp -a /etc/my.cnf /backup/etc/
+
+#生成的备份文件
+[root@mysql-master ~]# ll /backup/
+total 260
+drwxr-xr-x 2 mysql mysql    159 Dec  7 08:16 bin_log
+drwxr-xr-x 2 root  root      20 Dec  7 08:26 etc
+-rw-r--r-- 1 root  root  264123 Dec  7 08:02 mysql_bak_1.sql.gz
+```
+
+### 更改数据
+
+```sql
+#创建一个数据库
+mysql> create database testdb;
+Query OK, 1 row affected (0.00 sec)
+
+#添加一条数据
+mysql> insert hellodb.teachers (name,age,gender) values ('a',1,'M');
+Query OK, 1 row affected (0.01 sec)
+```
+
+### 在原主机还原
+
+```sql
+#删除所有数据
+[root@mysql-master ~]# ls /data/
+mysql  mysql_log
+[root@mysql-master ~]# rm -fr /data/*
+
+#数据恢复
+-------------------------------------------------------------------------------
+#先将之前的配置文件注释掉，否则生成数据库基础环境时会出问题
+[root@mysql-master ~]# grep "^#" /etc/my.cnf
+#log_bin=/data/mysql_log/bin_log/bin_log
+
+#恢复数据库基础环境（二进制安装的情况）
+mysqld --initialize --user=mysql --datadir=/data/mysql #mysql-8.0.27
+#获取密码
+[root@mysql-master ~]# grep password /data/mysql/mysql.log
+2021-12-07T00:34:13.537293Z 6 [Note] [MY-010454] [Server] A temporary password is generated for root@localhost: YxtwgMg#q4;g
+
+#先关闭网络连接在启动数据库
+[root@mysql-master ~]# vim /etc/my.cnf
+[mysqld]
+skip_networking=ON #断网
+[root@mysql-master ~]# systemctl restart mysql.service
+
+#进入数据库，修改初始密码，并暂时关闭二进制日志记录（因为恢复时无需开启二进制日志）
+[root@mysql-master ~]# mysql -p'YxtwgMg#q4;g'
+mysql> ALTER USER 'root'@'localhost' IDENTIFIED BY '123';
+mysql> set @@sql_log_bin=off;
+
+#完全备份恢复数据
+#现在终端将备份解压
+[root@mysql-master ~]# gzip -d /backup/mysql_bak_1.sql.gz
+#恢复
+mysql> source /backup/mysql_bak_1.sql;
+#查看恢复状况，但后续修改的操作没有恢复
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| hellodb            |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+mysql> select * from hellodb.teachers;
++-----+---------------+-----+--------+
+| TID | Name          | Age | Gender |
++-----+---------------+-----+--------+
+|   1 | Song Jiang    |  45 | M      |
+|   2 | Zhang Sanfeng |  94 | M      |
+|   3 | Miejue Shitai |  77 | F      |
+|   4 | Lin Chaoying  |  93 | F      |
+|   5 | xiangzheng    |  23 | M      |
+|   6 | azheng        | 123 | M      |
++-----+---------------+-----+--------+
+
+----------------------------------
+#利用二进制日志将剩余的数据恢复
+#查看完全备份中记录的二进制日志位置
+[root@mysql-master ~]# grep '\-\- CHANGE MASTER TO MASTER_LOG_FILE=' /backup/mysql_bak_1.sql
+-- CHANGE MASTER TO MASTER_LOG_FILE='bin_log.000006', MASTER_LOG_POS=156;
+#挑选二进制日志中的内容（多个二进制日志追加即可）（inc表示增量备份的意思）
+[root@mysql-master ~]# mysqlbinlog /backup/bin_log/bin_log.000006 --start-position=156 > inc.sql
+#在mysql中关闭二进制日志并还原
+#关闭二进制日志
+mysql> set @@sql_log_bin=0;
+Query OK, 0 rows affected (0.00 sec)
+mysql> show variables like 'sql_log_bin%';
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| sql_log_bin   | OFF   |
++---------------+-------+
+#还原
+mysql> source ~/inc.sql
+#恢复二进制日志
+mysql> set @@sql_log_bin=1;
+mysql> show variables like 'sql_log_bin%';
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| sql_log_bin   | ON    |
++---------------+-------+
+
+
+#查看恢复完成的文件
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| hellodb            |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
+| testdb             | #
++--------------------+
+6 rows in set (0.00 sec)
+
+mysql> select * from hellodb.teachers;
++-----+---------------+-----+--------+
+| TID | Name          | Age | Gender |
++-----+---------------+-----+--------+
+|   1 | Song Jiang    |  45 | M      |
+|   2 | Zhang Sanfeng |  94 | M      |
+|   3 | Miejue Shitai |  77 | F      |
+|   4 | Lin Chaoying  |  93 | F      |
+|   5 | xiangzheng    |  23 | M      |
+|   6 | azheng        | 123 | M      |
+|   7 | a             |   1 | M      | #
++-----+---------------+-----+--------+
+7 rows in set (0.00 sec)
+
+#最后别忘了恢复配置文件
+```
+
+### 在其他主机还原
+
+- 原理和原主机还原基本一样，（二进制安装MySQL > 配置初始配置文件 > 生成初始数据库 > 修改初始密码 > 导入完全备份 > 查看二进制日志位置 然后生成增量备份还原文件 > 导入增量备份）
+
+```
+
+```
+
+
+
+
+
+
+
+
+
+## 冷备份和还原(在远程主机恢复)
+
+```bash
+###备份
+#在源主机将MySQL服务停止
+systemctl stop mariadb
+
+#在备份服务器上创建文件夹
+mkdir -p /data/bak
+
+#将源主机的数据拷贝到备份服务器中
+[root@centos8 log_bin]$rsync -a /var/lib/mysql 10.0.0.18:/data/bak/
+[root@centos8 log_bin]$rsync -a /data/log_bin  10.0.0.18:/data/bak/
+[root@centos8 log_bin]$rsync -a /etc/my.cnf.d/mariadb-server.cnf  10.0.0.18:/data/bak/
+
+#源主机启动服务
+systemctl start mariadb
+
+#在源主机添加一些数据
+MariaDB [hellodb]> insert teachers (name,age,gender)values('azheng',23,'M') ;
+Query OK, 1 row affected (0.002 sec)
+
+MariaDB [hellodb]> select * from teachers;
++-----+---------------+-----+--------+
+| TID | Name          | Age | Gender |
++-----+---------------+-----+--------+
+|   1 | Song Jiang    |  45 | M      |
+|   2 | Zhang Sanfeng |  94 | M      |
+|   3 | Miejue Shitai |  77 | F      |
+|   4 | Lin Chaoying  |  93 | F      |
+|   5 | azheng        |  23 | M      |
++-----+---------------+-----+--------+
+
+#模拟数据库被删
+[root@centos8 log_bin]$rm -fr /var/lib/mysql
+
+###恢复
+#在备份服务器安装mariadb-server，不启动服务
+dnf install mariadb-server
+
+#将之前备份的文件拷贝到相应目录，并启动服务
+[root@backup bak]$cp -a mysql /var/lib/
+[root@backup bak]$cp -a mariadb-server.cnf /etc/my.cnf.d/
+[root@backup bak]$cp -a log_bin /data/
+[root@backup bak]$systemctl start mariadb
+
+#数据只恢复到了备份时的状态，备份后修改的数据并没有恢复
+MariaDB [hellodb]> select * from teachers;
++-----+---------------+-----+--------+
+| TID | Name          | Age | Gender |
++-----+---------------+-----+--------+
+|   1 | Song Jiang    |  45 | M      |
+|   2 | Zhang Sanfeng |  94 | M      |
+|   3 | Miejue Shitai |  77 | F      |
+|   4 | Lin Chaoying  |  93 | F      |
++-----+---------------+-----+--------+
+
+#将备份后修改的数据进行恢复
+前提是二进制文件没有被破坏
+[root@centos8 log_bin]$ls
+log_bin.000001  log_bin.000002  log_bin.index
+[root@centos8 log_bin]$mysqlbinlog log_bin.000002 > new_log_bin.sql #生成恢复文件
+[root@centos8 log_bin]$rsync -a new_log_bin 10.0.0.18:/data/bak/ #拷贝到恢复服务器上
+
+
+MariaDB [(none)]> set sql_log_bin=OFF #关闭恢复服务器中的二进制记录
+MariaDB [(none)]> system ls
+log_bin  mariadb-server.cnf  mysql  new_log_bin.sql
+MariaDB [(none)]> source /data/bak/new_log_bin.sql;
+MariaDB [hellodb]> select * from hellodb.teachers;
++-----+---------------+-----+--------+
+| TID | Name          | Age | Gender |
++-----+---------------+-----+--------+
+|   1 | Song Jiang    |  45 | M      |
+|   2 | Zhang Sanfeng |  94 | M      |
+|   3 | Miejue Shitai |  77 | F      |
+|   4 | Lin Chaoying  |  93 | F      |
+|   5 | azheng        |  23 | M      | #恢复成功
++-----+---------------+-----+--------+
+MariaDB [(none)]> set sql_log_bin=ON #别忘了开启二进制记录
+```
+
+
+
+## 单表备份还原
+
+- **不推荐单表备份还原，因为一般在数据库中表和表之间都是存在依赖关系，所以单表备份还原意义并不大**
+
+```sql
+mysqldump -uroot -p hellodb students > students.sql #备份
+#禁止其他人访问数据库(加写锁，或者写断网配置)
+[root@centos8 ~]$vim /etc/my.cnf.d/mariadb-server.cnf
+[mysqld]
+skip_networking=ON #断网
+systemctl restart mariadb
+et sql_log_bin=OFF #恢复操作没有必要开启二进制日志，可暂时关闭
+mysql hellodb < students.sql #恢复
+set sql_log_bin=ON #开启二进制日志
+```

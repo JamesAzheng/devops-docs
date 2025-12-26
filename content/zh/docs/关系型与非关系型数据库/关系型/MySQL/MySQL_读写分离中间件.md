@@ -1,0 +1,130 @@
+# MySQL常见中间件汇总
+
+- mysql-proxy：Oracle，https://downloads.mysql.com/archives/proxy/
+- Atlas：Qihoo，https://github.com/Qihoo360/Atlas/blob/master/README_ZH.md
+- dbproxy：美团，https://github.com/Meituan-Dianping/DBProxy
+- Cetus：网易乐得，https://github.com/Lede-Inc/cetus
+- Amoeba：https://sourceforge.net/projects/amoeba/
+- Cobar：阿里巴巴，Amoeba的升级版， https://github.com/alibaba/cobar
+- Mycat：基于Cobar， http://www.mycat.org.cn/
+- ProxySQL：https://proxysql.com/
+
+
+
+
+
+# Mycat 概述
+
+- **数据库是对底层存储文件的抽象，而Mycat是对数据库的抽象**
+
+- 一个彻底开源的，面向企业应用开发的大数据库集群
+- 支持事务、ACID、可以替代MySQL的加强版数据库
+- 一个可以视为MySQL集群的企业级数据库，用来替代昂贵的Oracle集群
+- 一个融合内存缓存技术、NoSQL技术、HDFS大数据的新型SQL Server
+- 结合传统数据库和新型分布式数据仓库的新一代企业级数据库产品
+- 一个新颖的数据库中间件产品
+
+
+
+
+
+# Mycat 主要功能
+
+- 其核心功能是分表分库，即将一个大表水平分割为N个小表，存储在后端MySQL服务器里或者其他数据库里。
+- 支持SQL92标准
+- 遵守MySQL 原生协议，跨语言，跨平台，跨数据库的通用中间件代理
+- 基于心跳的自动故障切换，支持读写分离，支持MySQL主从，以及galera cluster集群
+- 支持Galera for MySQL集群，Percona Cluster或者MariaDB cluster
+- 基于Nio实现，有效管理线程，高并发问题
+- 支持数据的多片自动路由与聚合，支持sum,count,max等常用的聚合函数,支持跨库分页
+- 支持单库内部任意join，支持跨库2表join，甚至基于caltlet的多表join
+- 支持通过全局表，ER关系的分片策略，实现了高效的多表join查询
+- 支持多租户方案
+- 支持分布式事务（弱xa）
+- 支持全局序列号，解决分布式下的主键生成问题
+- 分片规则丰富，插件化开发，易于扩展
+- 强大的web，命令行监控
+- 支持前端作为mysq通用代理，后端JDBC方式支持Oracle、DB2、SQL Server 、 mongodb 、巨杉
+- 支持密码加密
+- 支持服务降级
+- 支持IP白名单
+- 支持SQL黑名单、sql注入攻击拦截
+- 支持分表（1.6）
+- 集群基于ZooKeeper管理，在线升级，扩容，智能优化，大数据处理（2.0开发版）
+- 读写分离
+- 它的后端可以支持MySQL、SQL Server、Oracle、DB2、PostgreSQL、MongoDB等主流数据库
+- 而在最终用户看来，无论是那种存储方式，在MyCat里，都是一个传统的数据库表，支持标准的SQL语句进行数据的操作，这样一来，对前端业务系统来说，可以大幅降低开发难度，提升开发速度
+
+
+
+
+
+# Mycat 工作原理
+
+Mycat的原理中最重要的一个动词是“拦截”，它拦截了用户发送过来的SQL语句，首先对SQL语句做了一些特定的分析：如分片分析、路由分析、读写分离分析、缓存分析等，然后将此SQL发往后端的真实数据库，并将返回的结果做适当的处理，最终再返回给用户
+
+
+
+
+
+# Mycat 应用场景
+
+Mycat适用的场景很丰富，以下是几个典型的应用场景
+
+- 单纯的读写分离，此时配置最为简单，支持读写分离，主从切换
+- 分表分库，对于超过1000万的表进行分片，最大支持1000亿的单表分片
+- 多租户应用，每个应用一个库，但应用程序只连接Mycat，从而不改造程序本身，实现多租户化
+- 报表系统，借助于Mycat的分表能力，处理大规模报表的统计
+- 替代Hbase，分析大数据
+- 作为海量数据实时查询的一种简单有效方案，比如100亿条频繁查询的记录需要在3秒内查询出来结果，除了基于主键的查询，还可能存在范围查询或其他属性查询，此时Mycat可能是最简单有效的选择
+- Mycat长期路线图
+- 强化分布式数据库中间件的方面的功能，使之具备丰富的插件、强大的数据库智能优化功能、全面的系统监控能力、以及方便的数据运维工具，实现在线数据扩容、迁移等高级功能
+- 进一步挺进大数据计算领域，深度结合Spark Stream和Storm等分布式实时流引擎，能够完成快速的巨表关联、排序、分组聚合等 OLAP方向的能力，并集成一些热门常用的实时分析算法，让工程师以及DBA们更容易用Mycat实现一些高级数据分析处理功能
+- 不断强化Mycat开源社区的技术水平，吸引更多的IT技术专家，使得Mycat社区成为中国的Apache，并将Mycat推到Apache基金会，成为国内顶尖开源项目，最终能够让一部分志愿者成为专职的Mycat开发者，荣耀跟实力一起提升
+
+
+
+
+
+# Mycat 不适合的应用场景
+
+- 设计使用Mycat时有非分片字段查询，请慎重使用Mycat，可以考虑放弃！
+- 设计使用Mycat时有分页排序，请慎重使用Mycat，可以考虑放弃！
+- 设计使用Mycat时如果要进行表JOIN操作，要确保两个表的关联字段具有相同的数据分布，否则请慎重使用Mycat，可以考虑放弃！
+- 设计使用Mycat时如果有分布式事务，得先看是否得保证事务得强一致性，否则请慎重使用Mycat，可以考虑放弃！
+
+
+
+
+
+# MyCat 的高可用性架构
+
+需要注意: 在生产环境中, Mycat节点最好使用双节点, 即双机热备环境, 防止Mycat这一层出现单点故障. 
+
+可以使用的高可用集群方式有: 
+
+- Keepalived+Mycat+Mysql
+- Keepalived+LVS+Mycat+Mysql
+- Keepalived+Haproxy+Mycat+Mysql
+
+
+
+
+
+# ProxySQL
+
+## ProxySQL 概述
+
+- ProxySQL： MySQL中间件
+- 两个版本：官方版和percona版，percona版是基于官方版基础上修改
+- C++语言开发，轻量级但性能优异，支持处理千亿级数据
+- 具有中间件所需的绝大多数功能，包括：
+  - 多种方式的读/写分离
+  - 定制基于用户、基于schema、基于语句的规则对SQL语句进行路由
+  - 缓存查询结果
+  - 后端节点监控
+- 官方站点：https://proxysql.com/
+- 官方手册：https://github.com/sysown/proxysql/wiki
+
+
+

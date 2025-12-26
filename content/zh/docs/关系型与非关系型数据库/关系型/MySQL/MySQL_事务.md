@@ -1,0 +1,723 @@
+# 事务概述
+
+MySQL 中的事务是一组 SQL 语句，它们作为一个单独的逻辑单元执行，并且要么全部成功执行，要么全部回滚到事务开始前的状态。
+
+事务的使用对于确保数据的完整性和一致性至关重要，特别是在涉及多个并发用户或应用程序操作数据库时。
+
+
+
+# 事务的特性
+
+事务具有四大特性，通常称为 ACID 特性：
+
+## 原子性（Atomicity）
+
+- 事务是一个原子操作，要么全部执行成功，要么全部失败回滚，不存在部分执行的情况。
+
+- 原子性指的是事务不可分割，要么都做，要么都不做。
+
+
+## 一致性（Consistency）
+
+- 事务在执行前后，数据库的完整性约束没有被破坏，事务开始前和结束后，数据库的状态应保持一致。
+
+- 一致性指的是事务并行执行和串行执行的结果一致。
+
+
+## 隔离性（Isolation）
+
+- 多个事务并发执行时，每个事务的操作应该与其他事务的操作相互隔离，即一个事务的执行不应该受到其他事务的影响。
+
+- 隔离性指的是多个事务间的操作相互隔离，之间不受影响。
+
+- 一个事务所做出的操作在提交之前，是不能为其它事务所见；隔离有多种隔离级别，实现并发
+  - MySQL的默认隔离级别是“可重复读”；既当前事务开启后，无论其他人对此事务作出怎样的修改，当前事务也只能看到开启时的初始数据
+
+
+
+
+
+
+
+
+## 持久性（Durability）
+
+- 一旦事务提交成功，其所做的改变将永久保存在数据库中，即使系统发生故障，这些改变也不会丢失。
+
+- 持久性指的是，事务一旦提交，则永久保存，不可回滚。
+
+
+
+# 事务的隔离级别
+
+隔离级别是数据库管理系统（DBMS）中用来控制事务之间相互影响程度的概念。常见的隔离级别包括：
+
+## 读未提交
+
+- Read Uncommitted
+
+- 可读取到未提交数据，从而**产生脏读**
+
+- 最低级别的隔离级别。允许事务读取其他事务尚未提交的数据。这意味着一个事务可以看到另一个事务未提交的更新，可能会导致脏读（Dirty Read）问题。
+
+## 读已提交
+
+- Read Committed，此为 Oracle 的默认隔离级别
+
+- 可读取到提交数据，但未提交数据不可读，**产生不可重复读**，即可读取到多个提交数据，导致每次读取数据不一致
+
+- 保证一个事务只能读取到已经提交的数据。这样可以避免脏读，但是可能会出现不可重复读（Non-repeatable Read）问题，因为在事务执行期间，另一个事务可能会提交并修改数据。
+
+**范例：**
+
+```sql
+-- 开启两个终端后，均临时关闭自动提交以及将隔离级别改为读已提交
+set autocommit=0; -- 0表示关闭事务自动提交
+select @@autocommit; -- 验证配置结果
+SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED; -- 将会话的隔离级别设置为读已提交，意味着该会话中的所有事务将使用读已提交的隔离级别。请注意，这仅影响当前会话，不会影响其他会话的隔离级别。
+select @@TRANSACTION_ISOLATION; -- 验证当前隔离级别
+
+
+-- 修改前，两个终端看到的内容如下：
+mysql> select * from teachers where tid=1;
++-----+------------+-----+--------+
+| TID | Name       | Age | Gender |
++-----+------------+-----+--------+
+|   1 | Song Jiang |  66 | M      |
++-----+------------+-----+--------+
+
+
+-- 终端1更新数据：
+mysql> update teachers set age=77 where tid=1;
+mysql> select * from teachers where tid=1;
++-----+------------+-----+--------+
+| TID | Name       | Age | Gender |
++-----+------------+-----+--------+
+|   1 | Song Jiang |  77 | M      |
++-----+------------+-----+--------+
+
+
+-- 终端2看到的内容未发生变化（因为终端1还未提交，避免了脏读）
+mysql> select * from teachers where tid=1;
++-----+------------+-----+--------+
+| TID | Name       | Age | Gender |
++-----+------------+-----+--------+
+|   1 | Song Jiang |  66 | M      |
++-----+------------+-----+--------+
+
+
+-- 终端1提交数据
+mysql> commit;
+
+
+-- 终端1提交后，终端2看到了更新的数据（产生不可重复读）
+mysql> select * from teachers where tid=1;
++-----+------------+-----+--------+
+| TID | Name       | Age | Gender |
++-----+------------+-----+--------+
+|   1 | Song Jiang |  77 | M      |
++-----+------------+-----+--------+
+```
+
+
+
+## 可重复读
+
+- Repeatable Read，此为 MySQL 的默认隔离级别
+
+- 多次读取数据都一致，**产生幻读**，即读取过程中，即使有其它提交的事务修改数据，仍只能读取到未修改前的旧数据。
+
+- 保证在事务执行期间查询的数据集不会发生变化，即使其他事务提交了数据也不会影响。这样可以避免脏读和不可重复读，但可能会出现幻读（Phantom Read）问题，即事务在同一范围内两次查询，但结果集不同。
+
+**范例：**
+
+```sql
+-- 开启两个终端后，均临时关闭自动提交
+set autocommit=0; -- 0表示关闭事务自动提交
+select @@autocommit; -- 验证配置结果
+
+
+-- 查看MySQL的默认隔离级别
+mysql> select @@TRANSACTION_ISOLATION;
++-------------------------+
+| @@TRANSACTION_ISOLATION |
++-------------------------+
+| REPEATABLE-READ         |
++-------------------------+
+
+-- 修改前，两个终端看到的内容如下：
+mysql> select * from teachers where tid=1;
++-----+------------+-----+--------+
+| TID | Name       | Age | Gender |
++-----+------------+-----+--------+
+|   1 | Song Jiang |  45 | M      |
++-----+------------+-----+--------+
+
+-- 终端1更新数据：
+mysql> update teachers set age=66 where tid=1;
+mysql> select * from teachers where tid=1;
++-----+------------+-----+--------+
+| TID | Name       | Age | Gender |
++-----+------------+-----+--------+
+|   1 | Song Jiang |  66 | M      |
++-----+------------+-----+--------+
+
+-- 终端2看到的内容未发生变化（产生可重复读，即幻读）
+mysql> select * from teachers where tid=1;
++-----+------------+-----+--------+
+| TID | Name       | Age | Gender |
++-----+------------+-----+--------+
+|   1 | Song Jiang |  45 | M      |
++-----+------------+-----+--------+
+
+-- 终端1提交数据
+mysql> commit;
+
+
+-- 终端2看到的内容依旧未发生变化（产生可重复读，即幻读）
+mysql> select * from teachers where tid=1;
++-----+------------+-----+--------+
+| TID | Name       | Age | Gender |
++-----+------------+-----+--------+
+|   1 | Song Jiang |  45 | M      |
++-----+------------+-----+--------+
+
+-- 终端2提交后，看到更新的数据
+mysql> commit;
+mysql> select * from teachers where tid=1;
++-----+------------+-----+--------+
+| TID | Name       | Age | Gender |
++-----+------------+-----+--------+
+|   1 | Song Jiang |  66 | M      |
++-----+------------+-----+--------+
+```
+
+
+
+## 串行化
+
+- Serializable
+
+- 可串行化，未提交的读事务阻塞修改事务（加读锁，但不阻塞读事务），或者未提交的修改事务阻塞读事务（加写锁，其它事务的读，写都不可以执行）。会导致并发性能差
+- 最高级别的隔离级别。通过强制事务串行执行来避免脏读、不可重复读和幻读。这样可以确保每个事务的执行不会受到其他事务的影响，但是可能会导致性能下降，因为并发性大大降低。
+
+
+
+## 隔离级别相关设置
+
+在 MySQL 中，默认的隔离级别是可重复读（Repeatable Read），但可以通过设置 `SET TRANSACTION ISOLATION LEVEL` 来更改隔离级别。不同的隔离级别适用于不同的业务场景，需要根据具体情况进行选择。
+
+
+
+## MVCC 
+
+**MVCC 和 事务的隔离级别：**
+
+MVCC（多版本并发控制机制）只在REPEATABLE READ和READ COMMITTED两个隔离级别下工作。其他两个隔离级别都和MVCC不兼容,因为READ UNCOMMITTED总是读取最新的数据行，而不是符合当前事务版本的数据行。而SERIALIZABLE则会对所有读取的行都加锁
+
+
+
+# 事务相关语句
+
+在 MySQL 中，可以通过使用 `BEGIN`、`COMMIT` 和 `ROLLBACK` 等语句来管理事务。具体而言：
+
+- `BEGIN` 用于开始一个新的事务。
+- `COMMIT` 用于提交事务，使其永久生效。
+- `ROLLBACK` 用于回滚事务，取消所有未提交的更改，使数据库回到事务开始时的状态。
+
+要注意的是，默认情况下，MySQL 自动将每个 SQL 语句作为一个事务来处理，这称为自动提交模式。你可以使用 `SET AUTOCOMMIT = 0;` 来禁用自动提交，从而开始一个显式事务，然后使用 `COMMIT` 或 `ROLLBACK` 来结束或回滚事务。
+
+
+
+# 事务日志
+
+- 记录事务信息，实现undo,redo等故障恢复功能
+
+
+
+# ---
+
+
+
+# 死锁
+
+- 两个或多个事务在同一资源相互占用，并请求锁定对方占用的资源的状态
+
+
+
+# 事务的实现过程
+
+当数据发生更新时（就是执行了增删改），首先会将数据写入到内存中，内存再将修改的内容写入到事务日志中，写入成功才会通知用户写入成功，最后再将事务日志中的内容写入到数据库从而完成数据的更新
+
+- 如果事务日志已经写入完毕 而在未写入数据库时宕机 则会在下次数据库恢复时读取事务日志中的内容从而完成数据的同步 **redo**
+- 如果事务日志未写完而宕机 则会当数据库恢复时事务日志会认为这是一个不完整的事务 从而将内容回滚 **undo**
+
+
+
+# 事务注意事项
+
+- **事务只对DML语句有效！即INSERT，DELETE，UPDATE ，其他语句不支持事务！！！**
+- **例如即使开启事务执行truncate来清空表内容 然后rollback回滚后表中的数据依旧会被清空，因为truncate因为底层是把表drop掉，然后新建了一张空表。**
+
+
+
+
+
+# 启动事务
+
+```sql
+#以下三种SQL语句都可以实现启动事务
+BEGIN; #常用
+
+BEGIN WORK;
+
+START TRANSACTION;
+```
+
+
+
+# 结束事务
+
+```sql
+#提交
+COMMIT
+
+#回滚
+ROLLBACK
+```
+
+
+
+# 关闭自动提交事务
+
+- MySQL默认是开启自动提交事务的，即每执行一次DML语句便会永久修改数据
+
+- 生产中建议关闭自动提交，防止误操作，**关闭自动提交还会提高写入效率，因为积攒到一起提交比每生成一次SQL语句就提交效率更高**
+
+
+- 执行 commit; 才会真正的提交修改
+
+
+```sql
+vim /etc/my.cnf
+[mysqld]
+autocommit={1|0} #0表示关闭自动提交，1表示开启自动提交 也是默认值
+```
+
+### 免重启服务关闭自动提交事务
+
+```sql
+#默认是开启自动提交事务的
+mysql> show variables like 'autocommit';
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| autocommit    | ON    |
++---------------+-------+
+
+#关闭自动提交事务
+mysql> set autocommit=0;
+
+mysql> show variables like 'autocommit';
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| autocommit    | OFF   |
++---------------+-------+
+
+#在服务器配置文件中设置关闭自动提交事务
+shell> vim /etc/my.cnf
+[mysqld]
+autocommit=0
+
+#最终实现重启服务也不会失效
+shell> systemctl restart mysql.service
+mysql> show variables like 'autocommit';
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| autocommit    | OFF   |
++---------------+-------+
+```
+
+
+
+
+
+# 事务保存点
+
+- 实现部分撤销和部分提交，**但不能实现撤销的撤销**
+
+## 语法
+
+```sql
+#定义事务的保存点
+SAVEPOINT identifier
+
+#恢复到保存点
+ROLLBACK [WORK] TO [SAVEPOINT] identifier
+
+#释放保存点
+RELEASE SAVEPOINT identifier
+```
+
+## 范例
+
+```sql
+#表初始内容
+mysql> select * from teachers;
++-----+---------------+-----+--------+
+| TID | Name          | Age | Gender |
++-----+---------------+-----+--------+
+|   1 | Song Jiang    |  45 | M      |
+|   2 | Zhang Sanfeng |  94 | M      |
+|   3 | Miejue Shitai |  77 | F      |
+|   4 | Lin Chaoying  |  93 | F      |
++-----+---------------+-----+--------+
+
+#开启事务
+mysql> begin;
+
+#定义保存点
+mysql> SAVEPOINT p1;
+
+#插入内容
+mysql> insert teachers (name,age,gender)value('xiaoming',20,'M');
+
+#再次定义保存点
+mysql> SAVEPOINT p2;
+
+#再次插入内容
+mysql> insert teachers (name,age,gender)value('xiaoqiang',22,'M');
+
+#内容
+mysql> select * from teachers;
++-----+---------------+-----+--------+
+| TID | Name          | Age | Gender |
++-----+---------------+-----+--------+
+|   1 | Song Jiang    |  45 | M      |
+|   2 | Zhang Sanfeng |  94 | M      |
+|   3 | Miejue Shitai |  77 | F      |
+|   4 | Lin Chaoying  |  93 | F      |
+|   5 | xiaoming      |  20 | M      |
+|   6 | xiaoqiang     |  22 | M      |
++-----+---------------+-----+--------+
+
+#恢复到保存点p2
+mysql> ROLLBACK TO p2;
+mysql> select * from teachers;
++-----+---------------+-----+--------+
+| TID | Name          | Age | Gender |
++-----+---------------+-----+--------+
+|   1 | Song Jiang    |  45 | M      |
+|   2 | Zhang Sanfeng |  94 | M      |
+|   3 | Miejue Shitai |  77 | F      |
+|   4 | Lin Chaoying  |  93 | F      |
+|   5 | xiaoming      |  20 | M      |
++-----+---------------+-----+--------+
+
+#恢复到保存点p1
+mysql> ROLLBACK TO p1;
+mysql> select * from teachers;
++-----+---------------+-----+--------+
+| TID | Name          | Age | Gender |
++-----+---------------+-----+--------+
+|   1 | Song Jiang    |  45 | M      |
+|   2 | Zhang Sanfeng |  94 | M      |
+|   3 | Miejue Shitai |  77 | F      |
+|   4 | Lin Chaoying  |  93 | F      |
++-----+---------------+-----+--------+
+```
+
+
+
+
+
+
+
+# 查看事务
+
+```sql
+SELECT * FROM INFORMATION_SCHEMA.INNODB_TRX; #查看当前正在进行的事务，（MySQL8.0将下面两项的输出信息都合并到这一条命令中了）
+
+SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCKS; #查看当前锁定的事务，MySQL8.0+无此表
+
+SELECT * FROM INFORMATION_SCHEMA.INNODB_LOCK_WAITS; #查看当前等锁的事务，MySQL8.0+无此表
+```
+
+## 范例：找到未完成的导致阻塞的事务并kill掉
+
+```sql
+#终端1 开启事务并执行操作
+mysql> begin;
+mysql> delete from hellodb.teachers;
+
+
+#终端2 修改表出现阻塞
+mysql> select * from hellodb.teachers;
++-----+---------------+-----+--------+
+| TID | Name          | Age | Gender |
++-----+---------------+-----+--------+
+|   1 | Song Jiang    |  66 | M      |
+|   2 | Zhang Sanfeng |  66 | M      |
+|   3 | Miejue Shitai |  88 | F      |
+|   4 | Lin Chaoying  |  66 | F      |
+|   5 | xiangzheng    |  23 | M      |
+|   6 | xiaohong      |  17 | F      |
++-----+---------------+-----+--------+
+mysql> update hellodb.teachers set age=18 where tid=6; #阻塞ing...
+
+
+#终端3 排查阻塞的事务发现后kill掉
+#查看当前正在进行的事务
+mysql> SELECT * FROM INFORMATION_SCHEMA.INNODB_TRX\G;
+*************************** 1. row ***************************
+                    trx_id: 5919 #事务的ID
+                 trx_state: LOCK WAIT #被阻塞的事务
+               trx_started: 2021-12-01 02:44:54
+     trx_requested_lock_id: 139748692557824:7:4:6:139748572214928
+          trx_wait_started: 2021-12-01 02:44:54
+                trx_weight: 2
+       trx_mysql_thread_id: 12 #被阻塞的事务线程id
+                 trx_query: update hellodb.teachers set age=18 where tid=6 #被锁定的DML语句
+       trx_operation_state: starting index read
+         trx_tables_in_use: 1
+         trx_tables_locked: 1
+          trx_lock_structs: 2
+     trx_lock_memory_bytes: 1128
+           trx_rows_locked: 1
+         trx_rows_modified: 0
+   trx_concurrency_tickets: 0
+       trx_isolation_level: REPEATABLE READ
+         trx_unique_checks: 1
+    trx_foreign_key_checks: 1
+trx_last_foreign_key_error: NULL
+ trx_adaptive_hash_latched: 0
+ trx_adaptive_hash_timeout: 0
+          trx_is_read_only: 0
+trx_autocommit_non_locking: 0
+       trx_schedule_weight: 1
+*************************** 2. row ***************************
+                    trx_id: 5913
+                 trx_state: RUNNING
+               trx_started: 2021-12-01 02:41:11
+     trx_requested_lock_id: NULL
+          trx_wait_started: NULL
+                trx_weight: 8
+       trx_mysql_thread_id: 11 #运行中的事务线程id
+                 trx_query: NULL
+       trx_operation_state: NULL
+         trx_tables_in_use: 0
+         trx_tables_locked: 1
+          trx_lock_structs: 2
+     trx_lock_memory_bytes: 1128
+           trx_rows_locked: 7
+         trx_rows_modified: 6
+   trx_concurrency_tickets: 0
+       trx_isolation_level: REPEATABLE READ
+         trx_unique_checks: 1
+    trx_foreign_key_checks: 1
+trx_last_foreign_key_error: NULL
+ trx_adaptive_hash_latched: 0
+ trx_adaptive_hash_timeout: 0
+          trx_is_read_only: 0
+trx_autocommit_non_locking: 0
+       trx_schedule_weight: NULL
+#如果有多个事务线程，可以在通过查看进程的方式逐一判断哪个线程的嫌疑最大
+mysql> show processlist\G;
+...
+     Id: 11
+   User: root
+   Host: localhost
+     db: NULL
+Command: Sleep
+   Time: 373
+  State: 
+   Info: NULL
+...
+#这里只有1个事务线程，所以直接将其kill掉即可
+mysql> kill 11;
+
+#kill掉后 终端2 的修改操作立刻成功
+mysql> update hellodb.teachers set age=18 where tid=6;
+mysql> select * from hellodb.teachers;
++-----+---------------+-----+--------+
+| TID | Name          | Age | Gender |
++-----+---------------+-----+--------+
+|   1 | Song Jiang    |  66 | M      |
+|   2 | Zhang Sanfeng |  66 | M      |
+|   3 | Miejue Shitai |  88 | F      |
+|   4 | Lin Chaoying  |  66 | F      |
+|   5 | xiangzheng    |  23 | M      |
+|   6 | xiaohong      |  18 | F      |
++-----+---------------+-----+--------+
+```
+
+
+
+# 事务的阻塞超时时间
+
+```sql
+#查看事务锁的超时时长，默认50s
+MariaDB [hellodb]> show global variables like 'innodb_lock_wait_timeout';
++--------------------------+-------+
+| Variable_name           | Value |
++--------------------------+-------+
+| innodb_lock_wait_timeout | 50   |
++--------------------------+-------+
+
+#锁定时间超过50秒则提示超时
+mysql> update hellodb.teachers set age=18 where tid=4;
+ERROR 1205 (HY000): Lock wait timeout exceeded; try restarting transaction
+```
+
+
+
+# 指定事务隔离级别
+
+- 服务器变量transaction_isolation指定，默认为REPEATABLE-READ，可在GLOBAL和SESSION级进行设置
+
+```sql
+SET transaction_isolation='READ-UNCOMMITTED|READ-COMMITTED|REPEATABLE-READ|SERIALIZABLE'
+```
+
+- 服务器选项中指定
+
+```bash
+# vim /etc/my.cnf
+[mysqld]
+transaction-isolation=SERIALIZABLE
+```
+
+
+
+
+
+# 事务使用范例
+
+## 正常使用事务
+
+- 隔离性
+
+```sql
+#在当前终端开启事务
+mysql> begin;
+
+#当前终端
+--------------------------------------------------------------------------------
+mysql> select * from teachers;
++-----+---------------+-----+--------+
+| TID | Name          | Age | Gender |
++-----+---------------+-----+--------+
+|   1 | Song Jiang    |  66 | M      |
+|   2 | Zhang Sanfeng |  66 | M      |
+|   3 | Miejue Shitai |  88 | F      |
+|   4 | Lin Chaoying  |  66 | F      |
+|   5 | xiangzheng    |  23 | M      |
+|   6 | xiaohong      |  17 | F      |
++-----+---------------+-----+--------+
+
+#清空表中内容
+mysql> delete from teachers;
+Query OK, 6 rows affected (0.01 sec)
+
+mysql> select * from teachers;
+Empty set (0.00 sec)
+
+#最后可以选择 COMMIT提交 或 ROLLBACK回滚，提交表示使事务内容生效，回滚也表示撤销事务开启后执行的操作，另外退出开启事务的终端和ROLLBACK等价
+--------------------------------------------------------------------------------
+
+
+#其他终端
+--------------------------------------------------------------------------------
+#依旧可以看到表中内容
+mysql> select * from hellodb.teachers;
++-----+---------------+-----+--------+
+| TID | Name          | Age | Gender |
++-----+---------------+-----+--------+
+|   1 | Song Jiang    |  66 | M      |
+|   2 | Zhang Sanfeng |  66 | M      |
+|   3 | Miejue Shitai |  88 | F      |
+|   4 | Lin Chaoying  |  66 | F      |
+|   5 | xiangzheng    |  23 | M      |
+|   6 | xiaohong      |  17 | F      |
++-----+---------------+-----+--------+
+6 rows in set (0.00 sec)
+--------------------------------------------------------------------------------
+```
+
+
+
+## 利用事务实现加速写入存储过程
+
+- 事务可以实现统一写入在统一提交 所以速度快
+- 而普通方式是执行一条写入一条 所以速度慢
+
+### 准备存储过程
+
+```sql
+#存储过程内容，实际上就是生成十万条记录
+[root@8 ~]# cat testlog.sql 
+create table testlog (id int auto_increment primary key,name char(10),age int default 20);
+
+delimiter $$
+
+create procedure  sp_testlog() 
+begin  
+declare i int;
+set i = 1; 
+while i <= 100000 
+do  insert into testlog(name,age) values (concat('xiang',i),i); 
+set i = i +1; 
+end while; 
+end$$
+
+delimiter ;
+
+#导入存储过程
+[root@8 ~]# mysql -p888 -A hellodb < testlog.sql
+
+mysql> use hellodb;
+mysql> show tables;
++-------------------+
+| Tables_in_hellodb |
++-------------------+
+| classes           |
+| coc               |
+| courses           |
+| scores            |
+| students          |
+| teachers          |
+| testlog           | #
++-------------------+
+```
+
+### 正常写入存储过程
+
+```sql
+mysql> call sp_testlog;
+Query OK, 1 row affected (1 min 20.06 sec) #1分20秒
+```
+
+### 开启事务写入存储过程
+
+```sql
+mysql> begin;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> call sp_testlog;
+Query OK, 1 row affected (4.58 sec) #4秒
+
+mysql> commit;
+Query OK, 0 rows affected (0.09 sec)
+
+#查看写入了多少行的小技巧
+mysql> select count(*) from testlog;
++----------+
+| count(*) |
++----------+
+|   700000 |
++----------+
+1 row in set (0.20 sec)
+```
+

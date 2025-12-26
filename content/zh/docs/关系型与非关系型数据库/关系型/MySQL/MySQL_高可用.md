@@ -1,0 +1,845 @@
+# 前言
+
+虽然主从复制读写分离等技术可以实现减轻主库的压力 提升整体的性能，但是如果主节点或从节点宕机 而主节点或从节点又不能提升为新主 则会导致读写出现问题
+
+
+
+
+
+# 常见高可用解决方案
+
+**MHA：Master High Availability**
+
+- 对主节点进行监控，可实现自动故障转移至其它从节点；通过提升某一从节点为新的主节点，基于主从复制实现，还需要客户端配合实现，目前MHA主要支持一主多从的架构，要搭建MHA,要求一个复制集群中必须最少有三台数据库服务器，一主二从，即一台充当master，一台充当备用master，另外一台充当从库，出于机器成本的考虑，淘宝进行了改造，目前淘宝TMHA已经支持一主一从
+
+- 官方网站：
+  - https://code.google.com/archive/p/mysql-master-ha/
+  - https://github.com/yoshinorim/mha4mysql-manager/wiki/Downloads
+
+**Galera Cluster：wsrep(MySQL extended with the Write Set Replication)**
+
+- 通过wsrep协议在全局实现复制；任何一节点都可读写，不需要主从复制，实现多主读写
+
+**GR（Group Replication）**
+
+- MySQL官方提供的组复制技术(MySQL 5.7.17引入的技术)，基于原生复制技术Paxos算法，实现了多主更新，复制组由多个server成员构成，组中的每个server可独立地执行事务，但所有读写事务只在冲突检测成功后才会提交
+
+- 假设有三个节点，这3个节点互相通信，每当有事件发生，都会向其他节点传播该事件，然后协商，如果大多数节点都同意这次的事件，那么该事件将通过，否则该事件将失败或回滚。这些节点可以是单主模型的(single-primary)，也可以是多主模型的(multi-primary)。单主模型只有一个主节点可以接受写操作，主节点故障时可以自动选举主节点。多主模型下，所有节点都可以接受写操作，所以没有master-slave的概念（类似Galera Cluster）
+
+
+
+
+
+
+
+# MHA
+
+
+
+
+
+
+
+# Galera Cluster(PXC)
+
+## 概述
+
+Galera Cluster 集成了Galera插件的MySQL集群，是一种新型的，数据不共享的，高度冗余的高可用方案，目前Galera Cluster有两个版本，分别是Percona Xtradb Cluster及MariaDB Cluster，Galera本身是具有多主特性的，即采用multi-master的集群架构，是一个既稳健，又在数据一致性、完整性及高性能方面有出色表现的高可用解决方案
+
+#### 官方文档
+
+- http://galeracluster.com/documentation-webpages/galera-documentation.pdf
+- http://galeracluster.com/documentation-webpages/index.html
+- https://www.percona.com/doc/percona-xtradb-cluster/LATEST/index.html
+- https://mariadb.com/kb/en/library/getting-started-with-mariadb-galera-cluster/
+
+#### 特点
+
+- **多主架构：真正的多点读写的集群，在任何时候读写数据，都是最新的**
+- 同步复制：集群不同节点之间数据同步，没有延迟，在数据库挂掉之后，数据不会丢失
+- 并发复制：从节点APPLY数据时，支持并行执行，更好的性能
+- 故障切换：在出现数据库故障时，因支持多点写入，切换容易
+- 热插拔：在服务期间，如果数据库挂了，只要监控程序发现的够快，不可服务时间就会非常少。在节点故障期间，节点本身对集群的影响非常小
+- **自动节点克隆：在新增节点，或者停机维护时，增量数据或者基础数据不需要人工手动备份提供，Galera Cluster会自动拉取在线节点数据，最终集群会变为一致**
+- 对应用透明：集群的维护，对应用程序是透明的
+
+#### 缺点
+
+- **由于DDL 需全局验证通过，则集群性能由集群中最差性能节点决定**（一般集群节点配置都是一样的）
+- 配置新节点的开销。添加新节点时，它必须从现有节点之一复制完整的数据集。如果是*100 GB*，则复制*100 GB*。
+  - 新节点加入或延后较大的节点重新加入需全量拷贝数据(SST，State Snapshot Transfer),作为donor 贡献者，如： 同步数据时的提供者的节点在同步过程中无法提供读写
+- 只支持innodb存储引擎的表
+
+
+
+## 工作过程
+
+用户发起更新操作后，Galera Cluster在告诉用户成功前会进行全局检查 确定不会产生冲突后才会通知用户成功
+
+
+
+## 包含组件
+
+**Galera Cluster包括两个组件**
+
+- Galera replication library (galera-3) 
+- WSREP：MySQL extended with the Write Set Replication 
+
+
+
+## 使用端口
+
+**PXC最常使用如下4个端口号：**
+
+- 3306：数据库对外服务的端口号
+- 4444：请求SST的端口号
+- 4567：组成员之间进行沟通的端口号
+- 4568：用于传输IST的端口号
+
+
+
+## 两种实现方案
+
+**注意：两者都需要至少三个节点(两个节点也可以 但是会有脑裂情况的产生)，不能安装mysql server 或 mariadb-server**
+
+**PXC：Percona XtraDB Cluster**
+
+- 是Percona对Galera的实现
+
+- 参考仓库：https://mirrors.tuna.tsinghua.edu.cn/percona/release/$releasever/RPMS/$basea
+
+  rch
+
+**MariaDB Galera Cluster**
+
+- 参考仓库：https://mirrors.tuna.tsinghua.edu.cn/mariadb/mariadb-5.5.X/yum/centos7-amd64/
+
+
+
+## Percona-XtraDB-Cluster
+
+### PXC中涉及到的重要概念和核心参数
+
+#### 集群中节点的数量
+
+- 整个集群中节点数量应该控制在最少3个、最多8个的范围内。最少3个节点是为了防止出现脑裂现象，因为只有在2个节点下才会出现此现象。脑裂现象的标志就是输入任何命令，返回的结果都是unknown command。节点在集群中，会因新节点的加入或故障、同步失效等原因发生状态的切换。
+
+#### 节点状态的变化阶段
+
+- open：节点启动成功，尝试连接到集群时的状态
+- primary：节点已处于集群中，在新节点加入并选取donor进行数据同步时的状态
+- joiner：节点处于等待接收同步文件时的状态
+- joined：节点完成数据同步工作，尝试保持和集群进度一致时的状态
+- synced：节点正常提供服务时的状态，表示已经同步完成并和集群进度保持一致
+- donor：节点处于为新加入的节点提供全量数据时的状态
+  - donor节点就是数据的贡献者，如果一个新节点加入集群，此时又需要大量数据的SST数据传输，就有可能因此而拖垮整个集群的性能，所以在生产环境中，如果数据量较小，还可以使用SST全量数据传输，但如果数据量很大就不建议使用这种方式，可以考虑先建立主从关系，然后再加入集群。
+
+#### 节点的数据传输方式
+
+- SST：State Snapshot Transfer，全量数据传输
+- IST：Incremental State Transfer，增量数据传输
+- SST数据传输有xtrabackup、mysqldump和rsync三种方式，而增量数据传输就只有一种方式xtrabackup，但生产环境中一般数据量较小时，可以使用SST全量数据传输，但也只使用xtrabackup方法。
+
+#### GCache模块
+
+在PXC中一个特别重要的模块，它的核心功能就是为每个节点缓存当前最新的写集。如果有新节点加入进来，就可以把新数据的增量传递给新节点，而不需要再使用SST传输方式，这样可以让节点更快地加入集群中，涉及如下参数：
+
+- gcache.size：缓存写集增量信息的大小，它的默认大小是128MB，通过wsrep_provider_options参数设置，建议调整为2GB~4GB范围，足够的空间便于缓存更多的增量信息。
+- gcache.mem_size：GCache中内存缓存的大小，适度调大可以提高整个集群的性能
+- gcache.page_size：如果内存不够用（GCache不足），就直接将写集写入磁盘文件中
+
+
+
+### PXC Cluster 核心监控点
+
+```sql
+#同步是否完成，当节点处于Synced状态时，它是集群的一部分并准备好处理流量。
+mysql> SHOW STATUS LIKE 'wsrep_local_state_comment';
++---------------------------+--------+
+| Variable_name             | Value  |
++---------------------------+--------+
+| wsrep_local_state_comment | Synced |
++---------------------------+--------+
+
+#集群成员数量
+mysql> SHOW STATUS LIKE 'wsrep_cluster_size';
++--------------------+-------+
+| Variable_name      | Value |
++--------------------+-------+
+| wsrep_cluster_size | 3     |
++--------------------+-------+
+```
+
+
+
+### PXC Cluster 相关状态变量
+
+```sql
+mysql> show status like "wsrep%"\G
+*************************** 1. row ***************************
+Variable_name: wsrep_local_state_uuid
+        Value: 65d61f00-e187-11ec-8402-c71a57c783f3
+*************************** 2. row ***************************
+Variable_name: wsrep_protocol_version
+        Value: 10
+*************************** 3. row ***************************
+Variable_name: wsrep_last_applied
+        Value: 16
+*************************** 4. row ***************************
+Variable_name: wsrep_last_committed
+        Value: 16
+*************************** 5. row ***************************
+Variable_name: wsrep_monitor_status (L/A/C)
+        Value: [ (24, 24), (16, 16), (16, 16) ]
+*************************** 6. row ***************************
+Variable_name: wsrep_replicated
+        Value: 0
+*************************** 7. row ***************************
+Variable_name: wsrep_replicated_bytes
+        Value: 0
+*************************** 8. row ***************************
+Variable_name: wsrep_repl_keys
+        Value: 0
+*************************** 9. row ***************************
+Variable_name: wsrep_repl_keys_bytes
+        Value: 0
+*************************** 10. row ***************************
+Variable_name: wsrep_repl_data_bytes
+        Value: 0
+*************************** 11. row ***************************
+Variable_name: wsrep_repl_other_bytes
+        Value: 0
+*************************** 12. row ***************************
+Variable_name: wsrep_received
+        Value: 24
+*************************** 13. row ***************************
+Variable_name: wsrep_received_bytes
+        Value: 2641
+*************************** 14. row ***************************
+Variable_name: wsrep_local_commits
+        Value: 0
+*************************** 15. row ***************************
+Variable_name: wsrep_local_cert_failures
+        Value: 0
+*************************** 16. row ***************************
+Variable_name: wsrep_local_replays
+        Value: 0
+*************************** 17. row ***************************
+Variable_name: wsrep_local_send_queue
+        Value: 0
+*************************** 18. row ***************************
+Variable_name: wsrep_local_send_queue_max
+        Value: 1
+*************************** 19. row ***************************
+Variable_name: wsrep_local_send_queue_min
+        Value: 0
+*************************** 20. row ***************************
+Variable_name: wsrep_local_send_queue_avg
+        Value: 0
+*************************** 21. row ***************************
+Variable_name: wsrep_local_recv_queue
+        Value: 0
+*************************** 22. row ***************************
+Variable_name: wsrep_local_recv_queue_max
+        Value: 1
+*************************** 23. row ***************************
+Variable_name: wsrep_local_recv_queue_min
+        Value: 0
+*************************** 24. row ***************************
+Variable_name: wsrep_local_recv_queue_avg
+        Value: 0
+*************************** 25. row ***************************
+Variable_name: wsrep_local_cached_downto
+        Value: 1
+*************************** 26. row ***************************
+Variable_name: wsrep_flow_control_paused_ns
+        Value: 0
+*************************** 27. row ***************************
+Variable_name: wsrep_flow_control_paused
+        Value: 0
+*************************** 28. row ***************************
+Variable_name: wsrep_flow_control_sent
+        Value: 0
+*************************** 29. row ***************************
+Variable_name: wsrep_flow_control_recv
+        Value: 0
+*************************** 30. row ***************************
+Variable_name: wsrep_flow_control_active
+        Value: false
+*************************** 31. row ***************************
+Variable_name: wsrep_flow_control_requested
+        Value: false
+*************************** 32. row ***************************
+Variable_name: wsrep_flow_control_interval
+        Value: [ 173, 173 ]
+*************************** 33. row ***************************
+Variable_name: wsrep_flow_control_interval_low
+        Value: 173
+*************************** 34. row ***************************
+Variable_name: wsrep_flow_control_interval_high
+        Value: 173
+*************************** 35. row ***************************
+Variable_name: wsrep_flow_control_status
+        Value: OFF
+*************************** 36. row ***************************
+Variable_name: wsrep_cert_deps_distance
+        Value: 1
+*************************** 37. row ***************************
+Variable_name: wsrep_apply_oooe
+        Value: 0
+*************************** 38. row ***************************
+Variable_name: wsrep_apply_oool
+        Value: 0
+*************************** 39. row ***************************
+Variable_name: wsrep_apply_window
+        Value: 1
+*************************** 40. row ***************************
+Variable_name: wsrep_apply_waits
+        Value: 0
+*************************** 41. row ***************************
+Variable_name: wsrep_commit_oooe
+        Value: 0
+*************************** 42. row ***************************
+Variable_name: wsrep_commit_oool
+        Value: 0
+*************************** 43. row ***************************
+Variable_name: wsrep_commit_window
+        Value: 1
+*************************** 44. row ***************************
+Variable_name: wsrep_local_state
+        Value: 4
+*************************** 45. row ***************************
+Variable_name: wsrep_local_state_comment
+        Value: Synced
+*************************** 46. row ***************************
+Variable_name: wsrep_cert_index_size
+        Value: 1
+*************************** 47. row ***************************
+Variable_name: wsrep_cert_bucket_count
+        Value: 13
+*************************** 48. row ***************************
+Variable_name: wsrep_gcache_pool_size
+        Value: 5936
+*************************** 49. row ***************************
+Variable_name: wsrep_causal_reads
+        Value: 0
+*************************** 50. row ***************************
+Variable_name: wsrep_cert_interval
+        Value: 0
+*************************** 51. row ***************************
+Variable_name: wsrep_open_transactions
+        Value: 0
+*************************** 52. row ***************************
+Variable_name: wsrep_open_connections
+        Value: 0
+*************************** 53. row ***************************
+Variable_name: wsrep_ist_receive_status
+        Value: 
+*************************** 54. row ***************************
+Variable_name: wsrep_ist_receive_seqno_start
+        Value: 0
+*************************** 55. row ***************************
+Variable_name: wsrep_ist_receive_seqno_current
+        Value: 0
+*************************** 56. row ***************************
+Variable_name: wsrep_ist_receive_seqno_end
+        Value: 0
+*************************** 57. row ***************************
+Variable_name: wsrep_incoming_addresses
+        Value: 10.0.0.101:3306,10.0.0.100:3306,10.0.0.102:3306
+*************************** 58. row ***************************
+Variable_name: wsrep_cluster_weight
+        Value: 3
+*************************** 59. row ***************************
+Variable_name: wsrep_desync_count
+        Value: 0
+*************************** 60. row ***************************
+Variable_name: wsrep_evs_delayed
+        Value: 
+*************************** 61. row ***************************
+Variable_name: wsrep_evs_evict_list
+        Value: 
+*************************** 62. row ***************************
+Variable_name: wsrep_evs_repl_latency
+        Value: 0/0/0/0/0
+*************************** 63. row ***************************
+Variable_name: wsrep_evs_state
+        Value: OPERATIONAL
+*************************** 64. row ***************************
+Variable_name: wsrep_gcomm_uuid
+        Value: b28b1ba0-e18e-11ec-9b82-b764d470cb71
+*************************** 65. row ***************************
+Variable_name: wsrep_gmcast_segment
+        Value: 0
+*************************** 66. row ***************************
+Variable_name: wsrep_cluster_capabilities
+        Value: 
+*************************** 67. row ***************************
+Variable_name: wsrep_cluster_conf_id
+        Value: 9
+*************************** 68. row ***************************
+Variable_name: wsrep_cluster_size
+        Value: 3
+*************************** 69. row ***************************
+Variable_name: wsrep_cluster_state_uuid
+        Value: 65d61f00-e187-11ec-8402-c71a57c783f3
+*************************** 70. row ***************************
+Variable_name: wsrep_cluster_status
+        Value: Primary
+*************************** 71. row ***************************
+Variable_name: wsrep_connected
+        Value: ON
+*************************** 72. row ***************************
+Variable_name: wsrep_local_bf_aborts
+        Value: 0
+*************************** 73. row ***************************
+Variable_name: wsrep_local_index
+        Value: 1
+*************************** 74. row ***************************
+Variable_name: wsrep_provider_capabilities
+        Value: :MULTI_MASTER:CERTIFICATION:PARALLEL_APPLYING:TRX_REPLAY:ISOLATION:PAUSE:CAUSAL_READS:INCREMENTAL_WRITESET:UNORDERED:PREORDERED:STREAMING:NBO:
+*************************** 75. row ***************************
+Variable_name: wsrep_provider_name
+        Value: Galera
+*************************** 76. row ***************************
+Variable_name: wsrep_provider_vendor
+        Value: Codership Oy <info@codership.com> (modified by Percona <https://percona.com/>)
+*************************** 77. row ***************************
+Variable_name: wsrep_provider_version
+        Value: 4.10(9728532)
+*************************** 78. row ***************************
+Variable_name: wsrep_ready
+        Value: ON
+*************************** 79. row ***************************
+Variable_name: wsrep_thread_count
+        Value: 9
+```
+
+
+
+### PXC Cluster 仲裁器
+
+- **如果集群中剩余的节点数为偶数，则仲裁器很重要。**仲裁器将节点数保持为奇数，避免了脑裂的情况。
+
+- 官方文档：https://www.percona.com/doc/percona-xtradb-cluster/8.0/howtos/garbd_howto.html
+
+
+
+### PXC Cluster + Haproxy
+
+- 实现通过Haproxy访问PXC Cluster
+
+#### 环境说明
+
+- 注意：单台haproxy有单点失败问题
+
+| hostname     | IP         | MySQL-release | OS          |
+| ------------ | ---------- | ------------- | ----------- |
+| haproxy      | 10.0.0.28  |               | Centos8.3   |
+| PXC-master-1 | 10.0.0.100 | 8.0           | Ubuntu20.04 |
+| PXC-master-2 | 10.0.0.101 | 8.0           | Ubuntu20.04 |
+| PXC-master-3 | 10.0.0.102 | 8.0           | Ubuntu20.04 |
+
+#### haproxy配置
+
+```bash
+[root@haproxy ~]# vim /etc/haproxy/haproxy.cfg
+global
+...
+
+defaults
+...
+
+listen mysql-pxc-cluster
+    mode tcp
+    bind *:3306
+    option mysql-check
+    balance     roundrobin
+    server  10.0.0.100 10.0.0.100:3306 check
+    server  10.0.0.101 10.0.0.101:3306 check
+    server  10.0.0.102 10.0.0.102:3306 check
+    
+    
+[root@haproxy ~]# systemctl enable --now haproxy
+    
+[root@haproxy ~]# ss -ntl|grep 3306
+LISTEN    0         128                0.0.0.0:3306             0.0.0.0:*       
+```
+
+#### 测试
+
+```bash
+[root@haproxy ~]# mysql -uazheng -h10.0.0.28 -p12345 -e'select @@hostname'
++--------------+
+| @@hostname   |
++--------------+
+| PXC-master-1 |
++--------------+
+[root@haproxy ~]# mysql -uazheng -h10.0.0.28 -p12345 -e'select @@hostname'
++--------------+
+| @@hostname   |
++--------------+
+| PXC-master-2 |
++--------------+
+[root@haproxy ~]# mysql -uazheng -h10.0.0.28 -p12345 -e'select @@hostname'
++--------------+
+| @@hostname   |
++--------------+
+| PXC-master-3 |
++--------------+
+```
+
+#### 注意事项
+
+在 Percona XtraDB Cluster 8.0 中，默认的身份验证插件是 `caching_sha2_password`. HAProxy 不支持此身份验证插件。`mysql_native_password` 使用身份验证插件创建一个 mysql 用户。
+
+```sql
+mysql> CREATE USER 'haproxy_user'@'%' IDENTIFIED WITH mysql_native_password by '$3Kr$t';
+```
+
+
+
+### PXC Cluster + Haproxy + keepalived
+
+#### 环境说明
+
+- 注意：单台haproxy有单点失败问题
+
+| hostname     | IP         | VIP       | MySQL-release | OS          |
+| ------------ | ---------- | --------- | ------------- | ----------- |
+| haproxy-ka2  | 10.0.0.18  | 10.0.0.66 |               | Centos8.3   |
+| haproxy-ka2  | 10.0.0.28  | 10.0.0.66 |               | Centos8.3   |
+| PXC-master-1 | 10.0.0.100 |           | 8.0           | Ubuntu20.04 |
+| PXC-master-2 | 10.0.0.101 |           | 8.0           | Ubuntu20.04 |
+| PXC-master-3 | 10.0.0.102 |           | 8.0           | Ubuntu20.04 |
+
+#### haproxy配置
+
+- 两个节点配置一样
+
+```bash
+# vim /etc/haproxy/haproxy.cfg
+global
+...
+
+defaults
+...
+
+listen mysql-pxc-cluster
+    mode tcp
+    bind *:3306
+    option mysql-check
+    balance     roundrobin
+    server  10.0.0.100 10.0.0.100:3306 check
+    server  10.0.0.101 10.0.0.101:3306 check
+    server  10.0.0.102 10.0.0.102:3306 check
+    
+    
+# systemctl enable --now haproxy
+    
+# ss -ntl|grep 3306
+LISTEN    0         128                0.0.0.0:3306             0.0.0.0:*       
+```
+
+
+
+#### keepalived配置
+
+##### ka1
+
+```bash
+
+[root@haproxy-ka1 ~]# cat /etc/keepalived/keepalived.conf 
+global_defs {
+   router_id LVS_DEVEL
+   vrrp_skip_check_adv_addr
+}
+
+vrrp_script chk_haproxy {
+    script "/etc/keepalived/check_haproxy.sh"
+    interval 2
+    weight -30
+    fall 2
+    user root
+}
+
+vrrp_instance mysql-pxc-cluster {
+    state MASTER
+    interface eth0
+    virtual_router_id 51
+    priority 100
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        10.0.0.66/32 dev eth0
+    }
+    track_script {
+       chk_haproxy
+    }
+}
+```
+
+##### ka2
+
+```bash
+[root@haproxy-ka2 ~]# cat /etc/keepalived/keepalived.conf 
+global_defs {
+   router_id LVS_DEVEL
+   vrrp_skip_check_adv_addr
+}
+
+vrrp_script chk_haproxy {
+    script "/etc/keepalived/check_haproxy.sh"
+    interval 2
+    weight -30
+    fall 2
+    user root
+}
+
+vrrp_instance mysql-pxc-cluster {
+    state BACKUP
+    interface eth0
+    virtual_router_id 51
+    priority 80
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        10.0.0.66/32 dev eth0
+    }
+    track_script {
+       chk_haproxy
+    }
+}
+```
+
+##### ha状态检测脚本
+
+- 所有keepalived主机部署
+
+```bash
+# cat /etc/keepalived/check_haproxy.sh
+#!/bin/bash
+ps aux | grep process_name | grep -v grep &> /dev/null \
+||
+systemctl is-active haproxy.service &> /dev/null \
+||
+systemctl restart haproxy
+
+# chmod +x /etc/keepalived/check_haproxy.sh
+```
+
+
+
+### PXC Cluster常见问题汇总
+
+- 当全部节点关闭 则开启第一个节点时需要执行systemctl start mysql@bootstrap.service，并且要在最后一个关闭的集群进行此引导操作，否则会报以下错误：
+
+```
+It may not be safe to bootstrap the cluster from this node. It was not the last one to leave the cluster and may not contain all the updates. To force cluster bootstrap with this node, edit the grastate.dat file manually and set safe_to_bootstrap to 1 .
+```
+
+
+
+### Centos实现PXC Cluster
+
+- 参考文档：https://www.percona.com/doc/percona-xtradb-cluster/LATEST/install/yum.html#yum
+
+#### 环境说明
+
+| hostname     | IP        | MySQL-release | OS        |
+| ------------ | --------- | ------------- | --------- |
+| PXC-master-1 | 10.0.0.8  | 8.0           | Centos8.3 |
+| PXC-master-2 | 10.0.0.18 | 8.0           | Centos8.3 |
+| PXC-master-3 | 10.0.0.28 | 8.0           | Centos8.3 |
+
+#### 准备yum源并进行安装
+
+```bash
+#此处使用清华大学yum源，官方源太慢了
+[root@pxc1 ~]#vim /etc/yum.repos.d/pxc.repo
+[percona]
+name=percona_repo
+baseurl=https://mirrors.tuna.tsinghua.edu.cn/percona/release/$releasever/RPMS/$basearch/
+enabled=1
+gpgcheck=0
+
+#拷贝配置文件到其他节点
+[root@pxc1 ~]#scp /etc/yum.repos.d/pxc.repo 10.0.0.17:/etc/yum.repos.d
+[root@pxc1 ~]#scp /etc/yum.repos.d/pxc.repo 10.0.0.27:/etc/yum.repos.d
+
+#在三个节点都安装好PXC 5.7 
+[root@pxc1 ~]#yum install Percona-XtraDB-Cluster-57 -y
+[root@pxc2 ~]#yum install Percona-XtraDB-Cluster-57 -y
+[root@pxc3 ~]#yum install Percona-XtraDB-Cluster-57 -y
+```
+
+
+
+### Ubuntu实现PXC Cluster
+
+- 参考文档：https://www.percona.com/doc/percona-xtradb-cluster/LATEST/install/apt.html#apt
+
+#### 环境说明
+
+| hostname     | IP         | MySQL-release | OS          |
+| ------------ | ---------- | ------------- | ----------- |
+| PXC-master-1 | 10.0.0.100 | 8.0           | Ubuntu20.04 |
+| PXC-master-2 | 10.0.0.101 | 8.0           | Ubuntu20.04 |
+| PXC-master-3 | 10.0.0.102 | 8.0           | Ubuntu20.04 |
+
+#### 准备apt源并进行安装
+
+- 在所有节点执行
+
+```bash
+# apt update
+
+# apt install -y wget gnupg2 lsb-release curl
+
+# wget https://repo.percona.com/apt/percona-release_latest.generic_all.deb
+
+# dpkg -i percona-release_latest.generic_all.deb
+
+# apt update
+
+# percona-release setup pxc80
+
+# apt install -y percona-xtradb-cluster
+```
+
+#### 配置为集群
+
+- 在所有节点执行
+
+```bash
+# 配置前需先停止mysql
+# systemctl stop mysql
+
+# vim /etc/mysql/mysql.conf.d/mysqld.cnf
+...
+[mysqld]
+server-id=100 #每个节点的server-id必须不唯一
+...
+wsrep_cluster_name=pxc-cluster #集群名称，同属同一个集群则名称必须相同
+wsrep_cluster_address=gcomm://10.0.0.100,10.0.0.101,10.0.0.102 #集群成员
+wsrep_node_name=pxc-cluster-node-1 #不同节点命名要不同，如：pxc-cluster-node-2
+wsrep_node_address=10.0.0.100 #每个节点的IP
+...
+pxc_encrypt_cluster_traffic=OFF #加密默认启用，可以选择关闭
+```
+
+#### 引导第一个节点初始化集群
+
+- 通过引导第一个节点来初始化集群。**初始节点必须包含要复制到其他节点的所有数据。**
+- 这将告诉第一个初始化节点`wsrep_cluster_conf_id`为`1`
+
+```bash
+#在第一个节点执行
+#注意：后期停止也需要使用相同的名称mysql@bootstrap.service，后期使用mysql名称来启动和关闭就可以了
+root@PXC-master-1:~# systemctl start mysql@bootstrap.service
+
+
+#查看集群初始化状态
+#下面的输出显示集群大小为 1 个节点，它是主要组件，节点处于Synced状态，它已完全连接并准备好进行写入集复制
+root@PXC-master-1:~# mysql -p666 -e 'show status like "wsrep%"'
++----------------------------+--------------------------------------+
+| Variable_name              | Value                                |
++----------------------------+--------------------------------------+
+| wsrep_local_state_uuid     | c2883338-834d-11e2-0800-03c9c68e41ec |
+| ...                        | ...                                  |
+| wsrep_local_state          | 4                                    |
+| wsrep_local_state_comment  | Synced                               |
+| ...                        | ...                                  |
+| wsrep_cluster_size         | 1                                    |
+| wsrep_cluster_status       | Primary                              |
+| wsrep_connected            | ON                                   |
+| ...                        | ...                                  |
+| wsrep_ready                | ON                                   |
++----------------------------+--------------------------------------+
+```
+
+
+
+#### 将其他节点加入到集群
+
+- 正确配置的新节点会自动配置。wsrep_cluster_address 变量中至少一个运行节点的地址的话，启动其他节点时，该节点会自动加入集群并与集群同步
+- **注意：其他节点中任何现有数据和配置都将被覆盖，数据量较大时 请勿同时加入多个节点，以免新节点加入时产生大量流量造成开销。启动后 如果节点的状态为Joiner，则表示 SST 尚未完成。在所有其他节点都处于Synced状态之前，不要添加新节点**
+
+```bash
+# 修改完配置文件后 正常启动即可
+# systemctl start mysql
+
+#查看集群状态
+# mysql -p666 -e 'show status like "wsrep%"'
++----------------------------+--------------------------------------+
+| Variable_name              | Value                                |
++----------------------------+--------------------------------------+
+| wsrep_local_state_uuid     | c2883338-834d-11e2-0800-03c9c68e41ec |
+| ...                        | ...                                  |
+| wsrep_local_state          | 4                                    |
+| wsrep_local_state_comment  | Synced #Synced才表示同步完成
+| ...                        | ...                                  |
+| wsrep_cluster_size         | 2 #添加一个节点后节点数是否为2
+| wsrep_cluster_status       | Primary                              |
+| wsrep_connected            | ON                                   |
+| ...                        | ...                                  |
+| wsrep_ready                | ON                                   |
++----------------------------+--------------------------------------+
+```
+
+
+
+#### 验证复制
+
+- 略
+
+
+
+#### 节点扩容
+
+```bash
+#此行添加103，其它和上面一样 修改不同的node名称、ip等
+wsrep_cluster_address=gcomm://10.0.0.100,10.0.0.101,10.0.0.102,10.0.0.103
+```
+
+
+
+#### 节点缩容
+
+
+
+
+
+### 通用二进制实现PXC Cluster
+
+- 参考文档：https://www.percona.com/doc/percona-xtradb-cluster/LATEST/install/tarball.html#tarball
+
+
+
+
+
+### 源码编译实现PXC Cluster
+
+- 参考文档：https://www.percona.com/doc/percona-xtradb-cluster/LATEST/install/compile.html#compile
+
+
+
+
+
+### Docker实现PXC Cluster
+
+- 参考文档：https://www.percona.com/doc/percona-xtradb-cluster/LATEST/install/docker.html#docker
+
+
+
+
+
+
+
+# TIDB
+
+- 真正的分布式数据库，可以无限的水平扩展，超大型企业可能会用到

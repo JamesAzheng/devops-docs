@@ -1,0 +1,944 @@
+# docker-compose.yml
+
+```yaml
+version: '3.1'
+services:
+  # mysql
+  mysql:
+    image: mysql:5.7
+    restart: always
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "P@ssw0rd"
+    ports:
+      - 3306:3306
+```
+
+
+
+# yum 安装
+
+官方文档：https://dev.mysql.com/doc/refman/8.0/en/linux-installation-yum-repo.html
+
+
+
+# apt 安装
+
+官方文档：https://dev.mysql.com/doc/mysql-apt-repo-quick-guide/en/
+
+
+
+
+
+# 二进制安装
+
+安装包下载地址：https://dev.mysql.com/downloads/mysql/
+
+二进制安装官方文档：
+
+- https://dev.mysql.com/doc/refman/8.0/en/binary-installation.html
+- https://dev.mysql.com/doc/refman/8.0/en/postinstallation.html
+
+## 5.6
+
+### 准备用户
+
+- uid和gid可以自定义，但是必须为系统账号
+
+```bash
+useradd -r -u 306 -d /data/mysql mysql
+```
+
+### 准备数据目录
+
+- 建议使用逻辑卷，因为可以在线扩容
+
+```bash
+#可选做，后面的脚本mysql_install_db可自动生成此目录
+mkdir /data/mysql
+chown mysql:mysql /data/mysql
+```
+
+### 准备二进制程序
+
+```bash
+tar xf mysql-5.6.47-linux-glibc2.12-x86_64.tar.gz -C /usr/local
+cd /usr/local
+ln -s mysql-5.6.47-linux-glibc2.12-x86_64/ mysql
+chown -R root:root /usr/local/mysql/
+```
+
+### 准备配置文件
+
+```bash
+#cd /usr/local/mysql
+#cp -b support-files/my-large.cnf   /etc/my.cnf
+vim /etc/my.cnf
+#mysql语句块中添加以下三个选项
+[mysqld]
+datadir = /data/mysql
+innodb_file_per_table = on #在mariadb5.5以上版的是默认值，可不加
+skip_name_resolve = on    #禁止主机名解析，建议使用
+```
+
+### 安装依赖包
+
+```bash
+yum -y install perl libaio ncurses* numactl-libs
+```
+
+### 创建数据库文件
+
+```bash
+#执行此脚本时要注意路径问题，否则可能无法执行
+cd /usr/local/mysql/
+./scripts/mysql_install_db --datadir=/data/mysql --user=mysql
+
+[root@centos8 mysql]#ls /data/mysql/ -l
+total 110604
+-rw-rw---- 1 mysql mysql 12582912 Jun  1 16:44 ibdata1
+-rw-rw---- 1 mysql mysql 50331648 Jun  1 16:44 ib_logfile0
+-rw-rw---- 1 mysql mysql 50331648 Jun  1 16:44 ib_logfile1
+drwx------ 2 mysql mysql     4096 Jun  1 16:44 mysql
+drwx------ 2 mysql mysql     4096 Jun  1 16:44 performance_schema
+drwx------ 2 mysql mysql     4096 Jun  1 16:44 test
+```
+
+### 准备服务脚本，并启动服务
+
+```bash
+cp ./support-files/mysql.server /etc/rc.d/init.d/mysqld
+chkconfig --add mysqld
+service mysqld start
+
+#实现开机启动
+chmod +x /etc/rc.local
+echo '/etc/init.d/mysqld start' >> /etc/rc.local
+
+#如果有对应的service 文件可以执行下面
+cp support-files/systemd/mariadb.service /usr/lib/systemd/system/
+systemctl daemon-reload
+systemctl enable --now mariadb
+```
+
+### PATH路径
+
+```bash
+echo 'PATH=/usr/local/mysql/bin:$PATH' >> /etc/profile.d/mysql.sh
+. /etc/profile.d/mysql.sh
+```
+
+### 安全初始化
+
+```bash
+/user/local/mysql/bin/mysql_secure_installation
+```
+
+
+
+## 5.7
+
+### 安装相关依赖包
+
+```bash
+# centos
+yum -y install libaio numactl-libs ncurses-compat-libs
+
+
+# Ubuntu
+apt -y install libaio1 libncurses5
+```
+
+### 创建相关账户和组
+
+- uid和gid可以自定义，但是必须为系统账号
+
+```bash
+useradd -r -u 306 -d /data/mysql -s /sbin/nologin mysql
+```
+
+### 创建数据库存放目录
+
+```bash
+mkdir /data/
+```
+
+### 准备程序文件
+
+- https://repo.huaweicloud.com/mysql/Downloads/MySQL-5.7/
+- https://ftp.ntu.edu.tw/MySQL/Downloads/MySQL-5.7/
+
+```bash
+tar xf mysql-5.7.33-linux-glibc2.12-x86_64.tar.gz -C /usr/local
+
+cd /usr/local/
+
+ln -s mysql-5.7.33-linux-glibc2.12-x86_64/ mysql
+
+chown -R root.root /usr/local/mysql/
+```
+
+### 准备环境变量
+
+- 将mysql安装目录下的的可执行程序加入到PATH变量
+
+```bash
+echo 'PATH=/usr/local/mysql/bin:$PATH' > /etc/profile.d/mysql.sh
+
+. /etc/profile.d/mysql.sh
+```
+
+### 准备配置文件
+
+- **注意：此文件复制时 socket=/data/mysql/mysql.sock 后容易出现空格，从而导致mysql服务无法启动，注意检查**
+
+```bash
+# /etc/my.cnf
+[mysqld]
+datadir=/data/mysql
+skip_name_resolve=1
+socket=/data/mysql/mysql.sock
+log-error=/data/mysql/mysql.log
+pid-file=/data/mysql/mysql.pid
+
+[client]
+socket=/data/mysql/mysql.sock
+```
+
+###  生成数据库文件并提取root密码
+
+```bash
+# mysqld --initialize --user=mysql --datadir=/data/mysql 
+...省略...
+2021-06-06T10:14:37.529816Z 1 [Note] A temporary password is generated for root@localhost: *w:soPHo>4d+  #注意生成root的初始密码
+
+#获取密码
+# grep password /data/mysql/mysql.log
+2019-12-26T13:31:30.458826Z 1 [Note] A temporary password is generated for
+root@localhost: LufavlMka6,!
+
+#获取密码方法二
+# awk '/temporary password/{print $NF}' /data/mysql/mysql.log
+LufavlMka6,!
+```
+
+### 准备开启启动脚本
+
+#### 方法一：service文件
+
+- 推荐使用
+- 官方帮助：https://dev.mysql.com/doc/mysql-secure-deployment-guide/8.0/en/secure-deployment-post-install.html#secure-deployment-systemd-startup
+- **注意：以下service文件由官方提供，生产中可以按需修改**
+
+```bash
+# /usr/lib/systemd/system/mysql.service
+[Unit]
+Description=MySQL Server
+Documentation=man:mysqld(8)
+Documentation=http://dev.mysql.com/doc/refman/en/using-systemd.html
+After=network.target
+After=syslog.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+User=mysql
+Group=mysql
+
+# Have mysqld write its state to the systemd notify socket
+Type=notify
+
+# Disable service start and stop timeout logic of systemd for mysqld service.
+TimeoutSec=0
+
+# Start main service
+ExecStart=/usr/local/mysql/bin/mysqld --defaults-file=/etc/my.cnf $MYSQLD_OPTS 
+
+# Use this to switch malloc implementation
+EnvironmentFile=-/etc/sysconfig/mysql
+
+# Sets open_files_limit
+LimitNOFILE = 10000
+
+Restart=on-failure
+
+RestartPreventExitStatus=1
+
+# Set environment variable MYSQLD_PARENT_PID. This is required for restart.
+Environment=MYSQLD_PARENT_PID=1
+
+PrivateTmp=false
+```
+
+#### 方法二：开机启动脚本
+
+```bash
+cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld
+chkconfig --add mysqld
+service mysqld start
+
+#实现开机启动
+chmod +x /etc/rc.local
+echo '/etc/init.d/mysqld start' >> /etc/rc.local
+```
+
+### 修改初始口令
+
+- 方法一，通过mysqladmin修改
+
+```bash
+#注意修改密码前后要加单引号，否则会报错
+mysqladmin -uroot -p'LufavlMka6,!' password 12345
+```
+
+- 方法二，进入数据库后修改
+
+
+```sql
+ALTER USER 'root'@'localhost' IDENTIFIED BY '123';
+```
+
+### 测试登录
+
+```
+mysql -uroot -p12345
+```
+
+### bin_install_mysql5.7.sh
+
+```sh
+#!/bin/bash
+
+install_dependencies (){
+    if [ -f /etc/os-release ]; then
+        source /etc/os-release
+        case "$ID" in
+            ubuntu)
+                apt -y install libaio1 libncurses5 
+                ;;
+            centos)
+                yum -y install libaio numactl-libs ncurses-compat-libs 
+                ;;
+            *)
+                echo $ID
+                ;;
+        esac
+    else
+        echo "无法确定 Linux 发行版"
+    fi
+}
+
+install_mysql (){
+    local file="mysql-5.7.34-linux-glibc2.12-x86_64.tar.gz"
+    if [ -f $file ]; then
+	mkdir /data/
+        tar xf $file -C /usr/local
+        cd /usr/local/
+        ln -s ${file%.tar.gz} mysql
+        chown -R root.root /usr/local/mysql/
+	echo 'PATH=/usr/local/mysql/bin:$PATH' > /etc/profile.d/mysql.sh
+    else
+        echo "$file 不存在，请放在当前目录下"
+    fi
+}
+
+copy_config_files() {
+cat > /etc/my.cnf <<EOF
+[mysqld]
+user=root
+datadir=/data/mysql
+skip_name_resolve=1
+socket=/data/mysql/mysql.sock
+log-error=/data/mysql/mysqld.log
+pid-file=/data/mysql/mysqld.pid
+
+[client]
+socket=/data/mysql/mysql.sock
+EOF
+
+cat > /etc/systemd/system/mysqld.service <<EOF
+[Unit]
+Description=MySQL Server
+Documentation=man:mysqld(7)
+Documentation=http://dev.mysql.com/doc/refman/en/using-systemd.html
+After=network.target
+After=syslog.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+User=root
+Group=root
+
+Type=forking
+
+PIDFile=/data/mysql/mysqld.pid
+
+# Disable service start and stop timeout logic of systemd for mysqld service.
+TimeoutSec=0
+
+# Start main service
+ExecStart=/usr/local/mysql/bin/mysqld --defaults-file=/etc/my.cnf --daemonize --pid-file=/data/mysql/mysqld.pid \$MYSQLD_OPTS
+
+# Use this to switch malloc implementation
+EnvironmentFile=-/etc/sysconfig/mysql
+
+# Sets open_files_limit
+LimitNOFILE = 5000
+
+Restart=on-failure
+
+RestartPreventExitStatus=1
+
+PrivateTmp=false
+EOF
+}
+
+init_mysql() {
+    . /etc/profile.d/mysql.sh
+    mysqld --initialize --user=root --datadir=/data/mysql &> /dev/null
+    pass_file="/data/mysql/mysqld.log"
+    if [ -f $pass_file ]; then 
+        echo "数据库初始化成功! 初始密码为: $(awk '/temporary password/{print $NF}' $pass_file)"
+    else
+        echo "数据库初始化失败，请检查 $pass_file 是否存在"
+    fi
+}
+
+start_mysql() {
+    systemctl daemon-reload && systemctl enable --now mysqld &> /dev/null 
+    systemctl is-active mysqld &> /dev/null
+    if [ $? -eq 0 ];then
+        echo "数据库启动成功!"
+    else
+        echo "数据库启动失败，请检查 service 运行状态"
+    fi
+}
+
+main() {
+    install_dependencies
+    install_mysql
+    copy_config_files
+    init_mysql
+    start_mysql
+}
+
+main
+
+```
+
+
+
+## 8
+
+### bin_install_mysql8.sh
+
+```sh
+#!/bin/bash
+# 
+#********************************************************************
+#Author:            xiangzheng
+#QQ:                767483070
+#Date:              2022-05-24
+#FileName：         mysql_bin_install.sh
+#URL:               https://www.xiangzheng.vip
+#Email:             rootroot25@163.com
+#Description：      The test script
+#Copyright (C):     2022 All rights reserved
+#********************************************************************
+DIR='/usr/local/src'
+FILE='mysql-8.0.26-linux-glibc2.12-x86_64.tar'
+PASS='54321'
+
+[ -f ${DIR}/${FILE} ] || { echo "${DIR}/${FILE} file not exist exit" ; exit 3 ; }
+
+#Centos
+yum -y install libaio numactl-libs ncurses-compat-libs
+
+#Ubuntu
+#apt -y install libaio1 libncurses5
+
+useradd -r -u 306 -d /data/mysql -s /sbin/nologin mysql
+mkdir -p /data/mysql &> /dev/null
+chown -R mysql.mysql /data/mysql/
+
+cd ${DIR%/*}
+tar xf ${DIR}/${FILE} -C .
+if [ -f ${FILE}.xz ];then
+    tar xf ${FILE}.xz -C .
+fi
+ln -s ${FILE%.*} mysql
+chown -R root.root /usr/local/mysql/
+
+cat > /etc/my.cnf << EOF
+[mysqld]
+datadir=/data/mysql
+skip_name_resolve=1
+socket=/data/mysql/mysql.sock
+log-error=/data/mysql/mysql.log
+pid-file=/data/mysql/mysql.pid
+
+[client]
+socket=/data/mysql/mysql.sock
+EOF
+
+
+cat > /usr/lib/systemd/system/mysql.service << EOF
+[Unit]
+Description=MySQL Server
+Documentation=man:mysqld(8)
+Documentation=http://dev.mysql.com/doc/refman/en/using-systemd.html
+After=network.target
+After=syslog.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+User=mysql
+Group=mysql
+
+# Have mysqld write its state to the systemd notify socket
+Type=notify
+
+# Disable service start and stop timeout logic of systemd for mysqld service.
+TimeoutSec=0
+
+# Start main service
+ExecStart=/usr/local/mysql/bin/mysqld --defaults-file=/etc/my.cnf \$MYSQLD_OPTS 
+
+# Use this to switch malloc implementation
+EnvironmentFile=-/etc/sysconfig/mysql
+
+# Sets open_files_limit
+LimitNOFILE = 10000
+
+Restart=on-failure
+
+RestartPreventExitStatus=1
+
+# Set environment variable MYSQLD_PARENT_PID. This is required for restart.
+Environment=MYSQLD_PARENT_PID=1
+
+PrivateTmp=false
+EOF
+
+echo 'PATH=/usr/local/mysql/bin:$PATH' > /etc/profile.d/mysql.sh
+. /etc/profile.d/mysql.sh
+
+mysqld --initialize --user=mysql --datadir=/data/mysql
+INIT_PASS=`awk '/temporary password/{print $NF}' /data/mysql/mysql.log`
+
+systemctl daemon-reload
+systemctl enable --now mysql
+systemctl is-active mysql &> /dev/null && echo 'mysql install complete!'
+
+mysqladmin -uroot -p"${INIT_PASS}" password ${PASS} &>/dev/null
+```
+
+
+
+
+
+# 编译安装
+
+## 编译安装说明
+
+- **建议内存4G以上**
+
+- **生产中一般二进制安装就已经足够，除非用到特定的功能，则需要编译安装**
+
+利用cmake编译,而利用传统方法，cmake的重要特性之一是其独立于源码(out-of-source)的编译功能，即编译工作可以在另一个指定的目录中而非源码目录中进行，这可以保证源码目录不受任何一次编译的影响，因此在同一个源码树上可以进行多次不同的编译，如针对于不同平台编译
+
+编译选项:https://dev.mysql.com/doc/refman/5.7/en/source-configuration-options.html
+
+
+
+## 源码编译安装mariadb-10.2.18
+
+## 安装相关依赖包
+
+```bash
+yum -y install bison bison-devel zlib-devel libcurl-devel libarchive-devel boost-devel
+ gcc gcc-c++ cmake ncurses-devel gnutls-devel libxml2-devel openssl-devel libevent-devel libaio-devel
+```
+
+
+
+## 准备用户和数据目录
+
+```bash
+useradd -r -s /sbin/nologin -d /data/mysql mysql
+mkdir   /data/mysql
+chown mysql.mysql /data/mysql
+```
+
+
+
+## 下载并解压缩源码包
+
+```
+tar xvf   mariadb-10.2.18.tar.gz
+```
+
+
+
+## 源码编译安装mariadb
+
+```bash
+cd mariadb-10.2.18/
+cmake . \
+-DCMAKE_INSTALL_PREFIX=/app/mysql \
+-DMYSQL_DATADIR=/data/mysql/ \
+-DSYSCONFDIR=/etc/ \
+-DMYSQL_USER=mysql \
+-DWITH_INNOBASE_STORAGE_ENGINE=1 \
+-DWITH_ARCHIVE_STORAGE_ENGINE=1 \
+-DWITH_BLACKHOLE_STORAGE_ENGINE=1 \
+-DWITH_PARTITION_STORAGE_ENGINE=1 \
+-DWITHOUT_MROONGA_STORAGE_ENGINE=1 \
+-DWITH_DEBUG=0 \
+-DWITH_READLINE=1 \
+-DWITH_SSL=system \
+-DWITH_ZLIB=system \
+-DWITH_LIBWRAP=0 \
+-DENABLED_LOCAL_INFILE=1 \
+-DMYSQL_UNIX_ADDR=/data/mysql/mysql.sock \
+-DDEFAULT_CHARSET=utf8 \
+-DDEFAULT_COLLATION=utf8_general_ci
+make && make install
+```
+
+**提示：如果出错，执行rm -f CMakeCache.txt**
+
+
+
+## 准备环境变量
+
+```bash
+echo 'PATH=/app/mysql/bin:$PATH' > /etc/profile.d/mysql.sh
+.     /etc/profile.d/mysql.sh
+```
+
+
+
+## 生成数据库文件
+
+```bash
+cd   /app/mysql/
+scripts/mysql_install_db --datadir=/data/mysql/ --user=mysql
+```
+
+
+
+## 准备配置文件
+
+```bash
+cp /app/mysql/support-files/my-huge.cnf   /etc/my.cnf
+```
+
+
+
+## 准备启动脚本,并启动服务
+
+```bash
+cp /app/mysql/support-files/mysql.server /etc/init.d/mysqld
+chkconfig --add mysqld
+service mysqld start
+```
+
+
+
+## 安全初始化
+
+```bash
+mysql_secure_installation
+```
+
+
+
+
+
+
+
+# 多实例安装
+
+## CentOS 8 yum安装mariadb-10.3.17并实现三个实例
+
+###  安装mariadb
+
+```bash
+[root@centos8 ~]#yum install mariadb-server
+```
+
+### 准备三个实例的目录
+
+```bash
+[root@centos8 ~]#mkdir -pv /mysql/{3306,3307,3308}/{data,etc,socket,log,bin,pid} 
+[root@centos8 ~]#chown -R mysql.mysql /mysql
+[root@centos8 ~]#tree -d /mysql/
+/mysql/
+├── 3306
+│   ├── bin
+│   ├── data
+│   ├── etc
+│   ├── log
+│   ├── pid
+│   └── socket
+├── 3307
+│   ├── bin
+│   ├── data
+│   ├── etc
+│   ├── log
+│   ├── pid
+│   └── socket
+└── 3308
+   ├── bin
+   ├── data
+   ├── etc
+   ├── log
+   ├── pid
+   └── socket
+21 directories
+```
+
+### 生成数据库文件
+
+```bash
+[root@centos8 ~]#mysql_install_db --datadir=/mysql/3306/data --user=mysql
+[root@centos8 ~]#mysql_install_db --datadir=/mysql/3307/data --user=mysql
+[root@centos8 ~]#mysql_install_db --datadir=/mysql/3308/data --user=mysql
+```
+
+### 准备配置文件
+
+```bash
+[root@centos8 ~]#vim /mysql/3306/etc/my.cnf
+[mysqld]
+port=3306
+datadir=/mysql/3306/data
+socket=/mysql/3306/socket/mysql.sock
+log-error=/mysql/3306/log/mysql.log
+pid-file=/mysql/3306/pid/mysql.pid
+
+#重复上面步骤设置3307，3308
+```
+
+### 准备启动脚本
+
+```bash
+[root@centos8 ~]#vim /mysql/3306/bin/mysqld 
+#!/bin/bash
+port=3306
+mysql_user="root"
+mysql_pwd="magedu"
+cmd_path="/usr/bin"
+mysql_basedir="/mysql"
+mysql_sock="${mysql_basedir}/${port}/socket/mysql.sock"
+function_start_mysql()
+{
+    if [ ! -e "$mysql_sock" ];then
+     printf "Starting MySQL...\n"
+      ${cmd_path}/mysqld_safe --defaultsfile=${mysql_basedir}/${port}/etc/my.cnf &> /dev/null &
+    else
+     printf "MySQL is running...\n"
+      exit
+    fi
+}
+function_stop_mysql()
+{
+    if [ ! -e "$mysql_sock" ];then
+       printf "MySQL is stopped...\n"
+       exit
+    else
+       printf "Stoping MySQL...\n"
+       ${cmd_path}/mysqladmin -u ${mysql_user} -p${mysql_pwd} -S ${mysql_sock}
+shutdown
+   fi
+}
+function_restart_mysql()
+{
+   printf "Restarting MySQL...\n"
+   function_stop_mysql
+    sleep 2
+   function_start_mysql
+}
+case $1 in
+start)
+   function_start_mysql
+;;
+stop)
+   function_stop_mysql
+;;
+restart)
+   function_restart_mysql
+;;
+*)
+   printf "Usage: ${mysql_basedir}/${port}/bin/mysqld {start|stop|restart}\n"
+esac
+[root@centos8 ~]#chmod +x /mysql/3306/bin/mysqld 
+
+#重复上述过程，分别建立3307，3308的启动脚本
+```
+
+### 启动服务
+
+```bash
+[root@centos8 ~]#/mysql/3306/bin/mysqld start
+[root@centos8 ~]#/mysql/3307/bin/mysqld start
+[root@centos8 ~]#/mysql/3308/bin/mysqld start
+[root@centos8 ~]#ss -ntl
+State       Recv-Q       Send-Q         Local Address:Port       Peer 
+Address:Port     
+LISTEN       0             128                  0.0.0.0:22             
+0.0.0.0:*         
+LISTEN       0             128                     [::]:22                 
+[::]:*         
+LISTEN       0             80                         *:3306                 
+*:*         
+LISTEN       0             80                         *:3307                 
+*:*         
+LISTEN       0             80                         *:3308                 
+*:*
+```
+
+### 登录实例
+
+```bash
+[root@centos8 ~]#/mysql/3308/bin/mysqld start
+#两种连接方法
+[root@centos8 ~]#mysql -h127.0.0.1 -P3308
+[root@centos8 ~]#mysql -uroot -S /mysqldb/3306/socket/mysql.sock
+#确认连接的端口
+MariaDB [(none)]> show variables like 'port'; +---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| port         | 3308 |
++---------------+-------+ 1 row in set (0.001 sec)
+
+MariaDB [(none)]> 
+
+#关闭数据库，需要手动输入root的密码
+[root@centos8 ~]#/mysql/3308/bin/mysqld stop
+Stoping MySQL...
+Enter password: 
+[root@centos8 ~]#/mysql/3308/bin/mysqld start
+Starting MySQL...
+```
+
+### 修改root密码
+
+```bash
+#加上root的口令
+[root@centos8 ~]#mysqladmin -uroot -S /mysql/3306/socket/mysql.sock password 
+'magedu' 
+[root@centos8 ~]#mysqladmin -uroot -S /mysql/3307/socket/mysql.sock password 
+'magedu' 
+[root@centos8 ~]#mysqladmin -uroot -S /mysql/3308/socket/mysql.sock password 
+'magedu'
+
+#或者登录mysql,执行下面也可以
+Mariadb>update mysql.user set password=password(“centos”) where user=’root’;
+Mariadb>flush privileges;
+#重复步骤，分别修改别外两个实例3307，3308对应root口令
+```
+
+### 测试连接
+
+```bash
+[root@centos8 ~]#mysql -uroot -p -S /mysql/3306/socket/mysql.sock #提示输入口令才能登录
+```
+
+
+
+
+
+
+
+# yaml 文件部署
+
+- 使用 nfs 作为外部存储
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: mysql
+  labels:
+    app: mysql
+    version: v5.7
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+      version: v5.7
+  template:
+    metadata:
+      labels:
+        app: mysql
+        version: v5.7
+    spec:
+      containers:
+      - env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "bjhit@2022"
+        - name: MYSQL_DATABASE
+          value: "darknet_target"
+        name: mysql
+        image: mysql:5.7
+        volumeMounts:
+        - mountPath: /var/lib/mysql
+          name: mysql-data
+      volumes:
+      - name: mysql-data
+        nfs:
+          server: 172.16.0.101
+          path: /data/mysql
+          readOnly: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: mysql
+  labels:
+    app: mysql
+    version: v5.7
+spec:
+  ports:
+  - name: mysql
+    nodePort: 30306
+    port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    app: mysql
+    version: v5.7
+  type: NodePort
+```
+
+
+
+# 通过 helm 部署
+
+## 5.7
+
+
+
+
+
+# ---
+
+
+
+# 安装后执行安全加固脚本
+
+```bash
+mysql_secure_installation
+/user/local/mysql/bin/mysql_secure_installation
+```
+

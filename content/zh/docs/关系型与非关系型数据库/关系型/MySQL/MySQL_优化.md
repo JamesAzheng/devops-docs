@@ -1,0 +1,309 @@
+# 参考链接
+
+- 阿里巴巴Java开发手册：https://developer.aliyun.com/topic/java2020
+- 58到家数据库30条军规解读：http://zhuanlan.51cto.com/art/201702/531364.htm
+
+
+
+# 数据库服务衡量指标
+
+- **Qps**：query per second 每秒处理的请求数
+- **Tps**：transaction per second 每秒处理的事务数量
+
+
+
+
+
+# MySQL压力测试
+
+**常见MySQl压力测试工具**
+
+- mysqlslap 
+- Sysbench，功能强大，官网： https://github.com/akopytov/sysbench
+- tpcc-mysql
+- MySQL Benchmark Suite
+- MySQL super-smack
+- MyBench
+
+## mysqlslap
+
+来自于mariadb包，测试的过程默认生成一个mysqlslap的schema,生成测试表t1，查询和插入测试数据，mysqlslap库自动生成，如果已经存在则先删除。用--only-print来打印实际的测试过程，整个测试完成后不会在数据库中留下痕迹
+
+### 语法
+
+```ABAP
+mysqlslap [options]
+```
+
+### options
+
+```bash
+--auto-generate-sql, -a #自动生成测试表和数据，表示用mysqlslap工具自己生成的SQL脚本来测试并发压力
+
+--auto-generate-sql-load-type=type #测试语句的类型。代表要测试的环境是读操作还是写操作还是两者混合的。取值包括：read，key，write，update和mixed(默认)
+
+--auto-generate-sql-add-auto-increment #代表对生成的表自动添加auto_increment列，从5.1.18版本开始支持
+
+--number-char-cols=N, -x N #自动生成的测试表中包含多少个字符类型的列，默认1
+
+--number-int-cols=N, -y N #自动生成的测试表中包含多少个数字类型的列，默认1
+
+--number-of-queries=N #总的测试查询次数(并发客户数×每客户查询次数)
+
+--query=name,-q #使用自定义脚本执行测试，例如可以调用自定义的存储过程或者sql语句来执行测试
+
+--create-schema #代表自定义的测试库名称，测试的schema
+
+--commint=N #多少条DML后提交一次
+
+--compress, -C #如服务器和客户端都支持压缩，则压缩信息
+
+--concurrency=N, -c N #表示并发量，即模拟多少个客户端同时执行select。可指定多个值，以逗号或者--delimiter参数指定值做为分隔符,如：--concurrency=100,200,500
+
+--engine=engine_name, -e engine_name #代表要测试的引擎，可以有多个，用分隔符隔开。例如：--engines=myisam,innodb
+
+--iterations=N, -i N #测试执行的迭代次数，代表要在不同并发环境下，各自运行测试多少次
+
+--only-print #只打印测试语句而不实际执行。
+
+--detach=N #执行N条语句后断开重连
+
+--debug-info, -T #打印内存和CPU的相关信息
+```
+
+### 范例
+
+```bash
+#单线程测试
+mysqlslap -a -uroot -pmagedu
+
+#多线程测试。使用--concurrency来模拟并发连接
+mysqlslap -a -c 100 -uroot -pmagedu
+
+#迭代测试。用于需要多次执行测试得到平均值
+mysqlslap -a -i 10 -uroot -pmagedu
+mysqlslap ---auto-generate-sql-add-autoincrement -a
+mysqlslap -a --auto-generate-sql-load-type=read
+mysqlslap -a --auto-generate-secondary-indexes=3
+mysqlslap -a --auto-generate-sql-write-number=1000
+mysqlslap --create-schema world -q "select count(*) from City”
+mysqlslap -a -e innodb -uroot -pmagedu
+mysqlslap -a --number-of-queries=10 -uroot -pmagedu
+
+#测试同时不同的存储引擎的性能进行对比
+mysqlslap -a --concurrency=50,100 --number-of-queries 1000 --iterations=5 --
+engine=myisam,innodb --debug-info -uroot -pmagedu
+
+#执行一次测试，分别50和100个并发，执行1000次总查询
+mysqlslap -a --concurrency=50,100 --number-of-queries 1000 --debug-info -uroot -
+pmagedu
+
+#50和100个并发分别得到一次测试结果(Benchmark)，并发数越多，执行完所有查询的时间越长。为了准确起见，可以多迭代测试几次
+mysqlslap -a --concurrency=50,100 --number-of-queries 1000 --iterations=5 --
+debug-info -uroot -pmagedu
+```
+
+
+
+# 索引优化参考建议
+
+- 独立地使用列：尽量避免其参与运算，独立的列指索引列不能是表达式的一部分，也不能是函数的参数，在where条件中，始终将索引列单独放在比较符号的一侧，尽量不要在列上进行运算（函数操作和表达式操作）
+- 左前缀索引：构建指定索引字段的左侧的字符数，要通过索引选择性（不重复的索引值和数据表的记录总数的比值）来评估，尽量使用短索引，如果可以，应该制定一个前缀长度
+- 多列索引：AND操作时更适合使用多列索引，而非为每个列创建单独的索引
+- 选择合适的索引列顺序：无排序和分组时，将选择性最高放左侧
+- 只要列中含有NULL值，就最好不要在此列设置索引，复合索引如果有NULL值，此列在使用时也不会使用索引
+- 对于经常在where子句使用的列，最好设置索引
+- 对于有多个列where或者order by子句，应该建立复合索引
+- 对于like语句，以 % 或者 _ 开头的不会使用索引，以 % 结尾会使用索引
+- 尽量不要使用not in和<>操作,虽然可能使用索引,但性能不高
+- 不要使用RLIKE正则表达式会导致索引失效
+- 查询时，能不要\*就不用\*，尽量写全字段名，比如:select id,name,age from students;
+- 大部分情况连接效率远大于子查询
+- 在有大量记录的表分页时使用limit
+- 对于经常使用的查询，可以开启查询缓存（MySQL8.0+查询缓存废弃）
+- 多使用explain和profile分析查询语句
+- 查看慢查询日志，找出执行时间长的sql语句优化
+
+
+
+
+
+# 并发访问
+
+```bash
+# vim /etc/my.cnf
+[mysqld]
+max_connections=2000 #通常还要修改service文件中[Service]块中的LimitNOFILE=65535，以及limit文件
+```
+
+
+
+# 防止更新表时未加where导致修改所有行
+
+```bash
+[root@centos8 ~]# vim /etc/my.cnf
+[mysql] #客户端配置
+safe-updates #加以限制
+
+#或者设置别名：
+[root@centos8 ~]# alias mysql='mysql -U'
+```
+
+
+
+# 优化表空间
+
+删除表中数据，但不会自动缩减数据文件的大小。
+
+```sql
+#缩减表大小
+MariaDB [test]> OPTIMIZE TABLE table_name;
+```
+
+
+
+# 持久修改mysql提示符
+
+```bash
+vim /etc/my.cnf
+[mysql]
+prompt="\\r:\\m:\\s(\\u@\\h) [\\d]>\\_"
+
+
+#简洁
+prompt="MySQL [\\d]>\\_"
+```
+
+
+
+# 事务日志优化
+
+```bash
+# mkdir -p /data/mysql_log/transaction_log
+# chown -R mysql.mysql /data/mysql_log/
+# vim /etc/my.cnf
+[mysqld]
+######transaction-log######
+innodb_log_group_home_dir = /data/mysql_log/transaction_log
+innodb_log_file_size = 200M
+innodb_log_files_in_group = 3
+innodb_flush_log_at_trx_commit=2 #如果设置为1，同时sync_binlog = 1表示最高级别的容错
+
+
+# systemctrl restart mariadb|mysqld
+```
+
+
+
+
+
+
+
+# 二进制日志优化
+
+```bash
+#1表示开启，0表示关闭
+MariaDB [(none)]> select @@sql_log_bin;
++---------------+
+| @@sql_log_bin |
++---------------+
+|             1 | #开启
++---------------+
+```
+
+
+
+
+
+# MySQL 慢查询优化
+
+MySQL的慢查询可以通过设置慢查询阈值来进行优化，通常建议将慢查询阈值设置为2秒左右。
+
+慢查询阈值可以通过修改MySQL的配置文件来设置，常见的配置文件为`/etc/my.cnf`，在该文件中可以设置以下参数来设置慢查询阈值：
+
+```mysql
+slow_query_log = 1 # 开启慢查询日志功能
+slow_query_log_file = /var/lib/mysql/slow_query.log # 慢查询日志文件路径
+long_query_time = 2 # 慢查询阈值，单位为秒
+```
+
+其中，slow_query_log参数表示开启慢查询日志功能，slow_query_log_file参数表示慢查询日志文件的路径，long_query_time参数表示慢查询阈值，单位为秒。以上是一个示例配置，具体配置还需要根据实际情况进行调整。
+
+## 慢查询分析工具
+
+是的，`profile`和`mysqldumpslow`都是可以用来分析慢SQL的工具。
+
+总的来说，`profile`和`mysqldumpslow`都是很有用的工具，它们可以帮助你优化MySQL数据库的性能，提高SQL语句的执行效率。
+
+### profile
+
+`profile`是MySQL自带的一种分析工具，它可以帮助你查看SQL语句执行的性能瓶颈，如执行时间、扫描行数、索引使用情况等。使用`profile`需要在MySQL客户端中运行SQL语句，并在语句前加上`EXPLAIN`关键字，然后将结果进行分析。
+
+使用`profile`可以帮助我们分析SQL语句的性能瓶颈，下面是使用`profile`的基本步骤：
+
+1. 在MySQL客户端中连接到数据库。
+
+2. 使用`EXPLAIN`关键字查询要分析的SQL语句的执行计划，例如：
+
+   ```sql
+   EXPLAIN SELECT * FROM table WHERE id = 1;
+   ```
+
+   这将返回该SQL语句的执行计划。
+
+3. 分析`EXPLAIN`的输出结果，查看执行计划中的各个指标，例如：
+
+   - `type`列表示表访问的方式，如果是`ALL`表示全表扫描，如果是`range`表示使用了索引扫描。
+   - `rows`列表示扫描的行数，如果是全表扫描，这个值很大，如果是使用索引扫描，这个值比较小。
+
+   这些指标可以帮助我们找到SQL语句的性能瓶颈，优化SQL语句的执行效率。
+
+4. 如果需要进一步分析SQL语句的执行性能，可以使用`profile`命令。例如：
+
+   ```sql
+   SET profiling = 1;
+   SELECT * FROM table WHERE id = 1;
+   SHOW PROFILES;
+   SHOW PROFILE FOR QUERY 1;
+   ```
+
+   这些命令将启用`profile`功能，执行SQL语句并查看执行性能的统计信息。`SHOW PROFILE`命令将显示所有查询的性能统计信息，而`SHOW PROFILE FOR QUERY`命令将显示指定查询的性能统计信息。
+
+使用`profile`可以帮助我们深入了解SQL语句的执行性能，优化SQL语句的执行效率。需要注意的是，`profile`会增加服务器的负担，应该谨慎使用，避免对服务器性能造成影响。
+
+
+
+### mysqldumpslow
+
+`mysqldumpslow`则是一个第三方工具，可以用来分析MySQL的慢查询日志文件。它可以帮助你查看哪些SQL语句执行速度较慢，并输出执行时间、扫描行数、索引使用情况等详细信息。使用`mysqldumpslow`需要先启用MySQL的慢查询日志功能，然后将日志文件传递给该工具进行分析。
+
+使用`mysqldumpslow`可以帮助我们分析MySQL的慢查询日志文件，找出执行速度较慢的SQL语句，下面是使用`mysqldumpslow`的基本步骤：
+
+1. 确认MySQL服务器已启用慢查询日志功能，并且日志文件已生成。可以在MySQL配置文件中设置慢查询日志相关的参数，例如：
+
+   ```sql
+   slow_query_log = ON
+   slow_query_log_file = /var/log/mysql/slow.log
+   long_query_time = 2
+   ```
+
+   这些参数将启用慢查询日志功能，并将日志文件保存到`/var/log/mysql/slow.log`，设置执行时间超过2秒的查询为慢查询。
+
+2. 使用`mysqldumpslow`分析慢查询日志文件。例如：
+
+   ```sh
+   mysqldumpslow /var/log/mysql/slow.log
+   ```
+
+   这将输出慢查询日志文件中所有慢查询的统计信息，按照执行时间排序，最慢的查询排在最前面。
+
+3. 如果需要进一步分析某个查询的性能，可以使用`mysqldumpslow`命令的选项来指定查询条件，例如：
+
+   ```sh
+   mysqldumpslow -s c -t 10 /var/log/mysql/slow.log
+   ```
+
+   这将输出慢查询日志文件中最频繁的10个查询，按照查询次数排序。
+
+使用`mysqldumpslow`可以帮助我们找出执行速度较慢的SQL语句，优化MySQL的性能。需要注意的是，慢查询日志文件可能会占用较大的磁盘空间，应该根据服务器的硬件资源和访问量适当调整日志记录的条件。
+
