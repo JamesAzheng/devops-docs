@@ -2,7 +2,7 @@
 title: "ORM"
 ---
 
-# ORM 概述
+## ORM 概述
 
 ORM，对象关系映射，对象和关系之间的映射，使用面向对象的方式来操作数据库。
 
@@ -24,7 +24,7 @@ class Student:
     name = ?某类型字段
     age = ?某类型字段
 
-# 最终得到实例：
+## 最终得到实例：
 class Student:
     def __init__(self):
         self.id = ?
@@ -55,7 +55,7 @@ ORM 的主要作用包括：
 
 
 
-# Django ORM
+## Django ORM
 
 Django 的 ORM（Object-Relational Mapping）是 Django 框架中的一个核心组件，它提供了一种将数据库表映射到 Python 对象的方式，使得开发人员可以使用面向对象的方式操作数据库，而无需直接编写 SQL 查询语句。下面是 Django ORM 的一些重要特性和用法详解：
 
@@ -75,30 +75,30 @@ class MyModel(models.Model):
 3. 数据查询：Django 提供了 QuerySet API 来执行数据库查询操作，QuerySet 是一个可迭代的对象，支持链式调用。开发人员可以使用各种方法来过滤、排序、限制查询结果等。
 
 ```python
-# 查询所有数据
+## 查询所有数据
 MyModel.objects.all()
 
-# 根据条件过滤数据
+## 根据条件过滤数据
 MyModel.objects.filter(age__gte=18)
 
-# 排序查询结果
+## 排序查询结果
 MyModel.objects.order_by('-created_at')
 
-# 获取单个对象
+## 获取单个对象
 MyModel.objects.get(pk=1)
 ```
 
 4. 数据操作：Django 的模型类提供了一些方法来执行数据操作，如创建、更新、删除等。
 
 ```python
-# 创建对象
+## 创建对象
 obj = MyModel.objects.create(name='John', age=25)
 
-# 更新对象
+## 更新对象
 obj.age = 26
 obj.save()
 
-# 删除对象
+## 删除对象
 obj.delete()
 ```
 
@@ -112,7 +112,7 @@ class Book(models.Model):
     title = models.CharField(max_length=100)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
 
-# 查询某个作者的所有书籍
+## 查询某个作者的所有书籍
 author = Author.objects.get(name='John Doe')
 author.books.all()
 ```
@@ -121,7 +121,7 @@ Django ORM 提供了丰富的功能和灵活的查询语法，使得开发人员
 
 
 
-# 前期准备
+## 前期准备
 
 ## 1. 创建项目
 
@@ -189,8 +189,8 @@ django-admin startproject <project_name>
 编辑`settings.py`：
 
 ```py
-# 配置连接数据库，注释掉默认的 `DATABASES` 字段，如使用MySQL，可添加类似如下配置：
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+## 配置连接数据库，注释掉默认的 `DATABASES` 字段，如使用MySQL，可添加类似如下配置：
+## https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
@@ -203,12 +203,12 @@ DATABASES = {
 }
 
 
-# 设置时区
+## 设置时区
 TIME_ZONE = 'Asia/Shanghai'
 
 
-# 设置日志输出
-# https://docs.djangoproject.com/zh-hans/4.2/topics/logging/
+## 设置日志输出
+## https://docs.djangoproject.com/zh-hans/4.2/topics/logging/
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -310,24 +310,24 @@ LOGGING = {
 
 
 
-# 创建 Model 类
+## 创建 Model 类
 
 models.py：
 
 ```py
 from django.db import models
 
-# Create your models here.
+## Create your models here.
 
-# CREATE TABLE `students` (
-#   `StuID` int unsigned NOT NULL AUTO_INCREMENT,
-#   `Name` varchar(50) NOT NULL,
-#   `Age` tinyint unsigned NOT NULL,
-#   `Gender` enum('F','M') NOT NULL,
-#   `ClassID` tinyint unsigned DEFAULT NULL,
-#   `TeacherID` int unsigned DEFAULT NULL,
-#   PRIMARY KEY (`StuID`)
-# ) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb3;
+## CREATE TABLE `students` (
+## `StuID` int unsigned NOT NULL AUTO_INCREMENT,
+## `Name` varchar(50) NOT NULL,
+## `Age` tinyint unsigned NOT NULL,
+## `Gender` enum('F','M') NOT NULL,
+## `ClassID` tinyint unsigned DEFAULT NULL,
+## `TeacherID` int unsigned DEFAULT NULL,
+## PRIMARY KEY (`StuID`)
+## ) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb3;
 
 class Employee(models.Model): # metaclass=ModelBase
     class Meta:
@@ -424,7 +424,7 @@ for emp in emps:
 
 
 
-# 管理器对象 objects
+## 管理器对象 objects
 
 在Django中，管理器对象(objects)是模型(Model)的一个关键部分，用于管理数据库中模型实例的创建、查询、更新和删除等操作。下面是一些关于Django管理器对象的详解：
 
@@ -457,7 +457,7 @@ for emp in emps:
 
 
 
-# 查询
+## 查询
 
 ## 查询集
 
@@ -506,13 +506,13 @@ for emp in emps:
 还有注意是否使用了缓存：
 
 ```py
-# 查询了三次：
+## 查询了三次：
 emps = Employee.objects.all() # 懒查询
 print(emps)
 print(emps)
 print(emps)
 
-# 只查询了一次
+## 只查询了一次
 emps = list(Employee.objects.all()) # 非查询，查询后将查询结果包在了列表当中
 print(emps)
 print(emps)
@@ -593,10 +593,10 @@ for obj in objects:
 或者你可以对结果集进行其他查询操作，比如过滤、排序等：
 
 ```python
-# 获取所有名字以'A'开头的对象
+## 获取所有名字以'A'开头的对象
 objects_starting_with_a = MyModel.objects.all().filter(name__startswith='A')
 
-# 对结果集按照日期降序排序
+## 对结果集按照日期降序排序
 objects_ordered_by_date = MyModel.objects.all().order_by('-date')
 ```
 
@@ -676,7 +676,7 @@ class MyModel(models.Model):
     category = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
-# 使用 filter() 方法进行过滤
+## 使用 filter() 方法进行过滤
 objects = MyModel.objects.filter(category='A')
 ```
 
@@ -765,7 +765,7 @@ class MyModel(models.Model):
     category = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
-# 使用 exclude() 方法进行排除
+## 使用 exclude() 方法进行排除
 objects = MyModel.objects.exclude(category='A')
 ```
 
@@ -843,7 +843,7 @@ class MyModel(models.Model):
     category = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
-# 使用 order_by() 方法进行排序
+## 使用 order_by() 方法进行排序
 objects = MyModel.objects.order_by('price')
 ```
 
@@ -905,7 +905,7 @@ class MyModel(models.Model):
     category = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
-# 使用 values() 方法获取字段值
+## 使用 values() 方法获取字段值
 values_list = MyModel.objects.values('name', 'price')
 ```
 
@@ -945,12 +945,12 @@ class Transaction(models.Model):
 ```python
 from django.db.models import Sum
 
-# 进行投影操作，只选择'user_id'和'total_amount'字段
+## 进行投影操作，只选择'user_id'和'total_amount'字段
 queryset = Transaction.objects.annotate(
     total_amount=Sum('amount')
 ).values('user_id', 'total_amount')
 
-# 打印结果
+## 打印结果
 for data in queryset:
     print("User ID:", data['user_id'])
     print("Total Amount:", data['total_amount'])
@@ -995,12 +995,12 @@ class Transaction(models.Model):
 ```python
 from django.db.models import Sum
 
-# 按用户ID分组，并计算每个用户的总交易金额
+## 按用户ID分组，并计算每个用户的总交易金额
 queryset = Transaction.objects.values('user_id').annotate(
     total_amount=Sum('amount')
 )
 
-# 打印结果
+## 打印结果
 for data in queryset:
     print("User ID:", data['user_id'])
     print("Total Amount:", data['total_amount'])
@@ -1034,13 +1034,13 @@ class Transaction(models.Model):
 ```python
 from django.db.models import Sum, Count
 
-# 按用户ID分组，并计算每个用户的总交易金额和交易次数
+## 按用户ID分组，并计算每个用户的总交易金额和交易次数
 queryset = Transaction.objects.values('user_id').annotate(
     total_amount=Sum('amount'), 
     transaction_count=Count('id')
 )
 
-# 打印结果
+## 打印结果
 for data in queryset:
     print("User ID:", data['user_id'])
     print("Total Amount:", data['total_amount'])
@@ -1098,7 +1098,7 @@ class MyModel(models.Model):
     category = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
-# 使用 get() 方法获取单个对象
+## 使用 get() 方法获取单个对象
 object = MyModel.objects.get(name='Product A')
 ```
 
@@ -1148,7 +1148,7 @@ class MyModel(models.Model):
     category = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
-# 使用 count() 方法计算对象数量
+## 使用 count() 方法计算对象数量
 count = MyModel.objects.count()
 ```
 
@@ -1192,7 +1192,7 @@ class MyModel(models.Model):
     category = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
-# 使用 first() 方法获取第一个对象
+## 使用 first() 方法获取第一个对象
 first_object = MyModel.objects.first()
 ```
 
@@ -1236,7 +1236,7 @@ class MyModel(models.Model):
     category = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
-# 使用 last() 方法获取最后一个对象
+## 使用 last() 方法获取最后一个对象
 last_object = MyModel.objects.last()
 ```
 
@@ -1283,7 +1283,7 @@ class MyModel(models.Model):
     category = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
-# 使用 exists() 方法检查是否存在对象
+## 使用 exists() 方法检查是否存在对象
 if MyModel.objects.filter(category='A').exists():
     # 执行逻辑...
 ```
@@ -1303,15 +1303,15 @@ SELECT EXISTS (SELECT 1 FROM app_mymodel WHERE category = 'A' LIMIT 1);
 ## 与或非
 
 ```PY
-# AND，同时满足两个条件
+## AND，同时满足两个条件
 result = mgr.filter(StuID__gt=6, StuID__lt=8)
 print(result) # <QuerySet [<Employee: 7 Xi Ren 19>]>
 
-# OR，满足其中一个条件即可
+## OR，满足其中一个条件即可
 result = mgr.filter(StuID__in=[1, 2, 3])
 print(result) # <QuerySet [<Employee: 1 Shi Zhongyu 22>, <Employee: 2 Shi Potian 22>, <Employee: 3 Xie Yanke 53>]>
 
-# NOT
+## NOT
 由filter改用exclude是最简单的方式，也可使用Q对象中的~运算符取反
 ```
 
@@ -1328,10 +1328,10 @@ print(result) # <QuerySet [<Employee: 1 Shi Zhongyu 22>, <Employee: 2 Shi Potian
 ```python
 from django.db.models import Q
 
-# 构建查询条件
+## 构建查询条件
 query = Q(name__icontains='john') | Q(age__gte=18)
 
-# 使用 Q 对象进行过滤
+## 使用 Q 对象进行过滤
 results = MyModel.objects.filter(query)
 ```
 
@@ -1352,10 +1352,10 @@ Q 对象可以使用以下逻辑运算符进行组合：
 ```python
 from django.db.models import Q
 
-# 构建查询条件：同时满足两个条件
+## 构建查询条件：同时满足两个条件
 query = Q(name__icontains='john') & Q(age__gte=18)
 
-# 使用 Q 对象进行过滤
+## 使用 Q 对象进行过滤
 results = MyModel.objects.filter(query)
 ```
 
@@ -1366,10 +1366,10 @@ results = MyModel.objects.filter(query)
 ```python
 from django.db.models import Q
 
-# 构建查询条件：满足其中一个条件即可
+## 构建查询条件：满足其中一个条件即可
 query = Q(name__icontains='john') | Q(name__icontains='jane')
 
-# 使用 Q 对象进行过滤
+## 使用 Q 对象进行过滤
 results = MyModel.objects.filter(query)
 ```
 
@@ -1380,10 +1380,10 @@ results = MyModel.objects.filter(query)
 ```python
 from django.db.models import Q
 
-# 构建查询条件：不满足指定条件
+## 构建查询条件：不满足指定条件
 query = ~Q(name__icontains='john')
 
-# 使用 Q 对象进行过滤
+## 使用 Q 对象进行过滤
 results = MyModel.objects.filter(query)
 ```
 
@@ -1406,19 +1406,19 @@ results = MyModel.objects.filter(query)
 ```python
 from django.db.models import Sum, Count, Avg, Max, Min
 
-# 求和，在这个示例中，`total_sales` 变量将包含 `sales_amount` 字段的总和。
+## 求和，在这个示例中，`total_sales` 变量将包含 `sales_amount` 字段的总和。
 total_sales = MyModel.objects.aggregate(total_sales=Sum('sales_amount'))
 
-# 计数，在这个示例中，`total_customers` 变量将包含 `customer_id` 字段的数量。
+## 计数，在这个示例中，`total_customers` 变量将包含 `customer_id` 字段的数量。
 total_customers = MyModel.objects.aggregate(total_customers=Count('customer_id'))
 
-# 平均值，在这个示例中，`average_rating` 变量将包含 `rating` 字段的平均值。
+## 平均值，在这个示例中，`average_rating` 变量将包含 `rating` 字段的平均值。
 average_rating = MyModel.objects.aggregate(average_rating=Avg('rating'))
 
-# 最大值，在这个示例中，`highest_price` 变量将包含 `price` 字段的最大值。
+## 最大值，在这个示例中，`highest_price` 变量将包含 `price` 字段的最大值。
 highest_price = MyModel.objects.aggregate(highest_price=Max('price'))
 
-# 最小值，在这个示例中，`lowest_price` 变量将包含 `price` 字段的最小值。
+## 最小值，在这个示例中，`lowest_price` 变量将包含 `price` 字段的最小值。
 lowest_price = MyModel.objects.aggregate(lowest_price=Min('price'))
 ```
 
@@ -1452,26 +1452,26 @@ FROM
 ```python
 from django.db.models import Sum, Count, Avg, Max, Min
 
-# 求和并添加新字段，在这个示例中，`total_sales` 将会是每个对象的 `sales_amount` 字段的总和。
+## 求和并添加新字段，在这个示例中，`total_sales` 将会是每个对象的 `sales_amount` 字段的总和。
 queryset = MyModel.objects.annotate(total_sales=Sum('sales_amount'))
 
-# 计数并添加新字段，在这个示例中，`total_customers` 将会是每个对象的 `customer_id` 字段的数量。
+## 计数并添加新字段，在这个示例中，`total_customers` 将会是每个对象的 `customer_id` 字段的数量。
 queryset = MyModel.objects.annotate(total_customers=Count('customer_id'))
 
-# 平均值并添加新字段，在这个示例中，`average_rating` 将会是每个对象的 `rating` 字段的平均值。
+## 平均值并添加新字段，在这个示例中，`average_rating` 将会是每个对象的 `rating` 字段的平均值。
 queryset = MyModel.objects.annotate(average_rating=Avg('rating'))
 
-# 最大值并添加新字段，在这个示例中，`highest_price` 将会是每个对象的 `price` 字段的最大值。
+## 最大值并添加新字段，在这个示例中，`highest_price` 将会是每个对象的 `price` 字段的最大值。
 queryset = MyModel.objects.annotate(highest_price=Max('price'))
 
-# 最小值并添加新字段，在这个示例中，`lowest_price` 将会是每个对象的 `price` 字段的最小值。
+## 最小值并添加新字段，在这个示例中，`lowest_price` 将会是每个对象的 `price` 字段的最小值。
 queryset = MyModel.objects.annotate(lowest_price=Min('price'))
 ```
 
 示例（不额外为返回值命名）：
 
 ```py
-# 通过Gender分组，取各分组的Age总和
+## 通过Gender分组，取各分组的Age总和
 result = mgr.values('Gender').annotate(Sum('Age'))
 print(result) # <QuerySet [{'Gender': 'M', 'Age__sum': 495}, {'Gender': 'F', 'Age__sum': 190}]>
 '''
@@ -1485,7 +1485,7 @@ GROUP BY
 '''
 
 
-# 后面的values表示仅取Gender列（实际上无意义，仅作为values的使用演示）
+## 后面的values表示仅取Gender列（实际上无意义，仅作为values的使用演示）
 result = mgr.values('Gender').annotate(Sum('Age')).values('Gender')
 print(result) # <QuerySet [{'Gender': 'M'}, {'Gender': 'F'}]>
 '''
@@ -1508,7 +1508,7 @@ print(result)
 <QuerySet [{'Gender': 'M', 'Age__sum': 495}, {'Gender': 'F', 'Age__sum': 190}]>
 '''
 
-# 迭代访问每个结果，使用 for 循环迭代访问查询集中的每个结果，并对结果进行处理。
+## 迭代访问每个结果，使用 for 循环迭代访问查询集中的每个结果，并对结果进行处理。
 for item in result:
     print(item)
     print(item['Gender'], item['Age__sum'])
@@ -1710,10 +1710,10 @@ authors_with_most_books = Author.objects.annotate(book_count=Count('books')).fil
 这里是查询 `ClassID` 为 1 的学生信息的示例代码：
 
 ```python
-# 获取所有 `ClassID` 为 1 的学生信息
+## 获取所有 `ClassID` 为 1 的学生信息
 students_in_class_1 = Students.objects.filter(ClassID=1)
 
-# 输出这些学生的信息
+## 输出这些学生的信息
 for student in students_in_class_1:
     print(student)  # 或者使用其他方式查看学生信息
 ```
@@ -1766,12 +1766,12 @@ for student in students_in_class_1:
 ```python
 from django.db import models
 
-# 定义班级模型
+## 定义班级模型
 class Classes(models.Model):
     ClassID = models.AutoField(primary_key=True)
     ClassName = models.CharField(max_length=100)
 
-# 定义学生模型
+## 定义学生模型
 class Students(models.Model):
     StuID = models.AutoField(primary_key=True)
     Name = models.CharField(max_length=50)
@@ -1785,13 +1785,13 @@ class Students(models.Model):
 有了 `related_name`，我们可以从 `Classes` 模型访问与其关联的学生列表：
 
 ```python
-# 获取班级 ID 为 1 的班级
+## 获取班级 ID 为 1 的班级
 class_1 = Classes.objects.get(ClassID=1)
 
-# 使用反向关系访问这个班级的所有学生
+## 使用反向关系访问这个班级的所有学生
 students_in_class_1 = class_1.students.all()  # 使用 related_name 'students'
 
-# 打印学生信息
+## 打印学生信息
 for student in students_in_class_1:
     print(student.Name)
 ```
@@ -1805,7 +1805,7 @@ for student in students_in_class_1:
 你还可以使用 `filter()` 方法在反向关系上进行过滤，以获得特定的结果：
 
 ```python
-# 获取班级 ID 为 1 中年龄大于 18 的学生
+## 获取班级 ID 为 1 中年龄大于 18 的学生
 students_above_18 = class_1.students.filter(Age__gt=18)
 
 for student in students_above_18:
@@ -1947,7 +1947,7 @@ class Employee(models.Model):
     name = models.CharField(max_length=100)
     department = models.CharField(max_length=100)
 
-# 使用原始 SQL 查询
+## 使用原始 SQL 查询
 employees_in_sales = Employee.objects.raw("SELECT * FROM myapp_employee WHERE department = 'Sales'")
 ```
 
@@ -1967,7 +1967,7 @@ employees_in_sales = Employee.objects.raw("SELECT * FROM myapp_employee WHERE de
 如果有非常复杂的 SQL 查询，可能包含子查询、联合、分组等，`raw()` 是一个强有力的工具。下面是一个例子，展示了使用原始 SQL 查询实现更复杂的操作。
 
 ```python
-# 获取每个部门员工的平均工资，并显示部门名称和平均工资
+## 获取每个部门员工的平均工资，并显示部门名称和平均工资
 average_salary_per_dept = Employee.objects.raw(
     """
     SELECT department, AVG(salary) as avg_salary

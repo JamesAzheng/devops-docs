@@ -2,7 +2,7 @@
 title: "requests"
 ---
 
-# requests 模块概述
+## requests 模块概述
 
 `requests` 是一个Python HTTP库，用于向网络服务器发起请求和获取响应。它提供了简洁且易于使用的API，使得发送HTTP请求变得非常简单。
 
@@ -18,7 +18,7 @@ https://requests.readthedocs.io/en/latest/
 
 
 
-# requests 常用函数
+## requests 常用函数
 
 `requests` 模块提供了一系列常用的函数，用于发送不同类型的HTTP请求以及处理响应。以下是其中一些常用的函数：
 
@@ -127,13 +127,13 @@ requests.post(url, data=None, json=None, **kwargs)
 ```python
 import requests
 
-# 定义要发送的数据
+## 定义要发送的数据
 data = {'key1': 'value1', 'key2': 'value2'}
 
-# 发起POST请求
+## 发起POST请求
 response = requests.post('https://api.example.com/post', data=data)
 
-# 获取响应内容
+## 获取响应内容
 print(response.text)
 ```
 
@@ -142,13 +142,13 @@ print(response.text)
 ```python
 import requests
 
-# 定义要发送的JSON数据
+## 定义要发送的JSON数据
 payload = {'key1': 'value1', 'key2': 'value2'}
 
-# 发起POST请求，将数据编码为JSON格式
+## 发起POST请求，将数据编码为JSON格式
 response = requests.post('https://api.example.com/post', json=payload)
 
-# 获取响应内容
+## 获取响应内容
 print(response.text)
 ```
 
@@ -157,16 +157,16 @@ print(response.text)
 ```python
 import requests
 
-# 自定义请求头部
+## 自定义请求头部
 headers = {'Content-Type': 'application/json'}
 
-# 定义要发送的JSON数据
+## 定义要发送的JSON数据
 payload = {'key1': 'value1', 'key2': 'value2'}
 
-# 发起POST请求，将数据编码为JSON格式，并自定义请求头部信息
+## 发起POST请求，将数据编码为JSON格式，并自定义请求头部信息
 response = requests.post('https://api.example.com/post', json=payload, headers=headers)
 
-# 获取响应内容
+## 获取响应内容
 print(response.text)
 ```
 
@@ -210,7 +210,7 @@ except RequestException as e:
 
 
 
-# requests 常用类
+## requests 常用类
 
 在`requests`模块中，最常用的类是：
 

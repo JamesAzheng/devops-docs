@@ -2,7 +2,7 @@
 title: "json"
 ---
 
-# json 概述
+## json 概述
 
 Python 提供了标准库中的 `json` 模块，可以用于将 Python 数据结构转换为 JSON 格式（序列化）或将 JSON 数据解析为 Python 数据结构（反序列化）。这使得在 Python 中处理 JSON 数据变得非常方便。
 
@@ -10,7 +10,7 @@ Python 提供了标准库中的 `json` 模块，可以用于将 Python 数据结
 
 
 
-# json 与 python 类型对应关系
+## json 与 python 类型对应关系
 
 以下是一个简单的对应表，显示了 JSON 数据类型和相应的 Python 数据类型之间的关系：
 
@@ -163,12 +163,12 @@ JSON 标准不支持直接表示 Python 中的元组（`tuple`）类型。 JSON 
 
 
 
-# 范例：1
+## 范例：1
 
 ```python
 import json
 
-# 编码（将 Python 对象转换为 JSON 字符串）
+## 编码（将 Python 对象转换为 JSON 字符串）
 data = {
     "name": "Alice",
     "age": 30,
@@ -178,7 +178,7 @@ json_string = json.dumps(data)
 
 print(json_string) # {"name": "Alice", "age": 30, "isStudent": false}
 
-# 解码（将 JSON 字符串转换为 Python 对象）
+## 解码（将 JSON 字符串转换为 Python 对象）
 decoded_data = json.loads(json_string)
 
 print(decoded_data) # {'name': 'Alice', 'age': 30, 'isStudent': False}
@@ -186,7 +186,7 @@ print(decoded_data) # {'name': 'Alice', 'age': 30, 'isStudent': False}
 
 
 
-# 范例：2
+## 范例：2
 
 在Python中，`json`模块用于处理JSON数据。以下是`json`模块中常用的四个函数及其示例：
 
@@ -197,7 +197,7 @@ import json
 
 data = {"name": "John", "age": 30, "city": "New York"}
 
-# 将数据写入JSON文件
+## 将数据写入JSON文件
 with open("data.json", "w") as json_file:
     json.dump(data, json_file)
 ```
@@ -207,7 +207,7 @@ with open("data.json", "w") as json_file:
 ```python
 import json
 
-# 从JSON文件中读取数据
+## 从JSON文件中读取数据
 with open("data.json", "r") as json_file:
     loaded_data = json.load(json_file)
 
@@ -221,7 +221,7 @@ import json
 
 data = {"name": "John", "age": 30, "city": "New York"}
 
-# 将数据转换为JSON字符串
+## 将数据转换为JSON字符串
 json_string = json.dumps(data)
 
 print(json_string)  # 输出: {"name": "John", "age": 30, "city": "New York"}
@@ -234,7 +234,7 @@ import json
 
 json_string = '{"name": "John", "age": 30, "city": "New York"}'
 
-# 解析JSON字符串为Python对象
+## 解析JSON字符串为Python对象
 parsed_data = json.loads(json_string)
 
 print(parsed_data)  # 输出: {'name': 'John', 'age': 30, 'city': 'New York'}
@@ -244,11 +244,11 @@ print(parsed_data)  # 输出: {'name': 'John', 'age': 30, 'city': 'New York'}
 
 
 
-# ---
+## ---
 
 
 
-# yaml 转 json
+## yaml 转 json
 
 
 
@@ -266,7 +266,7 @@ pip install PyYAML
 import yaml
 import json
 
-# 假设你有一个 YAML 格式的数据
+## 假设你有一个 YAML 格式的数据
 yaml_data = """
 key1: value1
 key2:
@@ -277,10 +277,10 @@ key3:
   subkey2: subvalue2
 """
 
-# 将 YAML 格式的数据解析为 Python 对象
+## 将 YAML 格式的数据解析为 Python 对象
 parsed_data = yaml.safe_load(yaml_data)
 
-# 将 Python 对象转换为 JSON 格式的字符串
+## 将 Python 对象转换为 JSON 格式的字符串
 json_data = json.dumps(parsed_data)
 
 print(json_data)

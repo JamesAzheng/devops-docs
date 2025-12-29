@@ -3,7 +3,7 @@ title: "基于 cert-manager 实现证书证书自动化管理"
 ---
 
 
-# Cert-Manager 概述
+## Cert-Manager 概述
 cert-manager 是 Kubernetes 的原生证书管理器（CRD 控制器），它能够为 Kubernetes 或 OpenShift 集群中的工作负载创建 TLS 证书，并在证书到期前自动续订证书。
 
 它的作用是监控 Kubernetes 中的 Certificate 资源，自动向配置的证书颁发者（Issuer）申请证书，获取到证书后生成包含私钥和证书的 Kubernetes Secret（signed keypair），该 Secret 由应用程序 Pod 挂载或由 Ingress 控制器使用。
@@ -18,7 +18,7 @@ cert-manager 可以从各种证书颁发机构获取证书，包括： Let's Enc
 
 ---
 
-# Cert-Manager 架构
+## Cert-Manager 架构
 <!-- {{< figure src="/http/high-level-overview.svg" alt="图片描述" title="图片标题" caption="图片说明" align="center" >}} -->
 {{< figure src="/http/high-level-overview.svg" align="center" >}}
 
@@ -59,7 +59,7 @@ cert-manager 可以从各种证书颁发机构获取证书，包括： Let's Enc
 
 ---
 
-# Cert-Manager 核心组件
+## Cert-Manager 核心组件
 
 1. **cert-manager-controller**（主控制器 Deployment）  
    - 这是 cert-manager 的核心大脑。  
@@ -93,7 +93,7 @@ cert-manager 可以从各种证书颁发机构获取证书，包括： Let's Enc
 这些组件协同工作，确保 cert-manager 在 Kubernetes 中实现自动化、安全的 TLS 证书管理。
 
 ---
-# Cert-Manager CRDs
+## Cert-Manager CRDs
 cert-manager 的 **API** 主要基于 Kubernetes 的 **Custom Resource Definitions (CRDs)**，所有自定义资源都属于 API Group `cert-manager.io`（核心部分）和 `acme.cert-manager.io`（ACME 特定部分）。
 
 cert-manager 定义了以下核心 CRDs（可以通过 `kubectl get crd | grep cert-manager.io` 查看）：
@@ -117,8 +117,8 @@ cert-manager 定义了以下核心 CRDs（可以通过 `kubectl get crd | grep c
 
 ---
 
-# Cert-Manager 部署
-## Helm
+## Cert-Manager 部署
+### Helm
 ```yaml
 helm repo add cert-manager https://charts.jetstack.io
 
@@ -154,9 +154,9 @@ kubectl get crd | grep cert-manager
 - 潜在的资源覆盖、错误或集群不稳定。
 
 
-# Cert-Manager 使用
+## Cert-Manager 使用
 
-## 自建 CA 并签发应用证书
+### 自建 CA 并签发应用证书
 
 **目录结构**
 ```
@@ -171,7 +171,7 @@ cert-manager/
 │       └── deployment.yaml
 ```
 
-### 创建自签名的根 CA 证书
+#### 创建自签名的根 CA 证书
 
 **01-root-ca-selfsigned-ClusterIssuer.yaml**
 - 创建 SelfSigned ClusterIssuer（一次性）；
@@ -244,7 +244,7 @@ spec:
 kubectl apply -f .
 ```
 
-### 用自建根 CA 签发应用证书
+#### 用自建根 CA 签发应用证书
 **apps/backend/certificate-backend-api.yaml**
 ```yaml
 apiVersion: cert-manager.io/v1
@@ -301,9 +301,9 @@ spec:
   commonName: backend-api.backend.svc.cluster.local
 ```
 
-## 应用中引用证书
+### 应用中引用证书
 
-# 监控 Cert-Manager
-## Prometheus 配置
+## 监控 Cert-Manager
+### Prometheus 配置
 
-## AlertManager 配置
+### AlertManager 配置

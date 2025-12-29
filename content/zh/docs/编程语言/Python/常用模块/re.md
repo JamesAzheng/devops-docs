@@ -3,7 +3,7 @@ title: "re"
 ---
 
 
-# re 基础语法
+## re 基础语法
 
 `re` 模块是Python中用于处理正则表达式的标准库。以下是使用 `re` 模块的基本步骤：
 
@@ -64,7 +64,7 @@ title: "re"
 
 
 
-# flags
+## flags
 
 `re` 模块中的 `re.compile()`、`re.match()`、`re.search()`、`re.fullmatch()` 等函数可以接受一个可选的 `flags` 参数，用于指定不同的匹配选项和标志。以下是一些常见的 `flags` 参数，以及它们的作用：
 
@@ -126,7 +126,7 @@ print(result)  # 输出：['1234567890']
 
 可以通过按位或组合任意数量的标志来指定正则表达式的匹配方式，只需要在 `findall()` 函数中将它们作为第三个参数传入即可。
 
-# 编译正则对象
+## 编译正则对象
 
 ## re.compile()
 
@@ -171,7 +171,7 @@ else:
 
 
 
-# 单次匹配
+## 单次匹配
 
 ## re.match()
 
@@ -297,7 +297,7 @@ else:
 
 
 
-# 全文搜索
+## 全文搜索
 
 ## re.findall()
 
@@ -378,7 +378,7 @@ for match in matches_iterator:
 
 
 
-# 匹配替换
+## 匹配替换
 
 ## re.sub()
 
@@ -461,7 +461,7 @@ print("替换总次数:", count)
 
 
 
-# 分组
+## 分组
 
 match、search 函数可以返回 match 对象；findall 返回字符串列表；finditer 返回一个个 match 对象
 
@@ -636,7 +636,7 @@ if match:
 
 
 
-# 分割字符串
+## 分割字符串
 
 ## re.split()
 
@@ -677,7 +677,7 @@ print("分割后的列表:", split_list)
 
 
 
-# 其它正则模块
+## 其它正则模块
 
 Python中有几个常用的正则表达式库，其中最常见和流行的是re模块。re模块是Python标准库的一部分，用于处理正则表达式。
 

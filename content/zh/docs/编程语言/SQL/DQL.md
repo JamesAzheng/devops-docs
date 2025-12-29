@@ -2,7 +2,7 @@
 title: "DQL"
 ---
 
-# 前言
+## 前言
 
 `SELECT` 是 SQL 中用于从数据库中检索数据的语句。通过 `SELECT` 语句，可以从一个或多个表中选择特定列的数据，也可以使用不同的条件、排序和聚合函数对数据进行处理。
 
@@ -122,7 +122,7 @@ SELECT 列 FROM teachers [where] [行]
 
 
 
-# SELECT
+## SELECT
 
 ## 算术操作符
 
@@ -139,7 +139,7 @@ mysql> SELECT name, age FROM teachers;
 | Lin Chaoying  |  93 |
 +---------------+-----+
 
-# 所有年龄加10岁：
+## 所有年龄加10岁：
 mysql> SELECT name, age+10 FROM teachers;
 +---------------+--------+
 | name          | age+10 |
@@ -545,7 +545,7 @@ mysql> select distinct gender, age from teachers;
 
 
 
-# SELECT 子句
+## SELECT 子句
 
 ## AS
 
@@ -703,7 +703,7 @@ MariaDB [hellodb]> select * from teachers;
 +-----+---------------+-----+--------+
 
 
-# 筛选出 teachers 表中性别为 F 的所有内容
+## 筛选出 teachers 表中性别为 F 的所有内容
 MariaDB [hellodb]> select * from teachers where gender='F';
 +-----+---------------+-----+--------+
 | TID | Name          | Age | Gender |
@@ -728,7 +728,7 @@ MariaDB [hellodb]> select * from teachers;
 |   4 | Lin Chaoying  |  93 | F      |
 +-----+---------------+-----+--------+
 
-# 筛选出 teachers 表中年龄大于等于 80 的所有内容
+## 筛选出 teachers 表中年龄大于等于 80 的所有内容
 MariaDB [hellodb]> select * from teachers where age>=80;
 +-----+---------------+-----+--------+
 | TID | Name          | Age | Gender |
@@ -755,7 +755,7 @@ MariaDB [hellodb]> select * from teachers;
 |   4 | Lin Chaoying  |  93 | F      |
 +-----+---------------+-----+--------+
 
-# 筛选出 teachers 表中性别不为 M 的所有内容
+## 筛选出 teachers 表中性别不为 M 的所有内容
 MariaDB [hellodb]> select * from teachers where gender<>'M';
 +-----+---------------+-----+--------+
 | TID | Name          | Age | Gender |
@@ -1080,10 +1080,10 @@ WHERE column_name BETWEEN value1 AND value2;
 **例子1：**
 
 ```sql
-# 18到20岁之间
+## 18到20岁之间
 select age from students where age between 18 and 20;
 
-# 等价于：
+## 等价于：
 select age from students where age>=18 and age<=20;
 ```
 
@@ -1234,7 +1234,7 @@ GROUP BY department, job_title;
 **范例3：**
 
 ```sql
-# 将男女分组，取平均年龄，和最大，最小年龄
+## 将男女分组，取平均年龄，和最大，最小年龄
 MariaDB [hellodb]> SELECT gender,avg(age),max(age),min(age) FROM students GROUP BY gender;
 +--------+----------+----------+----------+
 | gender | avg(age) | max(age) | min(age) |
@@ -1243,7 +1243,7 @@ MariaDB [hellodb]> SELECT gender,avg(age),max(age),min(age) FROM students GROUP 
 | M      |  33.0000 |      100 |       19 |
 +--------+----------+----------+----------+
 
-# 起别名更直观
+## 起别名更直观
 MariaDB [hellodb]> SELECT gender,avg(age) 平均年龄,max(age) 最大年龄,min(age) 最小年龄 FROM students GROUP BY gender;
 +--------+--------------+--------------+--------------+
 | gender | 平均年龄      | 最大年龄       | 最小年龄      |
@@ -1252,7 +1252,7 @@ MariaDB [hellodb]> SELECT gender,avg(age) 平均年龄,max(age) 最大年龄,min
 | M      |      33.0000 |          100 |           19 |
 +--------+--------------+--------------+--------------+
 
-# 取每个班的男生和女生平均年龄
+## 取每个班的男生和女生平均年龄
 MariaDB [hellodb]> SELECT classid,gender,avg(age) FROM students GROUP BY classid,gender;
 +---------+--------+----------+
 | classid | gender | avg(age) |
@@ -1357,7 +1357,7 @@ HAVING employee_count > 5;
 **例子3：**
 
 ```sql
-# 取每个班的平均年龄
+## 取每个班的平均年龄
 MariaDB [hellodb]> SELECT classid,avg(age) FROM students GROUP BY classid;
 +---------+----------+
 | classid | avg(age) |
@@ -1372,11 +1372,11 @@ MariaDB [hellodb]> SELECT classid,avg(age) FROM students GROUP BY classid;
 |       7 |  19.6667 |
 +---------+----------+
 
-# 取每个班的平均年龄，过滤classid为NULL的班级
+## 取每个班的平均年龄，过滤classid为NULL的班级
 MariaDB [hellodb]> SELECT classid,avg(age) FROM students GROUP BY classid WHERE classid IS NOT NULL;
 ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'WHERE classid IS NOT NULL' at line 1  # 分组后用WHERE会报错
 
-# 正确方法分组后使用 HAVING
+## 正确方法分组后使用 HAVING
 MariaDB [hellodb]> SELECT classid,avg(age) FROM students GROUP BY classid HAVING classid IS NOT NULL;
 +---------+----------+
 | classid | avg(age) |
@@ -1390,7 +1390,7 @@ MariaDB [hellodb]> SELECT classid,avg(age) FROM students GROUP BY classid HAVING
 |       7 |  19.6667 |
 +---------+----------+
 
-# 或 WHERE 在前（推荐用法）
+## 或 WHERE 在前（推荐用法）
 MariaDB [hellodb]> SELECT classid,avg(age) FROM students WHERE classid IS NOT NULL GROUP BY classid;
 +---------+----------+
 | classid | avg(age) |
@@ -1489,7 +1489,7 @@ LIMIT row_count
 **例子：**
 
 ```sql
-# 只显示前三个
+## 只显示前三个
 MariaDB [hellodb]> SELECT * FROM students ORDER BY stuid LIMIT 3;
 +-------+-------------+-----+--------+---------+-----------+
 | StuID | Name        | Age | Gender | ClassID | TeacherID |
@@ -1509,14 +1509,14 @@ MariaDB [hellodb]> SELECT * FROM students ORDER BY stuid LIMIT 3;
 ```sql
 LIMIT offset, row_count
 
-# 也可以理解为：
+## 也可以理解为：
 LIMIT start, len
 ```
 
  **例子：**
 
 ```sql
-# 跳过前两个，显示两个后面的三个
+## 跳过前两个，显示两个后面的三个
 MariaDB [hellodb]> SELECT * FROM students ORDER BY stuid LIMIT 2,3;
 +-------+-----------+-----+--------+---------+-----------+
 | StuID | Name      | Age | Gender | ClassID | TeacherID |
@@ -1526,7 +1526,7 @@ MariaDB [hellodb]> SELECT * FROM students ORDER BY stuid LIMIT 2,3;
 |     5 | Yu Yutong |  26 | M      |       3 |         1 |
 +-------+-----------+-----+--------+---------+-----------+
 
-# 等价于：
+## 等价于：
 SELECT * FROM students ORDER BY stuid LIMIT 3 OFFSET 2;
 ```
 
@@ -1567,7 +1567,7 @@ LIMIT 10 OFFSET 20;
 
 
 
-# SELECT 多表查询
+## SELECT 多表查询
 
 ![SQL JOINS](SQL JOINS.jpg)
 
@@ -1790,7 +1790,7 @@ MariaDB [hellodb]> SELECT * FROM teachers; # 老师表的年龄
 |   4 | Lin Chaoying  |  93 | F      |
 +-----+---------------+-----+--------+
 
-# 将teachers表中tid为4的人的年龄改为students表的平均年龄
+## 将teachers表中tid为4的人的年龄改为students表的平均年龄
 MariaDB [hellodb]> UPDATE teachers SET age=(SELECT avg(age) FROM students) WHERE tid=4;
 MariaDB [hellodb]> SELECT * FROM teachers;
 +-----+---------------+-----+--------+
@@ -2086,7 +2086,7 @@ MariaDB [hellodb]> SELECT e.name 员工姓名,l.name  领导姓名 FROM emp e IN
 | zhang        | wang         |
 +--------------+--------------+
 
-# 常用，利用左外连接LEFT JOIN(RIGHT JOIN也可以)然后起别名的方式实现，因为LEFT JOIN会将左边的内容全部显示 所以mage也会出现
+## 常用，利用左外连接LEFT JOIN(RIGHT JOIN也可以)然后起别名的方式实现，因为LEFT JOIN会将左边的内容全部显示 所以mage也会出现
 MariaDB [hellodb]> SELECT e.name 员工姓名,l.name  领导姓名 FROM emp e LEFT JOIN emp l ON e.leader_id=l.id;
 +--------------+--------------+
 | 员工姓名      | 领导姓名       |
@@ -2096,7 +2096,7 @@ MariaDB [hellodb]> SELECT e.name 员工姓名,l.name  领导姓名 FROM emp e LE
 | wang         | zhangsir     |
 | zhang        | wang         |
 +--------------+--------------+
-# 还可以利用IFNULL这个函数替换NULL的值
+## 还可以利用IFNULL这个函数替换NULL的值
 MariaDB [hellodb]> SELECT e.name 员工姓名,IFNULL(l.name,'无上级') 领导姓名 FROM emp e LEFT JOIN emp l ON e.leader_id=l.id;
 +--------------+--------------+
 | 员工姓名      | 领导姓名      |
@@ -2443,7 +2443,7 @@ LOCK IN SHARE MODE;
 
 
 
-# 多表查询
+## 多表查询
 
 
 
@@ -2952,7 +2952,7 @@ mysql> select st.name 学生姓名,co.Course 考试科目,sc.score 考试成绩 
 
 
 
-# SELECT 语句执行顺序
+## SELECT 语句执行顺序
 
 ```sql
 FROM --> WHERE --> GROUP BY --> HAVING  -->SELECT --> DISTINCT --> ORDER BY --> LIMIT
@@ -3024,7 +3024,7 @@ mysql> SELECT age FROM students as stu WHERE stu.age=22;
 
 
 
-# EXPLAIN
+## EXPLAIN
 
 ```sql
 mysql> EXPLAIN SELECT sum(age) FROM teachers;

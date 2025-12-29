@@ -2,7 +2,7 @@
 title: "argparse"
 ---
 
-# argparse 模块概述
+## argparse 模块概述
 
 `argparse` 是 Python 标准库中用于处理命令行参数的模块，它提供了一种简单而灵活的方式来解析命令行参数，并生成帮助文档。使用 `argparse` 可以轻松地创建命令行工具，以便用户可以通过命令行界面与程序进行交互。
 
@@ -78,7 +78,7 @@ python my_tool.py --verbose --threshold 0.5
 
 
 
-# ArgumentParser
+## ArgumentParser
 
 https://docs.python.org/3/library/argparse.html#argumentparser-objects
 
@@ -89,7 +89,7 @@ https://docs.python.org/3/library/argparse.html#argumentparser-objects
 ```python
 import argparse
 
-# 创建 ArgumentParser 对象
+## 创建 ArgumentParser 对象
 parser = argparse.ArgumentParser(
     prog=None,  # 用于指定程序的名称，默认为 sys.argv[0]
     usage=None,  # 用于自定义使用说明，默认会自动生成
@@ -115,13 +115,13 @@ parser = argparse.ArgumentParser(
 ```python
 import argparse
 
-# 创建一个名为 parser 的 ArgumentParser 对象，并使用 description 参数提供了工具的简短描述。
+## 创建一个名为 parser 的 ArgumentParser 对象，并使用 description 参数提供了工具的简短描述。
 parser = argparse.ArgumentParser(description="My command-line tool")
 ```
 
 
 
-# print_help()
+## print_help()
 
 打印工具的帮助信息。
 
@@ -150,7 +150,7 @@ optional arguments:
 
 
 
-# add_argument()
+## add_argument()
 
 https://docs.python.org/3/library/argparse.html#the-add-argument-method
 
@@ -449,7 +449,7 @@ parser.add_argument("-m", type=int, help="Specify the size of memory occupied (M
 ```
 
 ```py
-# cat test_argparse.py 
+## cat test_argparse.py 
 #!/usr/local/bin/python3
 import argparse
 
@@ -460,7 +460,7 @@ parser.add_argument("-m", type=int, help="Specify the size of memory occupied (M
 parser.print_help()
 
 
-# ./test_argparse.py 
+## ./test_argparse.py 
 usage: test_argparse.py [-h] [-m M]
 
 Memory and CPU stress testing tools
@@ -588,7 +588,7 @@ parser.add_argument("--color", choices=["red", "green", "blue"], help="Choose a 
 
 
 
-# parse_args()
+## parse_args()
 
 一旦你定义了命令行参数，可以通过 `parse_args()` 方法来解析用户提供的命令行参数，并将它们存储在一个命名空间对象中。
 
@@ -599,14 +599,14 @@ parser.add_argument("--color", choices=["red", "green", "blue"], help="Choose a 
 ```python
 import argparse
 
-# 创建 ArgumentParser 对象
+## 创建 ArgumentParser 对象
 parser = argparse.ArgumentParser(description="My command-line tool")
 
-# 定义命令行参数
+## 定义命令行参数
 parser.add_argument("name", help="Your name")
 parser.add_argument("--age", type=int, help="Your age")
 
-# 解析命令行参数
+## 解析命令行参数
 args = parser.parse_args()
 
 print(args)
@@ -651,7 +651,7 @@ Your age is: 30
 ## 范例：2
 
 ```py
-# cat ./modules/test_argparse.py
+## cat ./modules/test_argparse.py
 #!/usr/local/bin/python3
 import argparse
 
@@ -666,13 +666,13 @@ print(args)
 print(args.m)
 
 
-# ./modules/test_argparse.py
+## ./modules/test_argparse.py
 <class 'argparse.Namespace'>
 Namespace(m=None)
 None
 
 
-# ./modules/test_argparse.py -m 1024
+## ./modules/test_argparse.py -m 1024
 <class 'argparse.Namespace'>
 Namespace(m=1024)
 1024
@@ -685,25 +685,25 @@ Namespace(m=1024)
 ```python
 import argparse
 
-# 创建 ArgumentParser 对象
+## 创建 ArgumentParser 对象
 parser = argparse.ArgumentParser(description="My command-line tool")
 
-# 定义命令行参数
+## 定义命令行参数
 parser.add_argument("input", help="Input file path")
 parser.add_argument("--output-file", help="Output file path", default="output.txt")
 parser.add_argument("--verbose", action="store_true", help="Enable verbose mode")
 parser.add_argument("--threshold", type=float, help="Threshold value")
 
-# 解析命令行参数
+## 解析命令行参数
 args = parser.parse_args()
 
-# 访问命令行参数值
+## 访问命令行参数值
 input_file = args.input
 output_file = args.output_file
 verbose_mode = args.verbose
 threshold_value = args.threshold
 
-# 执行相应的操作，根据命令行参数的值
+## 执行相应的操作，根据命令行参数的值
 ```
 
 在命令行中运行这个脚本，可以像下面这样提供参数：
@@ -754,27 +754,27 @@ if __name__ == "__main__":
 
 
 
-# ---
+## ---
 
 
 
 
 
-# sys.argv
+## sys.argv
 
 在 Python 中，你可以使用 `sys.argv` 来访问命令行参数。
 
 `sys.argv` 是一个包含命令行参数的列表，其中第一个元素是脚本的名称，随后的元素是用户提供的参数，如下所示：
 
 ```python
-# cat 3.py 
+## cat 3.py 
 #!/usr/local/bin/python3
 import sys
 
 print(sys.argv)
 
 
-# ./3.py -la 11 22
+## ./3.py -la 11 22
 ['./3.py', '-la', '11', '22']
 ```
 
@@ -783,13 +783,13 @@ print(sys.argv)
 ```python
 import sys
 
-# 获取命令行参数
+## 获取命令行参数
 arguments = sys.argv
 
-# 打印脚本名称
+## 打印脚本名称
 print(f"脚本名称：{arguments[0]}")
 
-# 打印用户提供的参数
+## 打印用户提供的参数
 if len(arguments) > 1:
     print("用户提供的参数：")
     for arg in arguments[1:]:
@@ -820,11 +820,11 @@ arg3
 
 
 
-# ---
+## ---
 
 
 
-# 实现`ls`命令的功能
+## 实现`ls`命令的功能
 
 **要求：**
 
@@ -843,17 +843,17 @@ arg3
 from pathlib import Path
 import argparse
 
-# 创建 ArgumentParser 对象
+## 创建 ArgumentParser 对象
 parser = argparse.ArgumentParser(description="List information about the FILEs (the current directory by default).")
 
-# 定义命令行参数
+## 定义命令行参数
 parser.add_argument("ls", help="List files or directories in the current directory")
 #parser.add_argument("--age", type=int, help="Your age")
 
-# 解析命令行参数
+## 解析命令行参数
 args = parser.parse_args()
 
-# 访问参数值
+## 访问参数值
 print(args)
 print(args.ls)
 
@@ -870,9 +870,9 @@ if args.ls == 'ls':
 
 
 
-# 1
+## 1
 
-# argparser
+## argparser
 
 https://docs.python.org/3/library/argparse.html
 

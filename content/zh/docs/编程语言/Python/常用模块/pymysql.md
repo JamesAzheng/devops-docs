@@ -3,7 +3,7 @@ title: "pymysql"
 ---
 
 
-# 使用流程概述
+## 使用流程概述
 
 PyMySQL 是一个纯 Python 实现的 MySQL 客户端库，用于与 MySQL 服务器进行通信和交互。
 
@@ -75,7 +75,7 @@ PyMySQL 是一个纯 Python 实现的 MySQL 客户端库，用于与 MySQL 服�
 
 
 
-# 连接数据库
+## 连接数据库
 
 ## 通过 json 配置文件传参
 
@@ -101,7 +101,7 @@ import pymysql
 with open(os.path.join(os.path.dirname(__file__), 'config.json')) as f:
     conf = simplejson.load(f)
 
-# 创建连接数据库对象
+## 创建连接数据库对象
 conn = pymysql.connect(**conf)
 ```
 
@@ -127,7 +127,7 @@ pymysql.connect(host='10.0.0.123', password='12345', database='test', user='azhe
 
 
 
-# 创建游标对象
+## 创建游标对象
 
 - 操作数据库，必须使用游标，因此需要先获取一个游标对象（Cursor Object）
 - 游标对象是通过数据库连接对象的 `cursor()` 方法创建
@@ -148,7 +148,7 @@ with open(os.path.join(os.path.dirname(__file__), 'config.json')) as f:
 
 conn = pymysql.connect(**conf)
 
-# 通过连接数据库对象，创建游标对象
+## 通过连接数据库对象，创建游标对象
 cursor = conn.cursor()
 ```
 
@@ -163,7 +163,7 @@ cursor = conn.cursor()
 ```python
 import pymysql
 
-# 连接到 MySQL 数据库
+## 连接到 MySQL 数据库
 connection = pymysql.connect(host='localhost',
                              user='username',
                              password='password',
@@ -194,7 +194,7 @@ finally:
 
 
 
-# 执行 SQL 语句和提交事务
+## 执行 SQL 语句和提交事务
 
 通过游标对象的 `execute()` 或 `executemany()` 方法可以执行 SELECT、INSERT、UPDATE、DELETE 等 SQL 语句。
 
@@ -215,11 +215,11 @@ with open(os.path.join(os.path.dirname(__file__), 'config.json')) as f:
 conn = pymysql.connect(**conf)
 cursor = conn.cursor()
 
-# 要执行的单条SQL语句
+## 要执行的单条SQL语句
 sql = """INSERT INTO students (name, age) VALUES ('tom', 23)"""
-# 通过游标对象，执行sql语句
+## 通过游标对象，执行sql语句
 cursor.execute(sql)
-# 提交事务
+## 提交事务
 conn.commit()
 ```
 
@@ -248,13 +248,13 @@ with open(os.path.join(os.path.dirname(__file__), 'config.json')) as f:
 conn = pymysql.connect(**conf)
 cursor = conn.cursor()
 
-# 多条SQL语句
+## 多条SQL语句
 for i in range(100, 103):
     # 要执行的SQL语句
     sql = """INSERT INTO students (name, age) VALUES ('tom{0}', {0})""".format(i)
     # 通过游标对象，执行sql语句
     cursor.execute(sql)
-# 统一提交事务
+## 统一提交事务
 conn.commit()
 ```
 
@@ -312,7 +312,7 @@ conn.commit()
 ```python
 import pymysql
 
-# 连接数据库
+## 连接数据库
 connection = pymysql.connect(host='your_host',
                              user='your_username',
                              password='your_password',
@@ -347,7 +347,7 @@ finally:
 
 
 
-# 获取 SQL 语句查询结果
+## 获取 SQL 语句查询结果
 
 - 可以使用游标对象的 `fetchone()`、`fetchall()`、`fetchmany(size)` 方法获取查询结果。
 - `fetchone()` 方法用于获取查询结果集中的一行数据。
@@ -435,7 +435,7 @@ while row:
 
 
 
-# 关闭连接
+## 关闭连接
 
 ## close()
 
@@ -446,7 +446,7 @@ while row:
 ```python
 import pymysql
 
-# 连接到 MySQL 数据库
+## 连接到 MySQL 数据库
 connection = pymysql.connect(host='localhost',
                              user='username',
                              password='password',
@@ -488,14 +488,14 @@ finally:
 ```python
 import pymysql
 
-# 连接到 MySQL 数据库
+## 连接到 MySQL 数据库
 connection = pymysql.connect(host='localhost',
                              user='username',
                              password='password',
                              database='database_name',
                              cursorclass=pymysql.cursors.DictCursor)
 
-# 使用 with 语句创建游标，并在 with 代码块结束时自动关闭游标
+## 使用 with 语句创建游标，并在 with 代码块结束时自动关闭游标
 with connection.cursor() as cursor:
     try:
         # 执行 SQL 查询
@@ -513,7 +513,7 @@ with connection.cursor() as cursor:
         # 游标会在 with 代码块结束时自动关闭，所以这里不需要调用 cursor.close()
         pass
 
-# 关闭连接
+## 关闭连接
 connection.close()
 ```
 
@@ -521,9 +521,9 @@ connection.close()
 
 
 
-# ---
+## ---
 
-# 示例：INSERT
+## 示例：INSERT
 
 ```yaml
 #!/usr/local/bin/python3
@@ -570,15 +570,15 @@ with open(os.path.join(os.path.dirname(__file__), 'config.json')) as f:
 conn = pymysql.connect(**conf)
 cursor = conn.cursor()
 
-# 要执行的单条SQL语句
+## 要执行的单条SQL语句
 sql = """INSERT INTO students (name, age) VALUES ('tom', 23)"""
-# 通过游标对象，执行sql语句
+## 通过游标对象，执行sql语句
 cursor.execute(sql)
-# 提交事务
+## 提交事务
 conn.commit()
 ```
 
 
 
-# 示例：SELECT
+## 示例：SELECT
 

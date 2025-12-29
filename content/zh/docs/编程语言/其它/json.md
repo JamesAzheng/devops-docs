@@ -2,7 +2,7 @@
 title: "JSON"
 ---
 
-# JSON 概述
+## JSON 概述
 
 https://www.json.org/
 
@@ -25,7 +25,7 @@ JSON（JavaScript Object Notation）是一种轻量级的数据交换格式，�
 
 
 
-# JSON 数据类型
+## JSON 数据类型
 
 这些基本数据类型可以组合在一起，构成复杂的 JSON 结构，用于表示各种数据。例如，可以在对象中嵌套数组，或者在数组中包含对象，从而构建更复杂的数据结构。 JSON 是一种通用的数据格式，广泛用于数据交换和配置文件等场景。
 

@@ -2,7 +2,7 @@
 title: "SQL"
 ---
 
-# SQL 语言规范
+## SQL 语言规范
 
 - SQL 语句中的关键字、函数名大小写不敏感，但建议用大写。
 - SQL 关键字不能跨多行或简写。
@@ -68,7 +68,7 @@ ORDER BY LastName;
 
 
 
-# SQL 语句分类
+## SQL 语句分类
 
 SQL（Structured Query Language）语句可以分为以下几类：
 
@@ -90,7 +90,7 @@ SQL（Structured Query Language）语句可以分为以下几类：
 
 
 
-# SQL 语句构成
+## SQL 语句构成
 
 关健字Keyword组成子句clause，多条clause组成语句
 
@@ -188,7 +188,7 @@ SQL 子句是构成 SQL 语句的组成部分，用于指定查询、操作或�
 
 这些子句根据 SQL 语句的类型而有所不同。使用这些子句的组合，可以构建各种查询和操作数据库的语句。
 
-# 获取帮助
+## 获取帮助
 
 https://dev.mysql.com/doc/refman/8.0/en/sql-statements.html
 
@@ -200,9 +200,9 @@ mysql> HELP KEYWORD
 
 
 
-# ---
+## ---
 
-# 1
+## 1
 
 SQL（Structured Query Language）是一种用于管理关系型数据库的标准化查询语言。它允许用户执行诸如查询数据、插入、更新和删除数据等操作。以下是一些常用的 SQL 语句及其详解：
 
@@ -285,7 +285,7 @@ SQL（Structured Query Language）是一种用于管理关系型数据库的标�
 
 
 
-# 2
+## 2
 
 SQL（Structured Query Language）是一种标准化的查询语言，用于管理关系型数据库。SQL 的规范定义了一系列语法规则和关键字，以执行各种数据库操作。以下是 SQL 语言的一般规范：
 

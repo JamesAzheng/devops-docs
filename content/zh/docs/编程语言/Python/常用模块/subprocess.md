@@ -2,7 +2,7 @@
 title: "subprocess"
 ---
 
-# subprocess
+## subprocess
 
 `subprocess` 是 Python 中用于创建和管理新进程的模块。它提供了一个更灵活的接口，用于执行外部命令、访问系统 I/O 流以及进行进程间通信。
 
@@ -51,11 +51,11 @@ title: "subprocess"
 
 
 
-# ---
+## ---
 
 
 
-# run()
+## run()
 
 `subprocess.run()` 是 Python `subprocess` 模块中的一个函数，用于执行外部命令并等待其完成。它是 Python 3.5 引入的一个便捷函数，简化了执行外部命令并处理输入、输出和错误的过程。
 
@@ -91,7 +91,7 @@ subprocess.run(args, *, stdin=None, input=None, stdout=None, stderr=None, captur
 ```python
 import subprocess
 
-# 执行命令，并将输入输出流设置为文本模式
+## 执行命令，并将输入输出流设置为文本模式
 result = subprocess.run(['echo', 'Hello, subprocess!'], capture_output=True, text=True)
 
 if result.returncode == 0:
@@ -113,7 +113,7 @@ else:
 ```python
 import subprocess
 
-# 执行命令，并将输入输出流设置为二进制模式
+## 执行命令，并将输入输出流设置为二进制模式
 result = subprocess.run(['echo', 'Hello, subprocess!'], capture_output=True, text=False)
 
 if result.returncode == 0:
@@ -141,7 +141,7 @@ else:
 ```python
 import subprocess
 
-# 执行命令，并捕获输出流
+## 执行命令，并捕获输出流
 result = subprocess.run(['ls', '-l'], capture_output=True, text=True)
 
 if result.returncode == 0:
@@ -165,7 +165,7 @@ else:
 ```python
 import subprocess
 
-# 执行命令，不捕获输出流
+## 执行命令，不捕获输出流
 result = subprocess.run(['ls', '-l'], capture_output=False)
 
 if result.returncode == 0:
@@ -195,7 +195,7 @@ else:
 ```python
 import subprocess
 
-# 执行带有管道的 shell 命令
+## 执行带有管道的 shell 命令
 result = subprocess.run('ls -l | grep .txt', shell=True, capture_output=True, text=True)
 
 if result.returncode == 0:
@@ -232,7 +232,7 @@ def count_files(folder_path, file_extension):
         print("Command failed!")
         print(result.stderr)
 
-# 指定文件夹路径和文件类型（比如统计.py文件数量）
+## 指定文件夹路径和文件类型（比如统计.py文件数量）
 count_files('/path/to/folder', 'py')
 ```
 
@@ -268,7 +268,7 @@ def character_count_in_files(folder_path):
             print(f"Failed to process file: {txt_file}")
             print(result.stderr)
 
-# 指定文件夹路径
+## 指定文件夹路径
 character_count_in_files('/path/to/folder')
 ```
 
@@ -281,21 +281,21 @@ character_count_in_files('/path/to/folder')
 ```python
 import subprocess
 
-# 要执行的Linux命令
+## 要执行的Linux命令
 command = "ls -l"
 
-# 使用subprocess运行命令
+## 使用subprocess运行命令
 result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
-# 打印命令的标准输出
+## 打印命令的标准输出
 print("标准输出:")
 print(result.stdout)
 
-# 打印命令的标准错误（如果有）
+## 打印命令的标准错误（如果有）
 print("标准错误:")
 print(result.stderr)
 
-# 打印命令的返回代码
+## 打印命令的返回代码
 print("返回代码:", result.returncode)
 ```
 
@@ -303,7 +303,7 @@ print("返回代码:", result.returncode)
 
 
 
-# call()
+## call()
 
 `subprocess.call()` 是 `subprocess` 模块中的一个函数，用于执行系统命令。它会等待子进程完成并返回一个表示子进程退出状态的整数值。
 
@@ -322,7 +322,7 @@ subprocess.call(args, *, stdin=None, stdout=None, stderr=None, shell=False, time
 ```python
 import subprocess
 
-# 执行命令，并等待其完成
+## 执行命令，并等待其完成
 return_code = subprocess.call(['ls', '-l'])
 
 if return_code == 0:
@@ -335,7 +335,7 @@ else:
 
 
 
-# check_output()
+## check_output()
 
 `subprocess.check_output()` 是 `subprocess` 模块中的一个函数，用于执行系统命令并获取其输出。与 `subprocess.run()` 或 `subprocess.call()` 不同，`check_output()` 函数直接返回子进程的标准输出，并在命令执行失败时引发 `CalledProcessError` 异常。
 
@@ -356,7 +356,7 @@ subprocess.check_output(args, *, stdin=None, stderr=None, shell=False, timeout=N
 ```python
 import subprocess
 
-# 执行命令，并获取输出
+## 执行命令，并获取输出
 output = subprocess.check_output(['ls', '-l'], text=True)
 
 print("Output:", output)
@@ -364,21 +364,21 @@ print("Output:", output)
 
 在这个示例中，`subprocess.check_output()` 执行 `ls -l` 命令，并返回其输出。如果命令执行失败，将会引发 `CalledProcessError` 异常。与 `subprocess.run()` 或 `subprocess.call()` 不同，`check_output()` 函数专注于获取命令的输出，而不返回退出状态码。
 
-# ---
+## ---
 
 
 
-# Popen()
+## Popen()
 
 `subprocess.Popen()` 允许更复杂的控制和与子进程的交互：
 
 ```python
 import subprocess
 
-# 打开子进程，执行命令
+## 打开子进程，执行命令
 process = subprocess.Popen(['echo', 'Hello, subprocess!'], stdout=subprocess.PIPE)
 
-# 读取子进程的输出
+## 读取子进程的输出
 output, _ = process.communicate()
 print(output.decode())
 ```
@@ -392,7 +392,7 @@ print(output.decode())
 ```python
 import subprocess
 
-# 创建子进程并建立管道通信
+## 创建子进程并建立管道通信
 p1 = subprocess.Popen(['cat', 'file.txt'], stdout=subprocess.PIPE)
 p2 = subprocess.Popen(['grep', 'pattern'], stdin=p1.stdout, stdout=subprocess.PIPE)
 p1.stdout.close()  # 关闭 p1 的输出流，以便在 p2 中触发文件读取
@@ -404,7 +404,7 @@ print(output.decode())
 
 
 
-# CompletedProcess()
+## CompletedProcess()
 
 
 

@@ -3,7 +3,7 @@ title: "Python练习题"
 ---
 
 
-# 质数（素数）
+## 质数（素数）
 
 **求100以内的质数**
 
@@ -28,7 +28,7 @@ def is_prime(n):
             return False
     return True
 
-# 测试
+## 测试
 print(is_prime(5))  # True
 print(is_prime(10)) # False
 
@@ -58,7 +58,7 @@ def find_primes(n):
     # 返回所有质数
     return [i for i in range(2, n+1) if is_prime[i]]
 
-# 测试
+## 测试
 print(find_primes(100000))
 ```
 
@@ -68,7 +68,7 @@ print(find_primes(100000))
 
 
 
-# 阶乘
+## 阶乘
 
 **求5的阶乘**
 
@@ -175,7 +175,7 @@ print(factorial_sum)  # 输出结果为 153，即 1! + 2! + 3! + 4! + 5! = 1 + 2
 
 
 
-# 打印九九乘法表
+## 打印九九乘法表
 
 ## for
 
@@ -303,7 +303,7 @@ func main() {
 
 
 
-# 用户登录验证
+## 用户登录验证
 
 要求：
 
@@ -315,10 +315,10 @@ func main() {
 
 
 ```python
-# 定义一个字典，存储已注册的用户和密码
+## 定义一个字典，存储已注册的用户和密码
 users = {"user1": "password1", "user2": "password2", "user3": "password3"}
 
-# 定义变量，用于记录输入错误的次数
+## 定义变量，用于记录输入错误的次数
 tries = 0
 
 while tries < 3:
@@ -362,7 +362,7 @@ if tries == 3:
 
 
 
-# 打印图形
+## 打印图形
 
 **打印一个边长为n的正方形（分别打印空心和实心的正方形，以*作为正方形的描边）**
 
@@ -371,7 +371,7 @@ if tries == 3:
 ```python
 n = int(input("请输入正方形的边长："))  # 获取输入的正方形边长
 
-# 外部循环控制每一行的输出
+## 外部循环控制每一行的输出
 for i in range(n):
     # 内部循环控制每一行中的字符输出
     for j in range(n):
@@ -396,7 +396,7 @@ for i in range(n):
 ```python
 n = int(input("请输入正方形的边长："))  # 获取输入的正方形边长
 
-# 外部循环控制每一行的输出
+## 外部循环控制每一行的输出
 for i in range(n):
     # 内部循环控制每一行中每个字符的输出
     for j in range(n):
@@ -430,7 +430,7 @@ for i in range(n):
 ```python
 n = int(input("请输入菱形的高度："))  # 获取输入的菱形高度
 
-# 打印上半部分
+## 打印上半部分
 for i in range(n):
     # 打印空格
     for j in range(n - i - 1):
@@ -441,7 +441,7 @@ for i in range(n):
     # 换行
     print()
 
-# 打印下半部分
+## 打印下半部分
 for i in range(n - 2, -1, -1):
     # 打印空格
     for j in range(n - i - 1):
@@ -460,7 +460,7 @@ for i in range(n - 2, -1, -1):
 
 
 
-# 打印杨辉三角
+## 打印杨辉三角
 
 **打印杨辉三角前六行**
 
@@ -471,7 +471,7 @@ for i in range(n - 2, -1, -1):
 
 
 
-# 斐波那契数列
+## 斐波那契数列
 
 **打印100以内的斐波那契数列**
 
@@ -482,10 +482,10 @@ for i in range(n - 2, -1, -1):
 以下是一个实现示例：
 
 ```python
-# 定义斐波那契数列的初始值
+## 定义斐波那契数列的初始值
 fibonacci = [0, 1]
 
-# 循环计算斐波那契数列并输出
+## 循环计算斐波那契数列并输出
 while True:
     # 计算下一个数
     next_num = fibonacci[-1] + fibonacci[-2]
@@ -495,7 +495,7 @@ while True:
     # 将下一个数添加到斐波那契数列中
     fibonacci.append(next_num)
 
-# 输出斐波那契数列
+## 输出斐波那契数列
 print(fibonacci)
 
 ```
@@ -545,7 +545,7 @@ print(result)
 
 
 
-# 其它
+## 其它
 
 **打印1到10**
 
@@ -1076,7 +1076,7 @@ while True:
 
 
 
-# 拷贝文件
+## 拷贝文件
 
 ## 01
 
@@ -1091,7 +1091,7 @@ import shutil
 src_file = "/etc/fstab"
 dst_file = "/tmp/fstab.txt"
 
-# 复制文件
+## 复制文件
 shutil.copy(src_file, dst_file)
 ```
 
@@ -1103,7 +1103,7 @@ shutil.copy(src_file, dst_file)
 
 
 
-# 复制目录
+## 复制目录
 
 选择一个已存在的目录作为当前工作目录，在其下创建a/b/c/d这样的子目录结构并在这些子目录的不同层级生成50个普通文件，要求文件名由随机4个小写字母构成。将a目录下所有内容复制到当前工作目录dst目录下去，要求复制的普通文件的文件名必须是x、y、Z开头。
 举例，假设工作目录是/tmp，构建的目录结构是/tmp/a/b/c/d。在a、b、c、d目录中放入随机生成的文件，这些文件的名称也是随机生成的。最终把a目录下所有的目录也就是b、c、d目录，和文件名开头是x、y、z开头的文件。
@@ -1118,7 +1118,7 @@ import shutil
 import random
 import string
 
-# 创建目录结构并生成随机文件
+## 创建目录结构并生成随机文件
 def create_directory_structure(base_dir):
     for dir_level in ['a', 'b', 'c', 'd']:
         current_dir = os.path.join(base_dir, dir_level)
@@ -1129,7 +1129,7 @@ def create_directory_structure(base_dir):
             with open(os.path.join(current_dir, random_filename), 'w') as file:
                 file.write("This is a random file.")
 
-# 复制指定文件到目标目录
+## 复制指定文件到目标目录
 def copy_files(src_dir, dst_dir):
     for dirpath, dirnames, filenames in os.walk(src_dir):
         for filename in filenames:
@@ -1156,7 +1156,7 @@ if __name__ == "__main__":
 
 
 
-# 单词统计
+## 单词统计
 
 文本生成方式：`man man > man.txt`
 
@@ -1170,13 +1170,13 @@ if __name__ == "__main__":
 import re
 from collections import Counter
 
-# 读取文件内容
+## 读取文件内容
 def read_file(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
         text = file.read()
     return text
 
-# 统计单词出现次数
+## 统计单词出现次数
 def count_words(text):
     # 将文本转换为小写，以不区分大小写
     text = text.lower()
@@ -1189,7 +1189,7 @@ def count_words(text):
     
     return word_counts
 
-# 显示出现次数最多的前十个单词
+## 显示出现次数最多的前十个单词
 def display_top_words(word_counts, n=10):
     top_words = word_counts.most_common(n)
     
@@ -1230,13 +1230,13 @@ if __name__ == "__main__":
 import re
 from collections import Counter
 
-# 读取文件内容
+## 读取文件内容
 def read_file(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
         text = file.read()
     return text
 
-# 统计单词出现次数
+## 统计单词出现次数
 def count_words(text, exclude_words=None):
     # 将文本转换为小写，以不区分大小写
     text = text.lower()
@@ -1253,7 +1253,7 @@ def count_words(text, exclude_words=None):
     
     return word_counts
 
-# 显示出现次数最多的前十个单词
+## 显示出现次数最多的前十个单词
 def display_top_words(word_counts, n=10):
     top_words = word_counts.most_common(n)
     

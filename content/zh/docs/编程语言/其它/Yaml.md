@@ -2,7 +2,7 @@
 title: "yaml"
 ---
 
-# yaml 语言概述
+## yaml 语言概述
 
 - YAML（YAML Ain't Markup Language）是一种人类可读的数据序列化格式，通常用于配置文件和数据交换。它的设计目标是使得数据的表示清晰易懂，同时尽可能地简洁。
 - 目前很多软件中采有此格式的文件，如:ubuntu，anisble，docker，k8s等
@@ -24,7 +24,7 @@ title: "yaml"
 
 
 
-# yaml 语法
+## yaml 语法
 
 ## 基本规则
 
@@ -240,12 +240,12 @@ students:
 假设我们有一个生产环境的配置文件，其中有多个服务器的配置信息。如果这些服务器有一些共同的配置，我们可以使用锚点和引用来避免重复。
 
 ```yaml
-# 定义共同的配置
+## 定义共同的配置
 common_settings: &common
   timeout: 30
   max_connections: 100
 
-# 服务器配置
+## 服务器配置
 servers:
   - name: server1
     <<: *common
@@ -365,7 +365,7 @@ content: |
 
 
 
-# 总结
+## 总结
 
 **yaml文件中，-开头的就是列表，k: v 就是字典，我理解的对吗**
 

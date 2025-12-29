@@ -27,21 +27,21 @@ title: "simplejson"
 ```python
 import simplejson as json
 
-# 将 Python 字典转换为 JSON 字符串
+## 将 Python 字典转换为 JSON 字符串
 python_dict = {'name': 'John', 'age': 30, 'city': 'New York'}
 json_str = json.dumps(python_dict)
 print("JSON 字符串:", json_str)
 
-# 将 JSON 字符串解析为 Python 字典
+## 将 JSON 字符串解析为 Python 字典
 parsed_dict = json.loads(json_str)
 print("Python 字典:", parsed_dict)
 
-# 将 Python 列表转换为 JSON 字符串
+## 将 Python 列表转换为 JSON 字符串
 python_list = [1, 2, 3, 4, 5]
 json_str = json.dumps(python_list)
 print("JSON 字符串:", json_str)
 
-# 将 JSON 字符串解析为 Python 列表
+## 将 JSON 字符串解析为 Python 列表
 parsed_list = json.loads(json_str)
 print("Python 列表:", parsed_list)
 ```

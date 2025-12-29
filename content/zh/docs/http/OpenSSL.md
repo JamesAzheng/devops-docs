@@ -4,7 +4,7 @@ title: "OpenSSL"
 
 
 
-# OpenSSL 概述
+#### OpenSSL 概述
 
 https://www.openssl.org/
 
@@ -15,22 +15,22 @@ https://www.openssl.org/
 - 可以实现对数据的加密以及密码的生成，CA的创建等功能
 - 来自 openssl-libs 包（centos）
 
-## OpenSSL 包含组件
+###### OpenSSL 包含组件
 
 - libcrypto：用于实现加密和解密的库
 - libssl：用于实现ssl通信协议的安全库
 - openssl：多用途命令行工具
 
-## OpenSSL 工作模式
+#### OpenSSL 工作模式
 
 - 交互式
 - 非交互式（script常用）
 
-## openssl 相关配置文件
+#### openssl 相关配置文件
 
 ```bash
 #需要安装
-[root@aliyun data]# rpm -ql openssl-libs
+[root@aliyun data]## rpm -ql openssl-libs
 /etc/pki/tls
 /etc/pki/tls/certs
 /etc/pki/tls/ct_log_list.cnf
@@ -41,12 +41,12 @@ https://www.openssl.org/
 
 
 
-# openssl 实现对称加密
+## openssl 实现对称加密
 
 ```bash
 #准备测试文件
-[root@aliyun ~]# cp /etc/fstab .
-[root@aliyun ~]# ll
+[root@aliyun ~]## cp /etc/fstab .
+[root@aliyun ~]## ll
 total 4
 -rw-r--r-- 1 root root 427 Oct 17 15:42 fstab
 
@@ -54,7 +54,7 @@ total 4
 openssl enc -e -des3 -a -salt -in fstab -out fstab.cipher
 
 #生产的加密文件
-# cat fstab.cipher 
+## cat fstab.cipher 
 U2FsdGVkX1/blsLFgB4zgPPsPucLNFLmGs7Nn6uNlPoDZMAVHhW5/Xfvj/95g93M
 19ly7adgK3/vwcD4OdzxgNIGnxoDmxrp/hjLLAJpMmaK9evMFYPk00z+lA6KJf4c
 hmV8KFNqhfggvDpSiWhFIzj34GeOyhy7UqmXurb52odmHOksNEcA5DfKSgO5Vyey
@@ -75,17 +75,17 @@ RiONuZWLNHdikkkE7R6oLTmtecFKiMDJ1GBrBR1HddDKfkaTYswZu2VNEehqWFsO
 openssl enc -d -des3 -a -salt -in fstab.cipher -out fstab
 
 #解密后的文件
-[root@centos8 ~]# cat fstab
+[root@centos8 ~]## cat fstab
 
 #
-# /etc/fstab
-# Created by anaconda on Mon J
+## /etc/fstab
+## Created by anaconda on Mon J
 ...
 ```
 
 
 
-# openssl 生成PKI
+## openssl 生成PKI
 
 pki：非对称密钥加密体系
 
@@ -111,7 +111,7 @@ pki：非对称密钥加密体系
 
 openssl命令生成密钥对：man genrsa
 
-## 生成私钥
+#### 生成私钥
 
 ```bash
 #用rsa算法生成私钥 rsa算法既能实现加密又能实现数字签名，还有一个是gendsa只支持数字签名
@@ -126,7 +126,7 @@ openssl genrsa -out /data/test.key -des3
 openssl rsa -in /data/test.key -out /data/test.key2
 ```
 
-##    从私钥中提取公钥
+####    从私钥中提取公钥
 
 ```bash
 openssl rsa -in test.key -pubout -out test.pub
@@ -144,60 +144,60 @@ openssl rsa -in test.key -pubout -out test.pub
 
 
 
-# openssl 配置文件说明
+## openssl 配置文件说明
 
 - 记录了CA的一些默认配置，一般无需修改
 
 ```bash
-[root@centos ~]# cat /etc/pki/tls/openssl.cnf 
+[root@centos ~]## cat /etc/pki/tls/openssl.cnf 
 ...
 [ ca ]
 default_ca	= CA_default #默认的ca，一个服务器上可以创建多个ca
 
 ####################################################################
-[ CA_default ] # CA_default 的设置
+[ CA_default ] ## CA_default 的设置
 
-dir		= /etc/pki/CA		# ca的主工作路径，centos8默认不存在，需要手动创建
-certs		= $dir/certs		# 证书存放路径
-crl_dir		= $dir/crl		# 证书吊销列表存放路径
-database	= $dir/index.txt	# 数据库索引文件。
-#unique_subject	= no			# Set to 'no' to allow creation of
-					# several certs with same subject.
-new_certs_dir	= $dir/newcerts		# 新证书的默认存放路径，$dir/crl也会存放一份，相当于有两份，一份为备份
+dir		= /etc/pki/CA		## ca的主工作路径，centos8默认不存在，需要手动创建
+certs		= $dir/certs		## 证书存放路径
+crl_dir		= $dir/crl		## 证书吊销列表存放路径
+database	= $dir/index.txt	## 数据库索引文件。
+#unique_subject	= no			## Set to 'no' to allow creation of
+					## several certs with same subject.
+new_certs_dir	= $dir/newcerts		## 新证书的默认存放路径，$dir/crl也会存放一份，相当于有两份，一份为备份
 
-certificate	= $dir/cacert.pem 	# 根ca证书存放路径
-serial		= $dir/serial 		# 证书颁发编号文件（下一个颁发证书的编号）
-crlnumber	= $dir/crlnumber	# 证书吊销编号文件
-					# must be commented out to leave a V1 CRL
-crl		= $dir/crl.pem 		# 证书吊销列表文件
+certificate	= $dir/cacert.pem 	## 根ca证书存放路径
+serial		= $dir/serial 		## 证书颁发编号文件（下一个颁发证书的编号）
+crlnumber	= $dir/crlnumber	## 证书吊销编号文件
+					## must be commented out to leave a V1 CRL
+crl		= $dir/crl.pem 		## 证书吊销列表文件
 private_key	= $dir/private/cakey.pem #CA私钥存放目录
 
-x509_extensions	= usr_cert		# The extensions to add to the cert
+x509_extensions	= usr_cert		## The extensions to add to the cert
 
-# Comment out the following two lines for the "traditional"
-# (and highly broken) format.
-name_opt 	= ca_default		# 主题名称选项
-cert_opt 	= ca_default		# 证书字段选项
+## Comment out the following two lines for the "traditional"
+## (and highly broken) format.
+name_opt 	= ca_default		## 主题名称选项
+cert_opt 	= ca_default		## 证书字段选项
 
-# Extension copying option: use with caution.
-# copy_extensions = copy
+## Extension copying option: use with caution.
+## copy_extensions = copy
 
-# Extensions to add to a CRL. Note: Netscape communicator chokes on V2 CRLs
-# so this is commented out by default to leave a V1 CRL.
-# crlnumber must also be commented out to leave a V1 CRL.
-# crl_extensions	= crl_ext
+## Extensions to add to a CRL. Note: Netscape communicator chokes on V2 CRLs
+## so this is commented out by default to leave a V1 CRL.
+## crlnumber must also be commented out to leave a V1 CRL.
+## crl_extensions	= crl_ext
 
 default_days	= 365 #证书的有效期，再企业内部用通常要长一些，如：3650(十年)
-default_crl_days= 30			# how long before next CRL
-default_md	= sha256		# use SHA-256 by default
-preserve	= no			# keep passed DN ordering
+default_crl_days= 30			## how long before next CRL
+default_md	= sha256		## use SHA-256 by default
+preserve	= no			## keep passed DN ordering
 
-# A few difference way of specifying how similar the request should look
-# For type CA, the listed attributes must be the same, and the optional
-# and supplied fields are just that :-)
+## A few difference way of specifying how similar the request should look
+## For type CA, the listed attributes must be the same, and the optional
+## and supplied fields are just that :-)
 policy		= policy_match #使用的策略，用户申请证书时，match字段为必须和CA相同
 
-# For the CA policy
+## For the CA policy
 [ policy_match ] #默认策略，policy=字段指定
 countryName		= match
 stateOrProvinceName	= match
@@ -206,9 +206,9 @@ organizationalUnitName	= optional
 commonName		= supplied
 emailAddress		= optional
 
-# For the 'anything' policy
-# At this point in time, you must list all acceptable 'object'
-# types.
+## For the 'anything' policy
+## At this point in time, you must list all acceptable 'object'
+## types.
 [ policy_anything ]
 countryName		= optional
 stateOrProvinceName	= optional
@@ -224,12 +224,12 @@ emailAddress		= optional
 
 
 
-# openssl 选项
+## openssl 选项
 
 - https://www.openssl.org/docs/man3.0/man1/
 - 注意：查阅时要注意openssl的版本，版本不同 则命令或子命令会有所不同
 
-## genrsa
+#### genrsa
 
 `openssl genrsa`是OpenSSL工具的一部分，用于生成RSA密钥对。RSA是一种非对称加密算法，可以用于加密和解密数据，以及进行数字签名和验证。
 
@@ -259,7 +259,7 @@ openssl genrsa -out private_key.pem 2048
 
 
 
-## genpkey
+#### genpkey
 
 `openssl genpkey`是OpenSSL工具的一部分，用于生成密钥对或私钥。它使用OpenSSL库中的密码学功能生成安全的公钥和私钥。
 
@@ -293,7 +293,7 @@ openssl rsa -in private_key.pem -pubout -out public_key.pem
 
 
 
-### genpkey & genrsa
+###### genpkey & genrsa
 
 `openssl genpkey`和`openssl genrsa`是OpenSSL工具中用于生成密钥对的两个不同命令，它们之间有以下区别：
 
@@ -307,7 +307,7 @@ openssl rsa -in private_key.pem -pubout -out public_key.pem
 
 
 
-## req
+#### req
 
 `openssl req`是OpenSSL工具的一部分，用于生成证书签名请求 (Certificate Signing Request, CSR)。CSR是一种包含公钥和证书主题信息的文件，用于向证书颁发机构 (Certificate Authority, CA) 申请数字证书。
 
@@ -337,7 +337,7 @@ openssl req -new -key private_key.pem -out csr.csr
 
 请注意，生成CSR是一项涉及到密码学和证书流程的任务。在实际应用中，建议仔细研究和理解选项、参数和证书要求，并遵循相应的证书颁发机构的要求和流程。
 
-### -subj
+###### -subj
 
 在定义网站证书时，一般需要指定以下内容作为主题信息（Subject）：
 
@@ -380,7 +380,7 @@ subject= /C=US/ST=California/L=San Francisco/O=Example Company/OU=IT Department/
 
 
 
-## x509
+#### x509
 
 `openssl x509`是OpenSSL工具的一部分，用于操作和管理X.509格式的证书。X.509是一种广泛使用的公钥证书标准，用于加密通信、数字签名和身份验证等安全领域。
 
@@ -417,7 +417,7 @@ openssl x509 -in certificate.crt -text
 
 
 
-# 创建私有CA
+## 创建私有CA
 
 即生成自签名证书
 
@@ -425,13 +425,13 @@ openssl x509 -in certificate.crt -text
 
 ```bash
 #创建所需目录
-[root@centos8 ~]# mkdir -p /etc/pki/CA/{certs,crl,newcerts,private}
+[root@centos8 ~]## mkdir -p /etc/pki/CA/{certs,crl,newcerts,private}
 
 #生成证书索引数据库文件（用户向CA申请证书时需要）
-[root@centos8 ~]# touch /etc/pki/CA/index.txt
+[root@centos8 ~]## touch /etc/pki/CA/index.txt
 
 #指定第一个颁发证书的序列号（用户向CA申请证书时需要）
-[root@centos8 ~]# echo 01 > /etc/pki/CA/serial
+[root@centos8 ~]## echo 01 > /etc/pki/CA/serial
 ```
 
 - **2.生成CA私钥**
@@ -453,7 +453,7 @@ openssl x509 -in certificate.crt -text
 -out /etc/pki/CA/cacert.pem #证书的保存路径 #路径和名称由配置文件定义
 
 #生成CA自签名证书
-[root@centos8 ~]# openssl req -new -x509 -key /etc/pki/CA/private/cakey.pem -days 36500 -out /etc/pki/CA/cacert.pem
+[root@centos8 ~]## openssl req -new -x509 -key /etc/pki/CA/private/cakey.pem -days 36500 -out /etc/pki/CA/cacert.pem
 ...
 Country Name (2 letter code) [XX]:CN #国家
 State or Province Name (full name) []:liaoning #省份
@@ -465,13 +465,13 @@ Email Address []: #邮箱地址
 
 
 #范例：查看证书的相关信息
-[root@centos8 ~]# openssl x509 -in /etc/pki/CA/cacert.pem -noout -text 
+[root@centos8 ~]## openssl x509 -in /etc/pki/CA/cacert.pem -noout -text 
 ...
 ```
 
 
 
-# 申请证书并颁发证书
+## 申请证书并颁发证书
 
 PS：申请证书也可以不在CA主机操作，但是需要将证书申请文件拷贝到CA主机才能完成申请，还需将申请到的证书再拷贝回需要证书的主机
 
@@ -479,10 +479,10 @@ PS：申请证书也可以不在CA主机操作，但是需要将证书申请文�
 
 ```bash
 #创建一个目录，假设为app1这个应用申请CA
-[root@centos8 ~]# mkdir -p /data/app1_crt
+[root@centos8 ~]## mkdir -p /data/app1_crt
 
 #为需要使用证书的主机生成生成私钥
-[root@centos8 ~]# ( umask 066 ; openssl genrsa -out /data/app1_crt/app1.key )
+[root@centos8 ~]## ( umask 066 ; openssl genrsa -out /data/app1_crt/app1.key )
 ```
 
 - **2.利用这个私钥 生成证书申请文件**
@@ -492,9 +492,9 @@ PS：申请证书也可以不在CA主机操作，但是需要将证书申请文�
 #要求： 国家，省，公司名称三项必须和CA一致（根据/etc/pki/tls/openssl.cnf中的policy = policy_match 字段指定）
 #Common Name也需指定，例如，您的姓名或服务器的主机名
 
-[root@centos8 ~]# openssl req -new -key /data/app1_crt/app1.key -out /data/app1_crt/app1.csr
+[root@centos8 ~]## openssl req -new -key /data/app1_crt/app1.key -out /data/app1_crt/app1.csr
 
-[root@centos8 ~]# tree /data/app1_crt/
+[root@centos8 ~]## tree /data/app1_crt/
 /data/app1_crt/
 ├── app1.csr #证书申请文件
 └── app1.key
@@ -507,7 +507,7 @@ PS：申请证书也可以不在CA主机操作，但是需要将证书申请文�
 ```bash
 #/etc/pki/CA/certs/app1.crt 表示生成的证书放置的位置
 #通常证书文件都是放在/etc/pki/CA/certs/这个目录下的
-[root@centos8 ~]# openssl ca -in /data/app1_crt/app1.csr -out /etc/pki/CA/certs/app1.crt -days 3600
+[root@centos8 ~]## openssl ca -in /data/app1_crt/app1.csr -out /etc/pki/CA/certs/app1.crt -days 3600
 ...
 Sign the certificate? [y/n]:y #y
 ...
@@ -516,45 +516,45 @@ Write out database with 1 new entries
 Data Base Updated
 
 #查看生成的证书文件
-[root@centos8 ~]# openssl x509 -in /etc/pki/CA/certs/app1.crt -noout -text
+[root@centos8 ~]## openssl x509 -in /etc/pki/CA/certs/app1.crt -noout -text
 #挑一部分来看
-[root@centos8 ~]# openssl x509 -in /etc/pki/CA/certs/app1.crt -noout -subject
+[root@centos8 ~]## openssl x509 -in /etc/pki/CA/certs/app1.crt -noout -subject
 subject=C = CN, ST = liaoning, O = alibaba, CN = centos8
-[root@centos8 ~]# openssl x509 -in /etc/pki/CA/certs/app1.crt -noout -issuer
+[root@centos8 ~]## openssl x509 -in /etc/pki/CA/certs/app1.crt -noout -issuer
 issuer=C = CN, ST = liaoning, L = huludao, O = alibaba
-[root@centos8 ~]# openssl x509 -in /etc/pki/CA/certs/app1.crt -noout -dates 
+[root@centos8 ~]## openssl x509 -in /etc/pki/CA/certs/app1.crt -noout -dates 
 notBefore=Oct 17 15:59:20 2021 GMT
 notAfter=Aug 26 15:59:20 2031 GMT
-[root@centos8 ~]# openssl x509 -in /etc/pki/CA/certs/app1.crt -noout -serial 
+[root@centos8 ~]## openssl x509 -in /etc/pki/CA/certs/app1.crt -noout -serial 
 serial=01
 
 
 #查看指定编号的证书的状态（通过CA的数据库文件来查找并获取状态）
-[root@centos8 ~]# openssl ca -status 01
+[root@centos8 ~]## openssl ca -status 01
 Using configuration from /etc/pki/tls/openssl.cnf
 01=Valid (V)
 
 
 #还会再/etc/pki/CA/newcerts/目录下生成一个和新申请证书相同的文件，相当于备份了
-[root@centos8 ~]# diff /etc/pki/CA/certs/app1.crt /etc/pki/CA/newcerts/01.pem 
-[root@centos8 ~]# 
+[root@centos8 ~]## diff /etc/pki/CA/certs/app1.crt /etc/pki/CA/newcerts/01.pem 
+[root@centos8 ~]## 
 
 #索引文件和序列号文件也会同时更新
-[root@centos8 ~]# cat /etc/pki/CA/index.txt
+[root@centos8 ~]## cat /etc/pki/CA/index.txt
 V	310826155920Z		01	unknown	/C=CN/ST=liaoning/O=alibaba/CN=centos8  
-[root@centos8 ~]# cat /etc/pki/CA/serial
+[root@centos8 ~]## cat /etc/pki/CA/serial
 02
-[root@centos8 ~]# cat /etc/pki/CA/serial.old
+[root@centos8 ~]## cat /etc/pki/CA/serial.old
 01
 ```
 
 - **4.将申请完毕的证书集中保存**
 
 ```bash
-[root@centos8 ~]# cp /etc/pki/CA/certs/app1.crt /data/app1_crt/
+[root@centos8 ~]## cp /etc/pki/CA/certs/app1.crt /data/app1_crt/
 
 #总结
-[root@centos8 ~]# tree /data/app1_crt/
+[root@centos8 ~]## tree /data/app1_crt/
 /data/app1_crt/
 ├── app1.crt #证书文件
 ├── app1.csr #证书申请文件
@@ -563,63 +563,63 @@ V	310826155920Z		01	unknown	/C=CN/ST=liaoning/O=alibaba/CN=centos8
 
 
 
-# 吊销证书
+## 吊销证书
 
-#### 在CA客户端获取要吊销证书的serial
+######## 在CA客户端获取要吊销证书的serial
 
 ```bash
-[root@centos8 ~]# openssl x509 -in /etc/pki/CA/certs/app1.crt -noout  -serial -subject
+[root@centos8 ~]## openssl x509 -in /etc/pki/CA/certs/app1.crt -noout  -serial -subject
 serial=01
 subject=C = CN, ST = liaoning, O = alibaba, CN = centos8
 ```
 
-#### 在CA上，根据客户提交的serial与subject信息，对比检验是否与index.txt文件中的信息一致
+######## 在CA上，根据客户提交的serial与subject信息，对比检验是否与index.txt文件中的信息一致
 
 ```bash
 #吊销证书，/etc/pki/CA/newcerts/01.pem，01.pem表示被吊销证书的serial
-[root@centos8 ~]# openssl ca -revoke /etc/pki/CA/newcerts/01.pem
+[root@centos8 ~]## openssl ca -revoke /etc/pki/CA/newcerts/01.pem
 Using configuration from /etc/pki/tls/openssl.cnf
 Revoking Certificate 01.
 Data Base Updated
 ```
 
-#### 证书吊销后发生的文件变化
+######## 证书吊销后发生的文件变化
 
 ```bash
 #开头为R即表示证书被吊销，正常状态是V
-[root@centos8 ~]# cat /etc/pki/CA/index.txt
+[root@centos8 ~]## cat /etc/pki/CA/index.txt
 R	310826155920Z	211017164217Z	01	unknown	/C=CN/ST=liaoning/O=alibaba/CN=centos8
 ```
 
-#### 指定第一个吊销证书的编号,注意：第一次更新证书吊销列表前，才需要执行
+######## 指定第一个吊销证书的编号,注意：第一次更新证书吊销列表前，才需要执行
 
 ```bash
 #开始是没有这个文件的
-[root@centos8 ~]# cat /etc/pki/CA/crlnumber
+[root@centos8 ~]## cat /etc/pki/CA/crlnumber
 cat: /etc/pki/CA/crlnumber: No such file or directory
 
 #指定第一个吊销证书的编号，同样/etc/pki/CA/crlnumber这个文件也是根据openssl配置文件来指定的
-[root@centos8 ~]# echo 01 > /etc/pki/CA/crlnumber
+[root@centos8 ~]## echo 01 > /etc/pki/CA/crlnumber
 ```
 
-#### 更新证书吊销列表
+######## 更新证书吊销列表
 
 ```bash
-[root@centos8 ~]# openssl ca -gencrl -out /etc/pki/CA/crl.pem
+[root@centos8 ~]## openssl ca -gencrl -out /etc/pki/CA/crl.pem
 Using configuration from /etc/pki/tls/openssl.cnf
 
 #同样吊销证书的编号文件也会更新
-[root@centos8 ~]# cat /etc/pki/CA/crlnumber
+[root@centos8 ~]## cat /etc/pki/CA/crlnumber
 02
 
 #这个文件正常应该放到互联网中通知大家这个证书已经被吊销
 /etc/pki/CA/crl.pem
 ```
 
-#### 查看crl（证书吊销列表）文件
+######## 查看crl（证书吊销列表）文件
 
 ```bash
-[root@centos8 ~]# openssl crl -in /etc/pki/CA/crl.pem -noout -text 
+[root@centos8 ~]## openssl crl -in /etc/pki/CA/crl.pem -noout -text 
 Certificate Revocation List (CRL):
         Version 2 (0x1)
         Signature Algorithm: sha256WithRSAEncryption
@@ -652,11 +652,11 @@ Revoked Certificates:
 #吊销列表文件也可以传到Windows上改为crl后缀来进行查看
 ```
 
-#### 吊销其他证书和以上步骤一样
+######## 吊销其他证书和以上步骤一样
 
 
 
-# 创建自签名证书
+## 创建自签名证书
 
 - 自己的证书给自己用，也不给别人分配，流程和创建私有CA的生成CA自签名证书一样
 - 在一些企业内部应用并且需要证书进行加密时可以使用这种方式
@@ -664,10 +664,10 @@ Revoked Certificates:
 
 ```bash
 #创建nginx证书存放目录
-[root@centos8 ~]# mkdir -p /apps/nginx/certs
+[root@centos8 ~]## mkdir -p /apps/nginx/certs
 
 #自签名CA证书，同时生成ca的key和ca的证书
-[root@centos8 ~]# openssl req -newkey rsa:4096 -nodes -sha256 -keyout /apps/nginx/certs/ca.key -x509 -days 36500 -out /apps/nginx/certs/ca.crt
+[root@centos8 ~]## openssl req -newkey rsa:4096 -nodes -sha256 -keyout /apps/nginx/certs/ca.key -x509 -days 36500 -out /apps/nginx/certs/ca.crt
 ...
 Country Name (2 letter code) [XX]:CN #国家
 State or Province Name (full name) []:liaoning #省份
@@ -678,13 +678,13 @@ Common Name (eg, your name or your server's hostname) []: #通用名称，域名
 Email Address []: #邮箱地址，可选
 
 #此阶段生成的文件
-[root@centos8 ~]# tree /apps/nginx/certs/
+[root@centos8 ~]## tree /apps/nginx/certs/
 /apps/nginx/certs/
 ├── ca.crt #ca的证书
 └── ca.key #ca的私钥
 
 #自制key和csr文件
-[root@centos8 ~]# openssl req -newkey rsa:4096 -nodes -sha256 -keyout /apps/nginx/certs/www.azheng.com.key -out /apps/nginx/certs/www.azheng.com.csr
+[root@centos8 ~]## openssl req -newkey rsa:4096 -nodes -sha256 -keyout /apps/nginx/certs/www.azheng.com.key -out /apps/nginx/certs/www.azheng.com.csr
 ...
 Country Name (2 letter code) [XX]:CN
 State or Province Name (full name) []:liaoning
@@ -700,7 +700,7 @@ A challenge password []:azheng123
 An optional company name []:
 
 #此阶段生成的文件
-[root@centos8 ~]# tree /apps/nginx/certs/
+[root@centos8 ~]## tree /apps/nginx/certs/
 /apps/nginx/certs/
 ├── ca.crt
 ├── ca.key
@@ -708,13 +708,13 @@ An optional company name []:
 └── www.azheng.com.key #证书key文件
 
 #签发证书
-[root@centos8 ~]# openssl x509 -req -days 36500 -in /apps/nginx/certs/www.azheng.com.csr -CA /apps/nginx/certs/ca.crt -CAkey /apps/nginx/certs/ca.key -CAcreateserial -out /apps/nginx/certs/www.azheng.com.crt
+[root@centos8 ~]## openssl x509 -req -days 36500 -in /apps/nginx/certs/www.azheng.com.csr -CA /apps/nginx/certs/ca.crt -CAkey /apps/nginx/certs/ca.key -CAcreateserial -out /apps/nginx/certs/www.azheng.com.crt
 Signature ok
 subject=C = CN, ST = liaoning, L = huludao, O = alibaba, OU = yunwei
 Getting CA Private Key
 
 #此阶段生产的文件
-[root@centos8 ~]# tree /apps/nginx/certs/
+[root@centos8 ~]## tree /apps/nginx/certs/
 /apps/nginx/certs/
 ├── ca.crt
 ├── ca.key
@@ -724,13 +724,13 @@ Getting CA Private Key
 └── www.azheng.com.key
 
 #验证证书内容
-[root@centos8 ~]# openssl x509 -in /apps/nginx/certs/www.azheng.com.crt -noout -text 
+[root@centos8 ~]## openssl x509 -in /apps/nginx/certs/www.azheng.com.crt -noout -text 
 ...
 
 #合并CA和服务器证书成一个文件，注意服务器证书在前
-[root@centos8 ~]# cd /apps/nginx/certs/
-[root@centos8 certs]# cat www.azheng.com.crt ca.crt > www.azheng.com.pem
-[root@centos8 certs]# tree /apps/nginx/certs/
+[root@centos8 ~]## cd /apps/nginx/certs/
+[root@centos8 certs]## cat www.azheng.com.crt ca.crt > www.azheng.com.pem
+[root@centos8 certs]## tree /apps/nginx/certs/
 /apps/nginx/certs/
 ├── ca.crt
 ├── ca.key
@@ -754,7 +754,7 @@ Getting CA Private Key
 
 
 ```sh
-# 自签名CA证书，同时生成ca的key和ca的证书
+## 自签名CA证书，同时生成ca的key和ca的证书
 openssl req \
 -newkey rsa:4096 \
 -nodes \
@@ -766,7 +766,7 @@ openssl req \
 -subj "/C=CN/CN=www.nasm.us"
 
 
-# 自制key和csr文件
+## 自制key和csr文件
 openssl req \
 -newkey rsa:4096 \
 -nodes \
@@ -776,7 +776,7 @@ openssl req \
 -subj "/C=CN/CN=www.nasm.us"
 
 
-# 签发证书
+## 签发证书
 openssl x509 \
 -req -days 36500 \
 -in /etc/nginx/conf.d/www.nasm.us.csr \
@@ -786,13 +786,13 @@ openssl x509 \
 -out /etc/nginx/conf.d/www.nasm.us.crt
 
 
-# 合并CA和服务器证书成一个文件，注意服务器证书在前
+## 合并CA和服务器证书成一个文件，注意服务器证书在前
 cat /etc/nginx/conf.d/www.nasm.us.crt /etc/nginx/conf.d/ca.crt > /etc/nginx/conf.d/www.nasm.us.pem
 
-# 合并CA和服务器证书成一个文件，注意服务器证书在前
-[root@centos8 ~]# cd /apps/nginx/certs/
-[root@centos8 certs]# cat www.azheng.com.crt ca.crt > www.azheng.com.pem
-[root@centos8 certs]# tree /apps/nginx/certs/
+## 合并CA和服务器证书成一个文件，注意服务器证书在前
+[root@centos8 ~]## cd /apps/nginx/certs/
+[root@centos8 certs]## cat www.azheng.com.crt ca.crt > www.azheng.com.pem
+[root@centos8 certs]## tree /apps/nginx/certs/
 /apps/nginx/certs/
 ├── ca.crt
 ├── ca.key
@@ -810,7 +810,7 @@ cat /etc/nginx/conf.d/www.nasm.us.crt /etc/nginx/conf.d/ca.crt > /etc/nginx/conf
 ```sh
 cd /data/certs/nasm.us/
 
-# 自签名CA证书，同时生成ca的key和ca的证书
+## 自签名CA证书，同时生成ca的key和ca的证书
 openssl req \
 -newkey rsa:4096 \
 -nodes \
@@ -822,7 +822,7 @@ openssl req \
 -subj "/C=CN/CN=www.nasm.us"
 
 
-# 自制key和csr文件
+## 自制key和csr文件
 openssl req \
 -newkey rsa:4096 \
 -nodes \
@@ -832,7 +832,7 @@ openssl req \
 -subj "/C=CN/CN=www.nasm.us"
 
 
-# 签发证书
+## 签发证书
 openssl x509 \
 -req -days 36500 \
 -in www.nasm.us.csr \
@@ -842,7 +842,7 @@ openssl x509 \
 -out www.nasm.us.crt
 
 
-# 合并CA和服务器证书成一个文件，注意服务器证书在前
+## 合并CA和服务器证书成一个文件，注意服务器证书在前
 cat www.nasm.us.crt ca.crt > www.nasm.us.pem
 
 

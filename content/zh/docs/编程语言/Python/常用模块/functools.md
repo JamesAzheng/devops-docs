@@ -2,7 +2,7 @@
 title: "functools"
 ---
 
-# functools
+## functools
 
 `functools` 模块是 Python 标准库中的一个模块，它提供了一些用于高阶函数（Higher-Order Functions）和函数操作的工具。高阶函数是那些接受一个或多个函数作为参数或返回一个函数作为结果的函数。`functools` 模块包括一些有用的函数，如 `partial`、`reduce`、`wraps` 等，用于函数的修饰、组合和操作。
 
@@ -13,7 +13,7 @@ title: "functools"
 ```python
 from functools import partial
 
-# 创建一个新函数，固定了一个参数
+## 创建一个新函数，固定了一个参数
 double = partial(lambda x, y: x * y, 2)
 result = double(5)  # 等同于调用 lambda x: 2 * x，返回 10
 ```
@@ -23,7 +23,7 @@ result = double(5)  # 等同于调用 lambda x: 2 * x，返回 10
 ```python
 from functools import reduce
 
-# 使用 reduce 计算阶乘
+## 使用 reduce 计算阶乘
 result = reduce(lambda x, y: x * y, range(1, 6))  # 返回 120，即 5!
 ```
 

@@ -3,7 +3,7 @@ title: "logging"
 ---
 
 
-# logging 模块概述
+## logging 模块概述
 
 https://docs.python.org/3/library/logging.html?highlight=logging#module-logging
 
@@ -25,7 +25,7 @@ https://docs.python.org/3/library/logging.html?highlight=logging#module-logging
 
 
 
-# Level
+## Level
 
 日志级别指的是产生日志的事件的严重程度。
 
@@ -69,13 +69,13 @@ https://docs.python.org/3/library/logging.html?highlight=logging#module-logging
 ```python
 import logging
 
-# 创建一个Logger实例
+## 创建一个Logger实例
 logger = logging.getLogger('my_logger')
 
-# 设置Logger的级别为DEBUG
+## 设置Logger的级别为DEBUG
 logger.setLevel(logging.DEBUG)
 
-# 记录DEBUG级别的日志消息
+## 记录DEBUG级别的日志消息
 logger.debug('This is a debug message.')  # 会被记录
 ```
 
@@ -163,10 +163,10 @@ logger.debug('This is a debug message.')  # 会被记录
 ```python
 import logging
 
-# 创建一个Logger实例
+## 创建一个Logger实例
 logger = logging.getLogger('my_logger')
 
-# 记录不同级别的日志消息
+## 记录不同级别的日志消息
 logger.debug('This is a debug message.')      # 不会被记录
 logger.info('This is an info message.')        # 不会被记录
 logger.warning('This is a warning message.')  # 会被记录
@@ -181,13 +181,13 @@ logger.critical('This is a critical message.') # 会被记录
 ```python
 import logging
 
-# 设置全局默认日志级别为DEBUG
+## 设置全局默认日志级别为DEBUG
 logging.basicConfig(level=logging.DEBUG)
 
-# 创建一个Logger实例
+## 创建一个Logger实例
 logger = logging.getLogger('my_logger')
 
-# 现在记录DEBUG级别的日志消息将被记录
+## 现在记录DEBUG级别的日志消息将被记录
 logger.debug('This is a debug message.')
 ```
 
@@ -354,7 +354,7 @@ logger.debug('This is a debug message.')
 
 
 
-# Logger
+## Logger
 
 `Logger` 是 Python `logging` 模块中的核心组件之一，用于记录应用程序的日志消息。`Logger` 对象负责处理和分发日志消息，允许您按照不同的级别、目标和格式来记录日志。以下是关于 `Logger` 的详细解释：
 
@@ -429,14 +429,13 @@ import logging
 
 FORMAT = "%(asctime)s %(levelname)s \x01 %(message)s"
 
-# 
-logging.basicConfig(format=FORMAT, datefmt="%Y-%m-%d %H:%M:%S", filename='/var/log/test.log')
+## logging.basicConfig(format=FORMAT, datefmt="%Y-%m-%d %H:%M:%S", filename='/var/log/test.log')
 
 for i in range(6):
     logging.warning('warning ~~~')
 
 
-# tail -f /var/log/test.log
+## tail -f /var/log/test.log
 2023-10-10 10:55:36 WARNING  warning ~~~
 2023-10-10 10:55:36 WARNING  warning ~~~
 2023-10-10 10:55:36 WARNING  warning ~~~
@@ -447,7 +446,7 @@ for i in range(6):
 
 
 
-# Handler
+## Handler
 
 `Handler` 是 Python `logging` 模块中的重要组件之一，用于定义如何处理和分发日志消息。每个 `Handler` 对象决定了日志消息的输出目标，例如将消息写入文件、发送到网络套接字、输出到控制台等。以下是关于 `Handler` 的详细解释：
 
@@ -509,7 +508,7 @@ for i in range(6):
 
 
 
-# Formatter
+## Formatter
 
 `Formatter` 是 Python `logging` 模块中的一个重要组件，用于定义日志消息的输出格式。通过定义 `Formatter`，您可以自定义日志消息的外观，包括时间戳、级别、消息文本等。
 
@@ -588,7 +587,7 @@ for i in range(6):
 ### 默认记录格式
 
 ```python
-# cat 1.py 
+## cat 1.py 
 #!/usr/local/bin/python3
 import logging
 
@@ -596,7 +595,7 @@ logging.warning('warning ~~~')
 
 
 
-# ./1.py 
+## ./1.py 
 WARNING:root:warning ~~~
 ```
 
@@ -649,13 +648,13 @@ logging.warning('warning ~~~')
 ```python
 import logging
 
-# 定义自定义格式化字符串，使用 '\x01' 作为分隔符
+## 定义自定义格式化字符串，使用 '\x01' 作为分隔符
 FORMAT = "%(asctime)s %(levelname)s \x01 %(message)s"
 
-# 配置根Logger的格式和日期时间格式
+## 配置根Logger的格式和日期时间格式
 logging.basicConfig(format=FORMAT, datefmt="%Y-%m-%d %H:%M:%S")
 
-# 记录一条警告级别的日志消息
+## 记录一条警告级别的日志消息
 logging.warning('warning ~~~')
 ```
 
@@ -666,28 +665,28 @@ logging.warning('warning ~~~')
 ```python
 import logging
 
-# 定义自定义格式化字符串，使用 '\x01' 作为分隔符
+## 定义自定义格式化字符串，使用 '\x01' 作为分隔符
 FORMAT = "%(asctime)s %(levelname)s \x01 %(message)s"
 
-# 配置根Logger的格式和日期时间格式
+## 配置根Logger的格式和日期时间格式
 logging.basicConfig(format=FORMAT, datefmt="%Y-%m-%d %H:%M:%S")
 
-# 记录一条警告级别的日志消息
+## 记录一条警告级别的日志消息
 logging.warning('2023-10-09 15:30:00 WARNING \x01 This is a warning message.')
 
-# 记录另一条信息
+## 记录另一条信息
 logging.info('2023-10-09 15:31:00 INFO \x01 This is an info message.')
 
-# 记录一条错误消息
+## 记录一条错误消息
 logging.error('2023-10-09 15:32:00 ERROR \x01 This is an error message.')
 
-# 模拟从日志文件中读取的日志消息
+## 模拟从日志文件中读取的日志消息
 log_entry = "2023-10-09 15:33:00 WARNING \x01 Another warning message."
 
-# 分割日志消息
+## 分割日志消息
 parts = log_entry.split('\x01')
 
-# 解析日志消息的各个部分
+## 解析日志消息的各个部分
 if len(parts) == 3:
     timestamp, level, message = parts
     print("Timestamp:", timestamp)
@@ -710,13 +709,13 @@ else:
 ```python
 import logging
 
-# 定义自定义格式化字符串，使用 '\x01' 作为分隔符，并包括了 %(alias)s 格式化代码
+## 定义自定义格式化字符串，使用 '\x01' 作为分隔符，并包括了 %(alias)s 格式化代码
 FORMAT = "%(asctime)s %(levelname)s \x01 %(message)s %(alias)s"
 
-# 配置根 Logger 的格式和日期时间格式
+## 配置根 Logger 的格式和日期时间格式
 logging.basicConfig(format=FORMAT, datefmt="%Y-%m-%d %H:%M:%S")
 
-# 记录一条警告级别的日志消息
+## 记录一条警告级别的日志消息
 logging.warning('warning ~~~')
 ```
 
@@ -727,16 +726,16 @@ logging.warning('warning ~~~')
 ```python
 import logging
 
-# 定义自定义格式化字符串，使用 '\x01' 作为分隔符，并包括了 %(alias)s 格式化代码
+## 定义自定义格式化字符串，使用 '\x01' 作为分隔符，并包括了 %(alias)s 格式化代码
 FORMAT = "%(asctime)s %(levelname)s \x01 %(message)s %(alias)s"
 
-# 配置根 Logger 的格式和日期时间格式
+## 配置根 Logger 的格式和日期时间格式
 logging.basicConfig(format=FORMAT, datefmt="%Y-%m-%d %H:%M:%S")
 
-# 定义一个名为 'alias' 的字典，包含了别名信息
+## 定义一个名为 'alias' 的字典，包含了别名信息
 alias = {'alias': 'azheng'}
 
-# 记录一条警告级别的日志消息，并通过 'extra' 参数传递了自定义字段
+## 记录一条警告级别的日志消息，并通过 'extra' 参数传递了自定义字段
 logging.warning('warning ~~~', extra=alias)
 
 
@@ -754,7 +753,7 @@ logging.warning('warning ~~~', extra=alias)
 ```python
 import logging
 
-# 创建自定义Formatter类
+## 创建自定义Formatter类
 class MyFormatter(logging.Formatter):
     def format(self, record):
         # 自定义格式化代码
@@ -764,22 +763,22 @@ class MyFormatter(logging.Formatter):
         # 将自定义字段添加到默认消息中
         return "{} - {}".format(log_message, custom_field)
 
-# 创建Logger实例
+## 创建Logger实例
 logger = logging.getLogger('my_logger')
 logger.setLevel(logging.DEBUG)
 
-# 创建Handler实例
+## 创建Handler实例
 handler = logging.StreamHandler()
 handler.setLevel(logging.DEBUG)
 
-# 创建自定义Formatter实例
+## 创建自定义Formatter实例
 formatter = MyFormatter('%(asctime)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 
-# 将Handler添加到Logger
+## 将Handler添加到Logger
 logger.addHandler(handler)
 
-# 记录带有自定义字段的日志消息
+## 记录带有自定义字段的日志消息
 logger.debug('This is a debug message.', extra={'custom_data': '12345'})
 ```
 
@@ -810,18 +809,18 @@ WARNING: This is a warning message.
 ```python
 import logging
 
-# 创建一个Formatter实例，定义自定义格式
+## 创建一个Formatter实例，定义自定义格式
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 
-# 创建一个Handler实例，并将Formatter设置为自定义格式
+## 创建一个Handler实例，并将Formatter设置为自定义格式
 handler = logging.StreamHandler()
 handler.setFormatter(formatter)
 
-# 获取根Logger实例并添加Handler
+## 获取根Logger实例并添加Handler
 logger = logging.getLogger()
 logger.addHandler(handler)
 
-# 记录一条日志消息
+## 记录一条日志消息
 logger.warning('This is a customized warning message.')
 ```
 
@@ -833,11 +832,11 @@ logger.warning('This is a customized warning message.')
 
 
 
-# ---
+## ---
 
 
 
-# 示例：使用默认 Logger
+## 示例：使用默认 Logger
 
 在 Python 的 `logging` 模块中，存在一个名为 "root logger" 或 "默认 logger" 的默认日志记录器。这个默认的日志记录器是模块初始化时自动创建的，并且没有指定名称。它是全局的，可以在整个应用程序中使用。
 
@@ -878,7 +877,7 @@ logger.setLevel(logging.WARNING)
 name = 'John'
 age = 30
 
-# 使用str.format()将变量的值包含在日志消息中
+## 使用str.format()将变量的值包含在日志消息中
 logger.warning('User {} is {} years old'.format(name, age))
 ```
 
@@ -895,7 +894,7 @@ logger.setLevel(logging.WARNING)
 name = 'John'
 age = 30
 
-# 使用C语言风格的格式化字符串将变量的值包含在日志消息中
+## 使用C语言风格的格式化字符串将变量的值包含在日志消息中
 logger.warning('User %s is %d years old', name, age)
 ```
 
@@ -931,7 +930,7 @@ logging.error('error ~~~')
 
 
 
-# 示例：自定义 Logger
+## 示例：自定义 Logger
 
 尽管默认日志记录器非常方便，但通常在实际应用程序中，建议使用显式命名的Logger对象来进行更细粒度的日志记录和控制。这些显式的Logger对象可以通过`logging.getLogger('name')`创建，其中 `'name'` 是Logger的名称，用于将日志消息进行分类和组织。
 
@@ -942,22 +941,22 @@ logging.error('error ~~~')
 ```python
 import logging
 
-# 创建一个Logger实例
+## 创建一个Logger实例
 logger = logging.getLogger('my_logger')
 logger.setLevel(logging.DEBUG)
 
-# 创建一个文件处理程序，将日志写入文件
+## 创建一个文件处理程序，将日志写入文件
 file_handler = logging.FileHandler('my_log.log')
 file_handler.setLevel(logging.DEBUG)
 
-# 创建一个格式化程序，定义日志消息的格式
+## 创建一个格式化程序，定义日志消息的格式
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 file_handler.setFormatter(formatter)
 
-# 将处理程序添加到Logger
+## 将处理程序添加到Logger
 logger.addHandler(file_handler)
 
-# 记录不同级别的日志消息
+## 记录不同级别的日志消息
 logger.debug('This is a debug message.')
 logger.info('This is an info message.')
 logger.warning('This is a warning message.')

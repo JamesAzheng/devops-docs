@@ -4,10 +4,10 @@ title: "NPM 概述"
 
 NPM（Node Package Manager）是JavaScript的包管理器，也是Node.js的默认包管理器。它可以让开发者分享和重用代码，并管理项目的依赖关系。以下是使用NPM的一些基本操作简介：
 
-# 安装 Node.js 和 NPM
+## 安装 Node.js 和 NPM
 要使用NPM，首先需要安装Node.js，它包含了NPM。你可以从[Node.js官方网站](https://nodejs.org/)下载安装程序。
 
-# 基本NPM命令
+## 基本NPM命令
 
 1. **初始化新项目**
    ```sh
@@ -64,7 +64,7 @@ NPM（Node Package Manager）是JavaScript的包管理器，也是Node.js的默�
    npm run start
    ```
 
-# 示例 package.json
+## 示例 package.json
 以下是一个`package.json`文件的简单示例：
 
 ```json
@@ -88,18 +88,18 @@ NPM（Node Package Manager）是JavaScript的包管理器，也是Node.js的默�
 }
 ```
 
-# 有用的NPM命令
+## 有用的NPM命令
 - **列出已安装的包:** `npm list`
 - **检查过时的包:** `npm outdated`
 - **审计漏洞:** `npm audit`
 - **修复漏洞:** `npm audit fix`
 
-# 总结
+## 总结
 NPM是一个强大的工具，可以简化JavaScript项目及其依赖关系的管理。通过掌握NPM，你可以优化开发过程，确保项目的可维护性和及时更新。
 
 
 
-# 使用国内 npm 源
+## 使用国内 npm 源
 
 为了加快在国内使用NPM时的下载速度，可以指定使用国内的NPM源。常用的国内NPM源有淘宝镜像。下面是一些配置方法：
 
@@ -207,11 +207,11 @@ registry=https://registry.npm.taobao.org
 
 
 
-# ---
+## ---
 
 
 
-# 一次性临时使用国内源
+## 一次性临时使用国内源
 
 如果你只想临时使用一次国内源进行安装，可以在命令前加上`--registry`选项，例如：
 
@@ -221,7 +221,7 @@ npm install <包名> --registry=http://registry.npmmirror.com
 
 
 
-# 在 `.npmrc` 文件中设置国内源
+## 在 `.npmrc` 文件中设置国内源
 
 **全局 `.npmrc` 文件：**
 

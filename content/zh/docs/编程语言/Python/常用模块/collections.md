@@ -12,24 +12,24 @@ title: "collections"
 
 
 
-# OrderedDict
+## OrderedDict
 
 `OrderedDict` 是 `collections` 模块中的一个类，它是一个有序字典，保持插入元素的顺序。与普通的字典不同，`OrderedDict` 记录元素的添加顺序，并在迭代时按照插入的顺序返回元素。
 
 ```python
 from collections import OrderedDict
 
-# 创建一个有序字典
+## 创建一个有序字典
 ordered_dict = OrderedDict()
 
-# 添加元素
+## 添加元素
 ordered_dict['a'] = 1
 ordered_dict['b'] = 2
 ordered_dict['c'] = 3
 
-# 打印有序字典
+## 打印有序字典
 print(ordered_dict)
-# Output: OrderedDict([('a', 1), ('b', 2), ('c', 3)])
+## Output: OrderedDict([('a', 1), ('b', 2), ('c', 3)])
 ```
 
 通过使用 `OrderedDict`，你可以确保字典的遍历顺序与元素添加的顺序一致。这在需要按照特定顺序处理字典元素时非常有用。
@@ -38,7 +38,7 @@ print(ordered_dict)
 
 
 
-# namedtuple
+## namedtuple
 
 `collections` 模块中的 `namedtuple` 提供了一种创建具有命名字段的轻量级对象类型的方法，类似于结构体。它是一个工厂函数，用于创建命名元组类。
 

@@ -3,7 +3,7 @@ title: "psutil"
 ---
 
 
-# Process()
+## Process()
 
 在Python中，有一些库可以用来控制进程的CPU亲缘性绑定，比如`psutil`和`os.sched_setaffinity`。
 
@@ -16,7 +16,7 @@ def bind_process_to_cores(process_id, core_list):
     p = psutil.Process(process_id)
     p.cpu_affinity(core_list)
 
-# 示例：将进程绑定到CPU核心0和1
+## 示例：将进程绑定到CPU核心0和1
 process_id_to_bind = 1234  # 替换为你的进程ID
 cores_to_bind = [0, 1]     # 替换为你想要绑定的CPU核心列表
 

@@ -3,7 +3,7 @@ title: "TCP 编程"
 ---
 
 
-# TCP 服务端编程
+## TCP 服务端编程
 
 下面这些步骤概括了一个基本的TCP服务端程序的工作流程。您可以根据具体需求对其进行扩展和优化，例如使用多线程或多进程处理多个客户端连接，或实现更复杂的应用程序逻辑。
 
@@ -52,7 +52,7 @@ socket.socket(family, type, proto=0, fileno=None)
 ```python
 import socket
 
-# 创建一个IPv4 TCP套接字
+## 创建一个IPv4 TCP套接字
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 ```
 
@@ -61,7 +61,7 @@ server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 ```py
 import socket
 
-# 创建一个IPv6 UDP套接字
+## 创建一个IPv6 UDP套接字
 udp_socket = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
 ```
 
@@ -591,7 +591,7 @@ import socket
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# 绑定地址和端口
+## 绑定地址和端口
 server_address = ('127.0.0.1', 8080)
 server_socket.bind(server_address)
 ```
@@ -661,7 +661,7 @@ server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_address = ('127.0.0.1', 8080)
 server_socket.bind(server_address)
 
-# 最多同时处理5个等待连接的客户端
+## 最多同时处理5个等待连接的客户端
 server_socket.listen(5)
 ```
 
@@ -783,10 +783,10 @@ server_socket.bind(server_address)
 
 server_socket.listen(5)
 
-# 使用 accept() 方法接受客户端的连接请求。这个方法会阻塞程序，直到有客户端尝试连接。
+## 使用 accept() 方法接受客户端的连接请求。这个方法会阻塞程序，直到有客户端尝试连接。
 client_socket, client_address = server_socket.accept()
 
-# accept() 方法还返回了客户端的地址信息，包括IP地址和端口号。这对于识别和跟踪连接的客户端非常有用。
+## accept() 方法还返回了客户端的地址信息，包括IP地址和端口号。这对于识别和跟踪连接的客户端非常有用。
 print(type(client_socket), client_socket) # <class 'socket.socket'> <socket.socket fd=452, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('10.0.0.1', 9999), raddr=('10.0.0.123', 51494)>
 print(type(client_address), client_address) # <class 'tuple'> ('10.0.0.123', 41784)
 ```
@@ -833,7 +833,7 @@ client_socket, client_address = server_socket.accept()
 
 client_socket.send(b'Hello, client!') # 发送数据给客户端
 
-# 记得关闭
+## 记得关闭
 client_socket.close() # 当与客户端的通信完成后，使用 close() 方法关闭客户端套接字。
 server_socket.close() # 如果服务器需要停止运行，使用 close() 方法关闭服务器套接字。
 ```
@@ -957,10 +957,10 @@ client_socket, client_address = server_socket.accept()
 
 data = client_socket.recv(1024)  # 接收最多1024字节的数据，通常为2048、4096以此类推
 
-# 使用 telnet 发送数据后会显示例如以下内容：
+## 使用 telnet 发送数据后会显示例如以下内容：
 print(type(data), data) # <class 'bytes'> b'hello server!\r\n'
 
-# 记得关闭
+## 记得关闭
 client_socket.close() # 当与客户端的通信完成后，使用 close() 方法关闭客户端套接字。
 server_socket.close() # 如果服务器需要停止运行，使用 close() 方法关闭服务器套接字。
 ```
@@ -1182,14 +1182,14 @@ data = client_socket.recv(1024)  # 接收最多1024字节的数据
 ```py
 import socket
 
-# 创建服务器套接字
+## 创建服务器套接字
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_address = ('0.0.0.0', 9999)
 server_socket.bind(server_address)
 server_socket.listen(5)
 print("Server is listening on port 9999...")
 
-# 接受客户端连接
+## 接受客户端连接
 client_socket, client_address = server_socket.accept()
 print(f"Connection from {client_address} has been established.")
 
@@ -1231,10 +1231,10 @@ finally:
 import socket
 import threading
 
-# 维护所有客户端连接
+## 维护所有客户端连接
 clients = []
 
-# 广播消息给所有客户端
+## 广播消息给所有客户端
 def broadcast(message, source_client):
     for client in clients:
         if client != source_client:
@@ -1245,7 +1245,7 @@ def broadcast(message, source_client):
                 client.close()
                 clients.remove(client)
 
-# 处理客户端连接
+## 处理客户端连接
 def handle_client(client_socket):
     while True:
         try:
@@ -1259,7 +1259,7 @@ def handle_client(client_socket):
     client_socket.close()
     clients.remove(client_socket)
 
-# 主函数，设置并启动服务器
+## 主函数，设置并启动服务器
 def main():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_address = ('0.0.0.0', 9999)
@@ -1285,7 +1285,7 @@ if __name__ == "__main__":
 import socket
 import threading
 
-# 接收来自服务器的消息
+## 接收来自服务器的消息
 def receive_messages(client_socket):
     while True:
         try:
@@ -1344,7 +1344,7 @@ if __name__ == "__main__":
 有问题，待排查
 
 ```py
-# TCP Chat Server
+## TCP Chat Server
 import datetime
 import socket
 import threading
@@ -1430,7 +1430,7 @@ while True:
 
 
 
-# TCP 客户端编程
+## TCP 客户端编程
 
 下面是一个示例代码：
 
@@ -1520,7 +1520,7 @@ if __name__ == '__main__':
 还有很多问题，仅供参考。
 
 ```py
-# TCP Chat Client
+## TCP Chat Client
 import threading
 import socket
 
@@ -1570,7 +1570,7 @@ while True:
 
 
 
-# Makefile
+## Makefile
 
 在 Python 中，`socket` 模块提供了用于网络通信的功能。其中，`makefile` 方法是 `socket` 对象的一个方法，它返回一个类文件对象，该对象允许你使用文件 I/O 接口来读写套接字。
 
@@ -1597,10 +1597,10 @@ socket.makefile(mode='r', buffering=None, encoding=None, errors=None, newline=No
 ```python
 import socket
 
-# 创建一个 TCP/IP 套接字
+## 创建一个 TCP/IP 套接字
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# 连接到服务器
+## 连接到服务器
 server_address = ('localhost', 10000)
 sock.connect(server_address)
 

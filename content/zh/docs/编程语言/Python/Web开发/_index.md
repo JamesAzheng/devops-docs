@@ -4,7 +4,7 @@ title: "Web开发"
 
 
 
-# Python 常用 Web 框架
+## Python 常用 Web 框架
 
 Python中一些常用的Web框架包括：
 
@@ -22,7 +22,7 @@ Python中一些常用的Web框架包括：
 
 
 
-# WSGI
+## WSGI
 
 WSGI（Web Server Gateway Interface，Web 服务器网关接口）是 Python 编程语言中定义的一种简单而通用的接口标准，用于 Web 服务器与 Web 应用程序或框架之间的通信。WSGI 由 PEP 333 和 PEP 3333 标准化，旨在促进 Web 服务器和 Web 应用程序之间的互操作性。
 
@@ -76,12 +76,12 @@ def simple_app(environ, start_response):
 ```python
 from wsgiref.simple_server import make_server
 
-# 创建一个 WSGI 服务器，监听本地 8000 端口
+## 创建一个 WSGI 服务器，监听本地 8000 端口
 server = make_server('localhost', 8000, simple_app)
 
 print("Serving on port 8000...")
 
-# 启动服务器
+## 启动服务器
 server.serve_forever()
 ```
 
@@ -126,7 +126,7 @@ class SimpleMiddleware:
 
         return response
 
-# 使用中间件包装 WSGI 应用程序
+## 使用中间件包装 WSGI 应用程序
 app_with_middleware = SimpleMiddleware(simple_app)
 ```
 

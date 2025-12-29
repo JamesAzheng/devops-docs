@@ -2,21 +2,21 @@
 title: "JVM"
 ---
 
-# JVM 概述
+## JVM 概述
 
 - Java Virtual Machine，Java 虚拟机
 
 ```bash
-# Oracle JDK8，默认的JVM是：HotSpot
-# java -version
+## Oracle JDK8，默认的JVM是：HotSpot
+## java -version
 java version "1.8.0_311"
 Java(TM) SE Runtime Environment (build 1.8.0_311-b11)
 Java HotSpot(TM) 64-Bit Server VM (build 25.311-b11, mixed mode)
 
 ---
 
-# Open JDK8
-# java -version
+## Open JDK8
+## java -version
 openjdk version "1.8.0_312"
 OpenJDK Runtime Environment (build 1.8.0_312-b07)
 OpenJDK 64-Bit Server VM (build 25.312-b07, mixed mode)
@@ -29,7 +29,7 @@ OpenJDK 64-Bit Server VM (build 25.312-b07, mixed mode)
 
 
 
-# JVM 组成
+## JVM 组成
 
 <img src="/docs/编程语言/Java/jvm.png" alt="jvm" style="zoom: 67%;" />
 
@@ -105,9 +105,9 @@ OpenJDK 64-Bit Server VM (build 25.312-b07, mixed mode)
 
 
 
-# ---
+## ---
 
-# 堆内存分代
+## 堆内存分代
 
 <img src="/docs/编程语言/Java/堆内存分代.png" alt="堆内存分代" style="zoom: 50%;" />
 
@@ -168,7 +168,7 @@ OpenJDK 64-Bit Server VM (build 25.312-b07, mixed mode)
 
 
 
-# Garbage Collection（GC）
+## Garbage Collection（GC）
 
 - Garbage Collection  垃圾收集器，**只有运行时数据区的堆有垃圾 需要回收 其他地方没有垃圾**
 
@@ -397,7 +397,7 @@ Copying 复制
 
 
 
-# 堆内存 GC 过程
+## 堆内存 GC 过程
 
 ## 年轻代回收 Minor GC 
 
@@ -453,9 +453,9 @@ Copying 复制
 
 
 
-# ---
+## ---
 
-# JVM 优化前言
+## JVM 优化前言
 
 **很多场合都需要对 JVM 进行优化调整，比如：**
 
@@ -483,7 +483,7 @@ Copying 复制
 
 
 
-# Java 内存调整相关参数
+## Java 内存调整相关参数
 
 ## Java 选项分类
 
@@ -499,24 +499,24 @@ Copying 复制
 - man java
 
 ```bash
-# 查看Java的标准选项
+## 查看Java的标准选项
 java
 
-# 查看Java的非标准选项
+## 查看Java的非标准选项
 java -X
 
 ------------------------------------------------------------------------------
 
-# 如果不将标准错误隐藏输出 2> /dev/null 则还会显示 java 的选项说明
+## 如果不将标准错误隐藏输出 2> /dev/null 则还会显示 java 的选项说明
 
-# 查看所有不稳定选项的当前生效值
+## 查看所有不稳定选项的当前生效值
 java -XX:+PrintFlagsFinal 2> /dev/null
 
-# 查看所有不稳定选项的默认值
+## 查看所有不稳定选项的默认值
 java -XX:+PrintFlagsInitial 2> /dev/null
 
-# 查看当前命令行的使用的选项设置
-# 如果显示：-XX:useParallelGC 说明当前使用 Parallel Scavenge + Parallel old
+## 查看当前命令行的使用的选项设置
+## 如果显示：-XX:useParallelGC 说明当前使用 Parallel Scavenge + Parallel old
 java -XX:+PrintCommandLineFlags 2> /dev/null
 ```
 
@@ -612,30 +612,30 @@ java -XX:+PrintCommandLineFlags 2> /dev/null
 - 如果不将标准错误隐藏输出 `2> /dev/null` 则还会显示 java 的选项说明
 
 ```bash
-# java -XX:+PrintCommandLineFlags 2> /dev/null 
+## java -XX:+PrintCommandLineFlags 2> /dev/null 
 -XX:InitialHeapSize=15424192 -XX:MaxHeapSize=246787072 -XX:+PrintCommandLineFlags -XX:+UseCompressedClassPointers -XX:+UseCompressedOops
 
-# free -h
+## free -h
           total        used        free      shared  buff/cache   available
 Mem:      941Mi       248Mi       472Mi       6.0Mi       219Mi       545Mi
 Swap:        0B          0B          0B
 
 ---
 
-# 将初始堆内存的结果转化为 M
-# echo 15424192/1024/1024 | bc
+## 将初始堆内存的结果转化为 M
+## echo 15424192/1024/1024 | bc
 14
-# 将系统总内存与初始堆内存相除，所以得到JVM默认初始堆内存 约等于总内存的1/64
-# echo 941/14 | bc
+## 将系统总内存与初始堆内存相除，所以得到JVM默认初始堆内存 约等于总内存的1/64
+## echo 941/14 | bc
 67
 
 ---
 
-# 将最大堆内存的结果转化为 M
-# echo 246787072/1024/1024 | bc
+## 将最大堆内存的结果转化为 M
+## echo 246787072/1024/1024 | bc
 235
-# 将系统总内存与最大堆内存相除，所以得到JVM默认分配最大堆内存 约等于总内存的1/4
-# echo 941/235 | bc
+## 将系统总内存与最大堆内存相除，所以得到JVM默认分配最大堆内存 约等于总内存的1/4
+## echo 941/235 | bc
 4
 ```
 
@@ -648,8 +648,7 @@ Swap:        0B          0B          0B
 
 ```bash
 #!/bin/bash
-#
-#********************************************************************
+## #********************************************************************
 #Author:	     	xiangzheng
 #QQ: 			    767483070
 #Date: 		     	2022-01-07
@@ -682,11 +681,11 @@ maxdeap
 
 ```bash
 #查看当前JVM内存的默认分配情况
-# bash heap.sh 
+## bash heap.sh 
 total=15424192byte 14MB
 max=246787072byte 235MB
 
-# free -h
+## free -h
               total        used        free      shared  buff/cache   available
 Mem:          941Mi       304Mi       205Mi        24Mi       431Mi       466Mi
 
@@ -697,9 +696,9 @@ Mem:          941Mi       304Mi       205Mi        24Mi       431Mi       466Mi
 
 
 
-# ---
+## ---
 
-# JMX
+## JMX
 
 - Java Management Extension ；Java 管理扩展
 - JMX 是一个为应用程序、设备、系统等植入管理功能的框架
@@ -711,7 +710,7 @@ Mem:          941Mi       304Mi       205Mi        24Mi       431Mi       466Mi
 - **为一般程序开启 JMX：**
 
 ```bash
-# 在Java程序启动时添加以下参数
+## 在Java程序启动时添加以下参数
 -Djava.rmi.server.hostname=192.168.1.2 # jmx服务端IP
 
 -Dcom.sun.management.jmxremote.port=6666 # jmx监听端口
@@ -724,7 +723,7 @@ Mem:          941Mi       304Mi       205Mi        24Mi       431Mi       466Mi
 - **tomcat 开启 JMX：**
 
 ```bash
-# vim /usr/local/tomcat/bin/catalina.sh
+## vim /usr/local/tomcat/bin/catalina.sh
 ...
 CATALINA_OPTS="${CATALINA_OPTS} -Djava.rmi.server.hostname=$(hostname -I | awk '{print $1}')"
 #CATALINA_OPTS="${CATALINA_OPTS} -Djava.rmi.server.hostname=10.0.0.18"
@@ -734,7 +733,7 @@ CATALINA_OPTS="${CATALINA_OPTS} -Dcom.sun.management.jmxremote.ssl=false"
 CATALINA_OPTS="${CATALINA_OPTS} -Dcom.sun.management.jmxremote.authenticate=false"
 
 
-# 说明：
+## 说明：
 CATALINA_OPTS="${CATALINA_OPTS} -Djava.rmi.server.hostname=JMX_HOST" #tomcat(Java程序)运行主机的IP地址，如果要在多台主机运行可以采用变量的方式获取当前主机的IP：$(hostname -I | awk '{print $1}')"
 CATALINA_OPTS="${CATALINA_OPTS} -Dcom.sun.management.jmxremote=true" #启动远程监控JMX
 CATALINA_OPTS="${CATALINA_OPTS} -Dcom.sun.management.jmxremote.port=JMX_PORT" #JMX监听的端口号，要和zabbix添加主机时候的端口一致即可 
@@ -744,9 +743,9 @@ CATALINA_OPTS="${CATALINA_OPTS} -Dcom.sun.management.jmxremote.authenticate=fals
 
 
 
-# ---
+## ---
 
-# JVM 常用工具
+## JVM 常用工具
 
 - JVM 相关工具位于 `$JAVA_HOME/bin` 下
 
@@ -778,13 +777,13 @@ Definitions:
 ### example
 
 ```sh
-# 显示Java进程
-# jps
+## 显示Java进程
+## jps
 2502 Jps
 
 
-# 列出当前Java进程的详细信息
-# jps -lv
+## 列出当前Java进程的详细信息
+## jps -lv
 2512 sun.tools.jps.Jps -Denv.class.path=/usr/local/jdk/lib/:/usr/local/jdk/jre/lib/ -Dapplication.home=/usr/local/jdk1.8.0_333 -Xms8m
 ```
 
@@ -798,13 +797,13 @@ Definitions:
 ### example
 
 ```bash
-# 获取Java进程ID
-# jps 
+## 获取Java进程ID
+## jps 
 2543 Jps
 
 
-# 打印配置信息（此处报错是因为没有运行Java进程，而jps进程是运行一次就关闭的Java进程）
-# jinfo 2543
+## 打印配置信息（此处报错是因为没有运行Java进程，而jps进程是运行一次就关闭的Java进程）
+## jinfo 2543
 Attaching to process ID 2543, please wait...
 Error attaching to process: sun.jvm.hotspot.debugger.DebuggerException: cannot open binary file
 sun.jvm.hotspot.debugger.DebuggerException: sun.jvm.hotspot.debugger.DebuggerException: cannot open binary file
@@ -831,7 +830,7 @@ count # 显示的次数
 ### option
 
 ```bash
-# jstat -options
+## jstat -options
 -class # class loader
 -compiler
 -gc
@@ -849,13 +848,13 @@ count # 显示的次数
 ### example
 
 ```bash
-# jps 
+## jps 
 2903 Jps
 
-# jstat -gc 2903
+## jstat -gc 2903
 
-# 三次，一秒一次
-# jstat -gcnew 2903 1000 3
+## 三次，一秒一次
+## jstat -gcnew 2903 1000 3
 ```
 
 
@@ -917,25 +916,25 @@ jmap -heap <pid>
 ### 安装依赖包
 
 ```bash
-# centos
+## centos
 xorg-x11-xauth xorg-x11-fonts-* xorg-x11-font-utils xorg-x11-fonts-Type1 libXtst
 
 
-# Ubuntu
+## Ubuntu
 ...
 ```
 
 ### example
 
 ```bash
-# 声明环境变量
-# export DISPLAY=10.0.0.1:0.0
+## 声明环境变量
+## export DISPLAY=10.0.0.1:0.0
 
 
-# 启动jconsole
-# jconsole
+## 启动jconsole
+## jconsole
 
-# Windows中的路径：
+## Windows中的路径：
 C:\Program Files\Java\jdk1.8.0_251\bin\jconsole.exe
 ```
 
@@ -943,7 +942,7 @@ C:\Program Files\Java\jdk1.8.0_251\bin\jconsole.exe
 
 
 
-# 第三方工具
+## 第三方工具
 
 ## Jprofile
 

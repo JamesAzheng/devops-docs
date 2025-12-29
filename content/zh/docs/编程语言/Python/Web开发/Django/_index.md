@@ -2,7 +2,7 @@
 title: "Django"
 ---
 
-# Django 概述
+## Django 概述
 
 https://www.djangoproject.com/
 
@@ -28,7 +28,7 @@ Django 是一个流行的开源 Web 框架，用于构建高效、可扩展的 W
 
 
 
-# Django 安装
+## Django 安装
 
 ```
 pip3 install django==4.2.11
@@ -38,7 +38,7 @@ pip3 install django==4.2.11
 
 
 
-# django-admin
+## django-admin
 
 `django-admin` 是 Django 框架提供的一个命令行工具，用于执行各种与 Django 项目相关的任务，例如创建项目、管理数据库、运行开发服务器等。通过 `django-admin`，开发者可以在命令行中轻松地执行各种 Django 相关的操作，提高了开发效率。
 

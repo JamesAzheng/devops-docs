@@ -2,7 +2,7 @@
 title: "configparser"
 ---
 
-# configparser
+## configparser
 
 `configparser` 是 Python 标准库中的一个模块，用于解析和操作 INI 文件格式的配置文件。它提供了一种简单的方法来读取和写入配置数据，支持创建、修改和删除配置文件中的节和键值对。
 
@@ -154,17 +154,17 @@ Theme=Dark
 ```python
 import configparser
 
-# 创建一个名为 cfg 的 ConfigParser 对象。这个对象将用于操作配置文件，包括读取、写入和修改配置数据。
+## 创建一个名为 cfg 的 ConfigParser 对象。这个对象将用于操作配置文件，包括读取、写入和修改配置数据。
 cfg = configparser.ConfigParser()
 print(cfg)  # <configparser.ConfigParser object at 0x000001EEE02A96F0>
 print('-' * 30)
 
-# 虽然在上述代码中创建了 cfg 对象，但还没有读取任何配置文件。要读取配置文件，通常使用 read() 方法。例如，要读取名为 mysql.ini 的配置文件，可以执行以下操作：
+## 虽然在上述代码中创建了 cfg 对象，但还没有读取任何配置文件。要读取配置文件，通常使用 read() 方法。例如，要读取名为 mysql.ini 的配置文件，可以执行以下操作：
 r = cfg.read('mysql.ini')
 print(r)  # ['mysql.ini']
 print('-' * 30)
 
-# 使用 configparser 模块中的 sections() 方法来获取配置文件中的所有节（sections），然后使用 options() 方法获取每个节中的键值对的键（options）。
+## 使用 configparser 模块中的 sections() 方法来获取配置文件中的所有节（sections），然后使用 options() 方法获取每个节中的键值对的键（options）。
 for x in cfg.sections():  #返回所有section，但不包含特殊的缺省section
     # 遍历配置文件中的所有节
     print(type(x), x)  # 打印节的类型和名称
@@ -178,7 +178,7 @@ for x in cfg.sections():  #返回所有section，但不包含特殊的缺省sect
 
 print('-' * 30)
 
-# 使用 configparser 模块中的 items() 方法来获取配置文件中所有节（sections）中的所有键值对（key-value pairs）。
+## 使用 configparser 模块中的 items() 方法来获取配置文件中所有节（sections）中的所有键值对（key-value pairs）。
 for y in cfg.items():
     print(type(y), y)
 '''
@@ -189,8 +189,8 @@ for y in cfg.items():
 
 print('-' * 30)
 
-# 这段代码使用 configparser 模块中的 items() 方法来获取配置文件中所有节（sections）中的所有键值对（key-value pairs），然后遍历每个键值对，分别打印键和值，并尝试使用 items() 方法获取特定节中的键值对。
-# 推荐使用！
+## 这段代码使用 configparser 模块中的 items() 方法来获取配置文件中所有节（sections）中的所有键值对（key-value pairs），然后遍历每个键值对，分别打印键和值，并尝试使用 items() 方法获取特定节中的键值对。
+## 推荐使用！
 for k, v in cfg.items():
     # 遍历配置文件中的所有节中的键值对
     print(type(k), k)  # 打印键的类型和内容
@@ -210,7 +210,7 @@ for k, v in cfg.items():
 
 print('-' * 30)
 
-# 判断某 section 下是否有某 option
+## 判断某 section 下是否有某 option
 print(cfg.has_option('Database', 'port'))  # True
 print(cfg.has_option('Database', 'pport'))  # False
 

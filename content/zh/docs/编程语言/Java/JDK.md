@@ -3,7 +3,7 @@ title: "JDK"
 ---
 
 
-# JDK 概述
+## JDK 概述
 
 - JDK 即Java语言的软件开发工具包，JDK协议基于JRL协议
 - JDK 大致分为两种，分别是Open JDK 和 Oracle JDK
@@ -20,20 +20,20 @@ title: "JDK"
 
 
 
-# Open JDK 安装
+## Open JDK 安装
 
 ## JDK8
 
 ### Centos
 
 ```bash
-# yum -y install java-1.8.0-openjdk
+## yum -y install java-1.8.0-openjdk
 ```
 
 ### Ubuntu
 
 ```bash
-# apt -y install openjdk-8-jdk
+## apt -y install openjdk-8-jdk
 ```
 
 ## JDK11
@@ -47,7 +47,7 @@ title: "JDK"
 #### apt安装
 
 ```bash
-# apt install openjdk-11-jdk
+## apt install openjdk-11-jdk
 ```
 
 
@@ -58,7 +58,7 @@ title: "JDK"
 
 
 
-# Oracle JDK 安装
+## Oracle JDK 安装
 
 - 官方下载地址：https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html
 - 需注册后才能下载
@@ -161,14 +161,14 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.301-b09, mixed mode)
 
 ```bash
 #验证安装包
-# ls -l /usr/local/src/jdk-11.0.14_linux-x64_bin.rpm 
+## ls -l /usr/local/src/jdk-11.0.14_linux-x64_bin.rpm 
 -rw-r--r-- 1 root root 151500100 Mar 10 12:01 /usr/local/src/jdk-11.0.14_linux-x64_bin.rpm
 
 #安装
-# yum -y install /usr/local/src/jdk-11.0.14_linux-x64_bin.rpm
+## yum -y install /usr/local/src/jdk-11.0.14_linux-x64_bin.rpm
 
 #验证安装
-# java -version
+## java -version
 java version "11.0.14" 2022-01-18 LTS
 Java(TM) SE Runtime Environment 18.9 (build 11.0.14+8-LTS-263)
 Java HotSpot(TM) 64-Bit Server VM 18.9 (build 11.0.14+8-LTS-263, mixed mode)
@@ -204,7 +204,7 @@ java -version
 
 
 
-# JRE和JDK的区别
+## JRE和JDK的区别
 
 - **JDK**：开发java程序用的开发包，JDK里面有java的运行环境(JRE)，包括client和server端的，需要配置环境变量 
 

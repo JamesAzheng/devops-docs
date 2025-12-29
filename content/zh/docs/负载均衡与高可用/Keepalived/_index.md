@@ -15,6 +15,11 @@ title: "Keepalived"
   - 为ipvs集群的各RS做健康状态检测
   - 基于脚本调用接口完成脚本中定义的功能，进而影响集群事务，因此支持LVS、nginx、haproxy等服务
 
+## 核心工作原理简述
+1. Master 节点会周期性地向 Backup 节点发送 VRRP 广播报文。
+2. 当 Backup 节点在规定时间内没有收到报文，则认为 Master 宕机。
+3. Backup 节点接管 VIP，并发送免费 ARP 更新交换机的 MAC 表。
+4. 当原 Master 恢复后，会根据优先级（Priority）重新夺回控制权（如果配置了抢占模式）。
 
 ## 主要功能
 
@@ -1009,4 +1014,265 @@ vrrp_instance WEB2 {
 - 使用非抢占模式，因为如果使用抢占式的话当优先级高的主机恢复后 会将VIP抢占回来 这样会造成一定程度上的网络波动
 
 
+
+
+
+
+
+
+## 配置文件
+### 配置文件结构
+- 配置文件位置：`/etc/keepalived/keepalived.conf`
+```sh
+# 全局配置
+global_defs {
+...
+}
+
+# VIP 配置
+vrrp_instance {
+...
+}
+
+
+# 虚拟服务器配置，可选
+```sh
+virtual_server {
+...
+}
+
+include /etc/keepalived/conf.d/*.conf # 添加此行，可将将配置放在子配置文件中
+```
+
+
+### 全局配置 (global_defs)
+这部分主要设置故障时的报警通知方式和路由 ID。
+```Bash
+global_defs {
+   router_id prod-bj-lb01           # 机器标识，通常为物理机主机名，每个节点应唯一
+   enable_script_security # 开启脚本开启安全检查
+   script_user root # 脚本执行身份（创建一个无登录权限的专用用户运行脚本，但脚本逻辑复杂，需要root权限时，还需要设为root）
+   notification_email {
+     admin@example.com           # 故障发生时接收报警的邮箱地址
+   }
+   notification_email_from keepalived@example.com # 发件人邮箱
+   smtp_server 127.0.0.1         # 邮件服务器 IP
+   smtp_connect_timeout 30       # 连接邮件服务器的超时时间
+   vrrp_skip_check_adv_addr      # 检查收到的 VRRP 通告中的 IP 是否有效
+   vrrp_strict                   # 严格遵守 VRRP 协议，开启后通常会禁止 VIP 的 ping 和访问，建议谨慎开启
+   vrrp_garp_interval 0          # 接口发送免费 ARP 的延迟时间
+   vrrp_gna_interval 0           # 网卡发送非请求消息的时间间隔
+}
+```
+
+### VIP 配置 (vrrp_instance)
+
+- 可以配置多组此字段，针对不同业务 如：web、mysql、redis等
+
+```bash
+...
+vrrp_instance <STRING> { # 虚拟路由器组，<STRING> 一般为业务名称，例如 DNS_VIP、K8s_Ingress_VIP
+    state MASTER # 初始状态，可以为 MASTER 或 BACKUP
+    interface ens160 # VIP 使用的物理接
+    virtual_router_id 51 # 每个虚拟路由器组的唯一标识，范围：0-255，同属一个虚拟路由器组的 keepalived 节点此值必须相同，与其他虚拟路由器组的此值不能相同，否则服务无法启动
+    priority 100 # 优先级，范围：1-254，MASTER 优先级需高于 BACKUP
+    advert_int 1 # vrrp通告的时间间隔，默认1s
+    # 认证机制
+    authentication {
+        auth_type PASS # PASS为简单密码，也可以设置为AH 表示IPESC认证(不推荐)
+        auth_pass 72198 # 密码，仅前8位有效,同属一个虚拟路由器组的 keepalived 节点此值必须相同
+    }
+    # VIP地址
+    virtual_ipaddress {
+        192.168.200.16 # 指定VIP，不指定网卡则默认为eth0，不指定子网掩码则默认为/32
+        # 192.168.200.17/24 dev eth0 # 指定子网掩码和网卡
+        # 192.168.200.18/16 dev eth2 label eth2:1 # 指定VIP网卡的label
+    }
+}
+```
+
+### 监控脚本配置 (vrrp_script)
+用于定期检查服务状态（如 Nginx 是否存活），如果服务挂了，自动降低优先级触发切换。
+```sh
+vrrp_script check_haproxy {
+    script "/etc/keepalived/check_service.sh" # 检测脚本的路径
+    interval 2                                # 每 2 秒执行一次脚本
+    weight -20                                # 如果脚本返回非 0（失败），优先级减 20
+}
+
+# 在 vrrp_instance 段落中引用：
+# track_script {
+#    check_haproxy
+# }
+```
+
+
+### 虚拟服务器配置 (virtual_server)
+这部分是可选的，仅在结合 LVS（负载均衡）使用时配置。
+```sh
+virtual_server 192.168.1.100 80 { # 定义虚拟服务器的 VIP 和端口
+    delay_loop 6                  # 健康检查的时间间隔（秒）
+    lb_algo rr                    # 负载均衡算法：rr (轮询)
+    lb_kind DR                    # 转发模式：DR (直接路由)、NAT、TUN
+    persistence_timeout 50        # 会话保持时间（秒）
+    protocol TCP                  # 使用协议
+
+    real_server 192.168.1.101 80 { # 定义后端真实服务器的 IP 和端口
+        weight 1                   # 权重
+        TCP_CHECK {                # 健康检查方式
+            connect_timeout 3      # 连接超时时间
+            nb_get_retry 3         # 重试次数
+            delay_before_retry 3   # 重试间隔
+            connect_port 80        # 检查的端口
+        }
+    }
+}
+```
+
+### 配置文件示例
+#### MASTER 主机
+#### BACKUP 主机
+
+
+## 故障通知
+
+- 当keepalived的状态发生变化时，可以自动触发脚本的执行，那么就可以通过编写脚本 在发生故障时进行触发 从而起到故障通知的效果
+
+- 默认以用户keepalived身份执行脚本，如果此用户不存在 则以root身份执行
+
+- 可以使用以下的配置来实现指定运行脚本的用户
+
+  - ```ABAP
+    global_defs {
+    ...
+       script_user <USER>
+    ...
+    }
+    ```
+
+
+
+### 通知脚本类型
+
+```bash
+notify_master <STRING>|<QUOTED-STRING> #当前节点成为主节点时触发的脚本
+
+notify_backup <STRING>|<QUOTED-STRING> #当前节点成为备节点时触发的脚本
+
+notify_fault  <STRING>|<QUOTED-STRING> #当前节点转为"失败"状态时触发的脚本
+
+notify        <STRING>|<QUOTED-STRING> #通用格式的通知触发机制，包含以上三种状态的通知
+
+notify_stop   <STRING>|<QUOTED-STRING> #当停止VRRP时触发的脚本
+```
+
+
+
+### 脚本的调用方法
+
+- **在 vrrp_instance XXX 语句块末尾添加**
+
+#### 范例：
+
+```bash
+vrrp_instance WEB1 {
+...
+    notify_master /etc/keepalived/notify.sh master
+    notify_backup /etc/keepalived/notify.sh backup
+    notify_fault  /etc/keepalived/notify.sh fault
+}
+```
+
+
+
+### 邮件配置
+
+#### 安装邮箱服务
+
+```bash
+#Centos
+yum -y install mailx
+
+#Ubuntu
+apt -y install mailx
+```
+
+#### 163邮箱
+
+```bash
+#vim /etc/mail.rc
+...
+set from=rootroot25@163.com
+set smtp=smtp.163.com
+set smtp-auth-user=rootroot25@163.com
+set smtp-auth-password=GMZAKJMKZVPKEKAC
+set smtp-auth=login
+set ssl-verify=ignore
+```
+
+#### QQ邮箱
+
+```bash
+#vim /etc/mail.rc
+...
+set from=767483070@qq.com
+set smtp=smtp.qq.com
+set smtp-auth-user=767483070@qq.com
+set smtp-auth-password=zcsnweqbmqsybeja
+set smtp-auth=login
+set ssl-verify=ignore
+```
+
+#### 测试
+
+```bash
+echo "test" |mail -s  "Warning" 767483070@qq.com
+```
+
+
+
+#### 邮件通知脚本范例
+
+```bash
+[root@keepalived1 ~]# vim /etc/keepalived/notify.sh
+
+#!/bin/bash
+# 
+#********************************************************************
+#Author:            xiangzheng
+#QQ:                767483070
+#Date:              2022-02-19
+#FileName：         /etc/keepalived/notify.sh
+#URL:               https://www.xiangzheng.vip
+#Email:             rootroot25@163.com
+#Description：      The test script
+#Copyright (C):     2022 All rights reserved
+#********************************************************************
+CONTACT="767483070@qq.com"
+
+notify(){
+    MAIL_SUBJECT="keepalived info: VIP floating "
+    MAIL_BODY="keepalived VIP floating host:$(hostname) status:${1}"
+    echo "${MAIL_BODY}" | mail -s "${MAIL_SUBJECT}" ${CONTACT}
+}
+
+case $1 in
+master)
+    notify master
+    ;;
+backup)
+    notify backup
+    ;;
+fault)
+    notify fault
+    ;;
+*)
+    echo "Usage: $(basename $0) {master|backup|fault}"
+    exit 1
+    ;;
+esac
+
+
+[root@keepalived1 ~]# chmod +x /etc/keepalived/notify.sh
+```
 

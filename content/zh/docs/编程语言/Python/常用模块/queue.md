@@ -2,13 +2,13 @@
 title: "queue"
 ---
 
-# queue 模块概述
+## queue 模块概述
 
 Python中的`queue`模块提供了多种队列数据结构的实现，用于在多线程编程中进行线程安全的数据共享和通信。以下是`queue`模块中常用的类和函数：
 
 
 
-# Queue 类型
+## Queue 类型
 
 - `queue.Queue(maxsize=0)`：创建一个FIFO队列（先进先出）。`maxsize`参数指定队列的最大容量，如果为0或负数，则队列的容量不受限制。
 - `queue.LifoQueue(maxsize=0)`：创建一个LIFO队列（后进先出），也称为堆栈。
@@ -16,7 +16,7 @@ Python中的`queue`模块提供了多种队列数据结构的实现，用于在�
 
 
 
-# 常用方法
+## 常用方法
 
 适用于上述所有队列类型：
 
@@ -116,7 +116,7 @@ print(q.full()) # True，队列已满
 
 
 
-# 不同队列类型的数据结构
+## 不同队列类型的数据结构
 
 不同的队列类型在Python中通常使用不同的数据结构来实现。以下是一些常见的队列类型及其基于的数据结构：
 
@@ -133,7 +133,7 @@ print(q.full()) # True，队列已满
 
 
 
-# Queue
+## Queue
 
 `queue.Queue` 是 Python 中 `queue` 模块提供的队列实现，它实现了先进先出（FIFO）队列，通常用于多线程编程中的数据共享和通信。下面是 `queue.Queue` 类的详细解释：
 
@@ -146,34 +146,34 @@ print(q.full()) # True，队列已满
 ```python
 import queue
 
-# 创建一个 FIFO 队列
+## 创建一个 FIFO 队列
 q = queue.Queue()
 
-# 放入元素
+## 放入元素
 q.put(1)
 q.put(2)
 
-# 从队列中取出元素
+## 从队列中取出元素
 item1 = q.get()  # item1 的值为 1，因为先进先出原则
 item2 = q.get()  # item2 的值为 2
 
-# 创建一个有容量限制的 FIFO 队列
+## 创建一个有容量限制的 FIFO 队列
 q_with_maxsize = queue.Queue(maxsize=2)
 
-# 放入元素
+## 放入元素
 q_with_maxsize.put(1)
 q_with_maxsize.put(2)
 
-# 尝试放入第三个元素会导致阻塞，因为队列已满
-# q_with_maxsize.put(3, block=True)  # 阻塞
+## 尝试放入第三个元素会导致阻塞，因为队列已满
+## q_with_maxsize.put(3, block=True)  # 阻塞
 
-# 使用非阻塞方式放入元素，会抛出 queue.Full 异常
+## 使用非阻塞方式放入元素，会抛出 queue.Full 异常
 try:
     q_with_maxsize.put_nowait(3)
 except queue.Full:
     print("Queue is full!")
 
-# 从队列中取出元素
+## 从队列中取出元素
 item3 = q_with_maxsize.get()  # item3 的值为 1
 item4 = q_with_maxsize.get()  # item4 的值为 2
 ```
@@ -194,15 +194,15 @@ item4 = q_with_maxsize.get()  # item4 的值为 2
 ```python
 from queue import Queue
 
-# 创建一个 FIFO 队列
+## 创建一个 FIFO 队列
 q = Queue()
 
-# 向队列中放入元素
+## 向队列中放入元素
 q.put(1)
 q.put(2)
 q.put(3)
 
-# 从队列中取出元素
+## 从队列中取出元素
 print(q.get()) # 1
 print(q.get()) # 2
 print(q.get()) # 3
@@ -221,15 +221,15 @@ import threading
 import time
 from queue import Queue
 
-# 创建一个 FIFO 队列
+## 创建一个 FIFO 队列
 q = Queue()
 
-# 向队列中放入元素
+## 向队列中放入元素
 q.put(1)
 q.put(2)
 q.put(3)
 
-# 从队列中取出元素
+## 从队列中取出元素
 print(q.get()) # 1
 print(q.get()) # 2
 print(q.get()) # 3
@@ -286,13 +286,13 @@ print('-' * 30)
 ```python
 from queue import Queue
 
-# 创建一个 FIFO 队列
+## 创建一个 FIFO 队列
 q = Queue()
 
-# 向队列中放入元素
+## 向队列中放入元素
 q.put(1)
 
-# 从队列中取出元素
+## 从队列中取出元素
 print(q.get()) # 1
 print(q.get(timeout=3)) # 取不到元素后，3秒钟超时，最后抛出_queue.Empty异常
 print('-' * 30) # 不会被打印
@@ -301,13 +301,13 @@ print('-' * 30) # 不会被打印
 ```python
 from queue import Queue
 
-# 创建一个 FIFO 队列
+## 创建一个 FIFO 队列
 q = Queue()
 
-# 向队列中放入元素
+## 向队列中放入元素
 q.put(1)
 
-# 从队列中取出元素
+## 从队列中取出元素
 print(q.get()) # 1
 print(q.get(block=False)) # 取不到元素后直接抛出_queue.Empty异常
 print('-' * 30) # 不会被打印
@@ -319,7 +319,7 @@ print('-' * 30) # 不会被打印
 
 
 
-# LifoQueue
+## LifoQueue
 
 `LifoQueue`（Last-In, First-Out Queue）是Python `queue` 模块提供的一种队列实现，它实现了后进先出（LIFO）的队列策略，也被称为堆栈（Stack）。与常规队列不同，`LifoQueue`允许您将元素推入队列的顶部，然后从顶部弹出元素。这种数据结构的特点是最后进入队列的元素首先被取出。
 
@@ -334,18 +334,18 @@ print('-' * 30) # 不会被打印
 ```python
 import queue
 
-# 创建一个LIFO队列
+## 创建一个LIFO队列
 lifo_q = queue.LifoQueue()
 
-# 推入元素
+## 推入元素
 lifo_q.put(1)
 lifo_q.put(2)
 
-# 从队列的顶部弹出元素
+## 从队列的顶部弹出元素
 item1 = lifo_q.get()  # item1的值为2，因为最后推入的元素最先弹出
 item2 = lifo_q.get()  # item2的值为1
 
-# 检查队列是否为空
+## 检查队列是否为空
 is_empty = lifo_q.empty()  # is_empty为True
 ```
 
@@ -374,7 +374,7 @@ print(q.get()) # 阻塞
 
 
 
-# PriorityQueue
+## PriorityQueue
 
 `PriorityQueue` 是 Python `queue` 模块提供的一种队列实现，它允许您在队列中为元素分配优先级，并确保元素按照优先级的顺序出队。这种队列常用于需要按照一定规则对元素进行排序和处理的情况，如任务调度和事件处理。
 
@@ -396,15 +396,15 @@ print(q.get()) # 阻塞
 ```python
 import queue
 
-# 创建一个优先级队列
+## 创建一个优先级队列
 priority_q = queue.PriorityQueue()
 
-# 放入带有优先级的元素
+## 放入带有优先级的元素
 priority_q.put((3, "Low-priority item"))
 priority_q.put((1, "High-priority item"))
 priority_q.put((2, "Medium-priority item"))
 
-# 从队列中取出元素（按优先级顺序）
+## 从队列中取出元素（按优先级顺序）
 item1 = priority_q.get()  # item1 的值为 (1, "High-priority item")
 item2 = priority_q.get()  # item2 的值为 (2, "Medium-priority item")
 item3 = priority_q.get()  # item3 的值为 (3, "Low-priority item")
@@ -473,34 +473,34 @@ TypeError: '<' not supported between instances of 'str' and 'int'
 
 
 
-# 示例用法：
+## 示例用法：
 
 ```python
 import queue
 
-# 创建一个FIFO队列
+## 创建一个FIFO队列
 q = queue.Queue()
 
-# 放入元素
+## 放入元素
 q.put(1)
 q.put(2)
 
-# 从队列中取出元素
+## 从队列中取出元素
 item1 = q.get()
 item2 = q.get()
 
-# 创建一个LIFO队列
+## 创建一个LIFO队列
 lifo_q = queue.LifoQueue()
 
-# 创建一个具有优先级的队列
+## 创建一个具有优先级的队列
 priority_q = queue.PriorityQueue()
 
-# 使用优先级队列
+## 使用优先级队列
 priority_q.put((1, "high-priority item"))
 priority_q.put((3, "low-priority item"))
 priority_q.put((2, "medium-priority item"))
 
-# 取出元素（按优先级顺序）
+## 取出元素（按优先级顺序）
 item = priority_q.get()  # 返回(1, "high-priority item")
 ```
 

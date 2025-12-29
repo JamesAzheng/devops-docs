@@ -19,13 +19,13 @@ Scapy是一个Python模块，用于处理、发送和捕获网络数据包。它
 ```python
 from scapy.all import IP, ICMP, sr1
 
-# 构建Ping数据包
+## 构建Ping数据包
 packet = IP(dst="www.example.com") / ICMP()
 
-# 发送数据包并接收响应
+## 发送数据包并接收响应
 response = sr1(packet, timeout=2)
 
-# 打印响应信息
+## 打印响应信息
 if response:
     response.show()
 else:
@@ -58,13 +58,13 @@ else:
 from scapy.layers.inet import IP, ICMP
 from scapy.sendrecv import sr1
 
-# 构建Ping数据包
+## 构建Ping数据包
 packet = IP(dst="www.example.com") / ICMP()
 
-# 发送数据包并接收响应
+## 发送数据包并接收响应
 response = sr1(packet, timeout=2)
 
-# 打印响应信息
+## 打印响应信息
 if response:
     response.show()
 else:

@@ -2,13 +2,13 @@
 title: "函数"
 ---
 
-# 函数概述
+## 函数概述
 
 在Python中，函数是一段可重用的代码块，用于执行特定任务。
 
 
 
-# 函数分类
+## 函数分类
 
 在Python中，函数可以根据它们的定义和功能进行分类。以下是一些常见的函数分类：
 
@@ -32,7 +32,7 @@ title: "函数"
 
 
 
-# 函数定义
+## 函数定义
 
 ```python
 def function_name(parameter1, parameter2, ...):
@@ -237,10 +237,10 @@ def print_info(**info):
         print(key, ":", value)
 
 print_info(name="Alice", age=25, city="London")
-# 输出:
-# name : Alice
-# age : 25
-# city : London
+## 输出:
+## name : Alice
+## age : 25
+## city : London
 ```
 
 在上面的例子中，`info`是一个可变关键字参数，它接收任意数量的实参，并将它们作为字典处理。
@@ -333,19 +333,19 @@ city New York
 **在参数的两边之间定义`*`**，这样的话`*`后面的参数只能使用关键字传参，也就是"keyword-only"参数。在这种方式中，`*`之前的参数是位置参数，`*`之后的参数是"keyword-only"参数。
 
 ```python
-# a 和 b 是位置参数，* 后面的 c 和 d 是 keyword-only，只能通过关键字传参。
+## a 和 b 是位置参数，* 后面的 c 和 d 是 keyword-only，只能通过关键字传参。
 def my_function(a, b, *, c, d):
     print(f"a={a}, b={b}, c={c}, d={d}")
 
 
-# 1 和 2 可以通过位置传参，c 和 d 只能通过关键字传参。
+## 1 和 2 可以通过位置传参，c 和 d 只能通过关键字传参。
 my_function(1, 2, c=3, d=4)
 """
 a=1, b=2, c=3, d=4
 """
 
 
-# * 后面的 c 和 d 只能使用关键字传参，否则会引发 TypeError
+## * 后面的 c 和 d 只能使用关键字传参，否则会引发 TypeError
 my_function(1, 2, 3, 4)
 """
 TypeError: my_function() takes 2 positional arguments but 4 were given
@@ -359,18 +359,18 @@ TypeError: my_function() takes 2 positional arguments but 4 were given
 **在参数的两边之间定义`*args`**，这样的话，`*args`后面的参数只能使用关键字传参，并且`args`将收集额外的位置参数作为一个元组。
 
 ```python
-# a 和 b 是位置参数，*args 是一个包含额外位置参数的元组，c 和 d 是 keyword-only 参数，必须通过关键字方式传递。
+## a 和 b 是位置参数，*args 是一个包含额外位置参数的元组，c 和 d 是 keyword-only 参数，必须通过关键字方式传递。
 def my_function(a, b, *args, c, d):
     print(f"a={a}, b={b}, args={args}, c={c}, d={d}")
 
 
-# 1 和 2 可以通过关键字传参，3 和 4 通过位置传参的方式会被 *args 所接受成为元组，c 和 d 只能通过关键字传参。
+## 1 和 2 可以通过关键字传参，3 和 4 通过位置传参的方式会被 *args 所接受成为元组，c 和 d 只能通过关键字传参。
 my_function(1, 2, 3, 4, c=5, d=6)
 """
 a=1, b=2, args=(3, 4), c=5, d=6
 """
 
-# c 和 d 未被赋予关键字传参，因此会报错。
+## c 和 d 未被赋予关键字传参，因此会报错。
 my_function(1, 2, 3, 4, 5, 6)
 """
 TypeError: my_function() missing 2 required keyword-only arguments: 'c' and 'd'
@@ -446,22 +446,22 @@ fn(y=20, x=30)
 `*args`也可以放在最前面，表示后面的参数全部为"keyword-only"参数。
 
 ```python
-# a 和 b 为位置参数，*args 为可变位置参数，c 和 d 为关键字参数，**kwargs 为可变关键字参数。
+## a 和 b 为位置参数，*args 为可变位置参数，c 和 d 为关键字参数，**kwargs 为可变关键字参数。
 def my_function(a, b, *args, c, d, **kwargs):
     print(f"a={a}, b={b}, args={args}, c={c}, d={d}, kwargs={kwargs}")
 
     
-# 1 和 2 为位置参数，传递给 a 和 b；
-# 3 和 4 为可变位置参数，传递给 *args 成为元组；
-# c 和 d 只能接受关键字传参；
-# x 和 y 为可变关键字参数，传递给 **args 成为字典。
+## 1 和 2 为位置参数，传递给 a 和 b；
+## 3 和 4 为可变位置参数，传递给 *args 成为元组；
+## c 和 d 只能接受关键字传参；
+## x 和 y 为可变关键字参数，传递给 **args 成为字典。
 my_function(1, 2, 3, 4, c=5, d=6, x=7, y=8)
 """
 a=1, b=2, args=(3, 4), c=5, d=6, kwargs={'x': 7, 'y': 8}
 """
 
 
-# 这种方式会报错，c 和 d 没有被通过关键字的方式传参。
+## 这种方式会报错，c 和 d 没有被通过关键字的方式传参。
 my_function(1, 2, 3, 4, 5, 6, x=7, y=8)
 """
 TypeError: my_function() missing 2 required keyword-only arguments: 'c' and 'd'
@@ -475,19 +475,19 @@ TypeError: my_function() missing 2 required keyword-only arguments: 'c' and 'd'
 **将`*`放在最前面定义**，在这种情况下，后续的参数将被视为"keyword-only"参数。
 
 ```python
-# * 后面的所有参数只能接受关键字传参。
+## * 后面的所有参数只能接受关键字传参。
 def my_function(*, a, b, c, d):
     print(f"a={a}, b={b}, c={c}, d={d}")
 
 
-# 正确传参方式，全部为关键字传参。
+## 正确传参方式，全部为关键字传参。
 my_function(a=1, b=2, c=3, d=4)
 """
 a=1, b=2, c=3, d=4
 """
 
 
-# 错误传参方式，不能为位置传参啦~
+## 错误传参方式，不能为位置传参啦~
 my_function(1, 2, 3, d=4)
 """
 TypeError: my_function() takes 0 positional arguments but 3 positional arguments (and 1 keyword-only argument) were given
@@ -533,20 +533,20 @@ TypeError: fn() got an unexpected keyword argument 'y'
 **将`*args`放在最前面定义**，在这种情况下，后续的参数将被视为"keyword-only"参数。
 
 ```python
-# *args 为可变位置参数，可以接受多个位置参数，最终成为元组；
-# a、b、c、d 只能接受关键字传参。
+## *args 为可变位置参数，可以接受多个位置参数，最终成为元组；
+## a、b、c、d 只能接受关键字传参。
 def my_function(*args, a, b, c, d):
     print(f"args={args}, a={a}, b={b}, c={c}, d={d}")
 
 
-# 正确传参方式，1、2、3、4 都会传递给 *args，最终成为元组；
-# a、b、c、d 只能为关键字传参。
+## 正确传参方式，1、2、3、4 都会传递给 *args，最终成为元组；
+## a、b、c、d 只能为关键字传参。
 my_function(1, 2, 3, 4, a=5, b=6, c=7, d=8)
 """
 args=(1, 2, 3, 4), a=5, b=6, c=7, d=8
 """
 
-# 错误传参方式，因为 a、b、c、d 没有通过位置参数的方式传参。
+## 错误传参方式，因为 a、b、c、d 没有通过位置参数的方式传参。
 my_function(1, 2, 3, 4, 5, 6, 7, 8)
 """
 TypeError: my_function() missing 4 required keyword-only arguments: 'a', 'b', 'c', and 'd'
@@ -622,18 +622,18 @@ def 计算幂(base, exponent, /, factor=1):
 使用示例：
 
 ```python
-# 仅使用位置参数调用函数
+## 仅使用位置参数调用函数
 结果1 = 计算幂(2, 3)  # base=2, exponent=3, factor=1（默认值）
 结果2 = 计算幂(2, 3, 10)  # base=2, exponent=3, factor=10
 
-# 同时使用关键字参数和位置参数传递'factor'
+## 同时使用关键字参数和位置参数传递'factor'
 结果3 = 计算幂(2, 3, factor=5)  # base=2, exponent=3, factor=5
 ```
 
 如果尝试将`base`或`exponent`作为关键字参数传递，将引发`SyntaxError`错误：
 
 ```python
-# 这将引发SyntaxError错误
+## 这将引发SyntaxError错误
 结果4 = 计算幂(base=2, exponent=3, factor=5)
 ```
 
@@ -644,19 +644,19 @@ def 计算幂(base, exponent, /, factor=1):
 ### 方法一
 
 ```python
-# / 前面的 a 和 b 只能通过位置传参。
+## / 前面的 a 和 b 只能通过位置传参。
 def fn(a, b, /):
     print(a, b)
 
   
-# 1 和 2 可以通过位置传参的方式，传递给 a 和 b。
+## 1 和 2 可以通过位置传参的方式，传递给 a 和 b。
 fn(1, 2)
 """
 1 2
 """
 
 
-# b 不能通过关键字传参。
+## b 不能通过关键字传参。
 fn(1, b=2)
 """
 TypeError: fn() got some positional-only arguments passed as keyword arguments: 'b'
@@ -666,29 +666,29 @@ TypeError: fn() got some positional-only arguments passed as keyword arguments: 
 ### 方法二
 
 ```python
-# / 前面的 a 和 b 只能通过位置传参。
+## / 前面的 a 和 b 只能通过位置传参。
 def fn(a, /, b):
     print(a, b)
 
-# 1 和 2 可以通过位置传参的方式，传递给 a 和 b。
+## 1 和 2 可以通过位置传参的方式，传递给 a 和 b。
 fn(1, 2)
 """
 1 2
 """
 
-# b 可以通过关键字传参，因为它在 / 的后面。
+## b 可以通过关键字传参，因为它在 / 的后面。
 fn(1, b=2)
 """
 1 2
 """
 
-# 错误的传参方式，因为 a 在 / 前面，因此 a 只能通过位置传参。
+## 错误的传参方式，因为 a 在 / 前面，因此 a 只能通过位置传参。
 fn(a=1, b=2)
 """
 TypeError: fn() got some positional-only arguments passed as keyword arguments: 'a'
 """
 
-# 错误的传参方式，因为关键字传参只能位于位置传参的后面。
+## 错误的传参方式，因为关键字传参只能位于位置传参的后面。
 fn(b=2, 1)
 """
 SyntaxError: positional argument follows keyword argument
@@ -803,7 +803,7 @@ SyntaxError: invalid syntax
 
 
 
-# 函数调用
+## 函数调用
 
 - 函数定义，只是声明了一个函数，它不能被执行，需要调用执行。
 - 调用的方式，就是**函数名后加上小括号**，如有必要在括号内填写上参数。
@@ -873,26 +873,26 @@ def example_func(a, b, c):
     print("b =", b)
     print("c =", c)
 
-# 使用位置参数调用函数
+## 使用位置参数调用函数
 example_func(1, 2, 3)
-# 输出：
-# a = 1
-# b = 2
-# c = 3
+## 输出：
+## a = 1
+## b = 2
+## c = 3
 
-# 使用关键字参数调用函数
+## 使用关键字参数调用函数
 example_func(c=3, a=1, b=2)
-# 输出：
-# a = 1
-# b = 2
-# c = 3
+## 输出：
+## a = 1
+## b = 2
+## c = 3
 
-# 混合使用位置参数和关键字参数
+## 混合使用位置参数和关键字参数
 example_func(1, c=3, b=2)
-# 输出：
-# a = 1
-# b = 2
-# c = 3
+## 输出：
+## a = 1
+## b = 2
+## c = 3
 ```
 
 在上面的示例中，`example_func`接受三个参数`a`、`b`和`c`。你可以通过位置参数或关键字参数来调用函数。在混合使用位置参数和关键字参数的情况下，**位置参数需要按照函数定义中的顺序传递**，而关键字参数则可以任意顺序指定。
@@ -1121,7 +1121,7 @@ add(*b'xy')
 120 121
 """
 
-# 顺序可能不确定？
+## 顺序可能不确定？
 add(*{10, 11})
 """
 10 11
@@ -1142,13 +1142,13 @@ add(*{'a':100, 'b':200})
 a b
 """
 
-# 错误写法，关键字解构后a和b会成为关键字传参（a=100, b=200），而add函数只接受x和y
+## 错误写法，关键字解构后a和b会成为关键字传参（a=100, b=200），而add函数只接受x和y
 add(**{'a':100, 'b':200})
 """
 TypeError: add() got an unexpected keyword argument 'a'
 """
 
-# 正确写法
+## 正确写法
 add(**{'x':100, 'y':200})
 """
 100 200
@@ -1179,7 +1179,7 @@ print(fn(*range(5), 100, *[20]))
 
 
 
-# 函数返回值 return
+## 函数返回值 return
 
 `return` 是Python中用于函数返回值的关键字。它用于在函数执行完毕后将结果返回给函数的调用者。可以根据需要返回不同类型的值，如整数、浮点数、字符串、列表等（像 range(5) 这种惰性对象等除外）。
 
@@ -1318,7 +1318,7 @@ print(result2)  # 输出：Name cannot be empty
 
 
 
-# 函数变量作用域
+## 函数变量作用域
 
 在Python中，变量的作用域由其在代码中被赋值的位置所决定。Python中有四种作用域：
 
@@ -1675,7 +1675,7 @@ outer_function()
 
 
 
-# 函数闭包
+## 函数闭包
 
 函数闭包是计算机编程中的一个重要概念，它涉及函数和其环境的交互。为了更好地理解函数闭包，让我们逐步详解它：
 
@@ -1835,7 +1835,7 @@ print(counter_function())      # 输出：3
 
 
 
-# 函数注释
+## 函数注释
 
 在Python中，您可以使用函数注释来为函数的形参提供注释。函数注释是一种在函数定义中包含参数和返回值类型的方式。它不会影响函数的实际行为，但可以提供有用的信息以帮助其他人了解函数应该如何使用。
 
@@ -1855,7 +1855,7 @@ def greet(name: str, age: int) -> str:
     """
     return f"Hello, {name}! You are {age} years old."
 
-# Calling the function
+## Calling the function
 result = greet("Alice", 30)
 print(result)
 ```
@@ -1864,7 +1864,7 @@ print(result)
 
 
 
-# 函数装饰器
+## 函数装饰器
 
 函数装饰器是Python中一种强大的工具，它允许你在不修改原始函数代码的情况下，对函数的行为进行扩展或修改。
 
@@ -1950,7 +1950,7 @@ print(calculate_sum(1000000))
 
 
 
-# 范例
+## 范例
 
 ## demo-1
 
@@ -2110,7 +2110,7 @@ showconfig('127.0.0.1', database='test', username='azheng', port=3307, password=
 """
 127.0.0.1 3307 azheng 123 {'database': 'test'}
 """
-# 属于 **kwargs 可变关键字参数的，会最后处理。
+## 属于 **kwargs 可变关键字参数的，会最后处理。
 ```
 
 
@@ -2262,12 +2262,12 @@ fn(y=1, a=2, x=3)
 ## 复杂情况
 
 ```python
-# / 前面的参数 a, b 为 positional-only 仅位置传参；
-# x, y, z=6 为普通参数，既可以接受关键字传参，也可以接受位置传参。且 z 还定义了缺省值；
-# *args 为可变位置参数，可以接受多个位置参数，并将其收纳到元组当中，未接受即为空元祖；
-# *args 后面的 m=4, n 为 keyword-only 仅关键字传参，且 m 还定义了缺省值；
-# **kwargs 为可变关键字参数，可以接受多个关键字参数，并将其收纳到字典当中，未接受即为空字典；
-# PS：python中形参就这么多类型。
+## / 前面的参数 a, b 为 positional-only 仅位置传参；
+## x, y, z=6 为普通参数，既可以接受关键字传参，也可以接受位置传参。且 z 还定义了缺省值；
+## *args 为可变位置参数，可以接受多个位置参数，并将其收纳到元组当中，未接受即为空元祖；
+## *args 后面的 m=4, n 为 keyword-only 仅关键字传参，且 m 还定义了缺省值；
+## **kwargs 为可变关键字参数，可以接受多个关键字参数，并将其收纳到字典当中，未接受即为空字典；
+## PS：python中形参就这么多类型。
 def fn(a, b, /, x, y, z=6, *args, m=4, n, **kwargs):
     print(a, b)
     print(x, y, z)
@@ -2429,7 +2429,7 @@ admin 123
 
 
 
-# 函数练习题
+## 函数练习题
 
 ## 题目一
 
@@ -2663,7 +2663,7 @@ def min_max(*args):
     # 返回最小值和最大值组成的元组
     return min_value, max_value
 
-# 测试函数
+## 测试函数
 if __name__ == "__main__":
     # 测试用例1
     nums1 = (3, 7, 1, 9, 5)
@@ -2896,7 +2896,7 @@ if __name__ == "__main__":
 
 
 
-# 匿名函数 Lambda
+## 匿名函数 Lambda
 
 Lambda 函数是 Python 中的一种匿名函数，它允许你在需要函数的地方定义简单的函数，而不必使用 `def` 关键字来定义一个正式的函数。
 
@@ -2934,10 +2934,10 @@ print(add(3, 5))  # 输出: 8
 下面是一个使用 `map()` 和 Lambda 函数的示例：
 
 ```python
-# 定义一个列表
+## 定义一个列表
 numbers = [1, 2, 3, 4, 5]
 
-# 使用 map() 将 Lambda 函数应用于列表中的每个元素，求每个元素的平方
+## 使用 map() 将 Lambda 函数应用于列表中的每个元素，求每个元素的平方
 squared_numbers = list(map(lambda x: x**2, numbers))
 
 print("原始列表:", numbers)
@@ -2959,10 +2959,10 @@ Lambda 函数是 `lambda x: x**2`，它接受一个参数 `x`，并返回 `x` �
 下面是一个使用 `filter()` 和 Lambda 函数的示例：
 
 ```python
-# 定义一个列表
+## 定义一个列表
 numbers = [1, 2, 3, 4, 5]
 
-# 使用 filter() 将 Lambda 函数应用于列表中的每个元素，筛选出偶数
+## 使用 filter() 将 Lambda 函数应用于列表中的每个元素，筛选出偶数
 even_numbers = list(filter(lambda x: x % 2 == 0, numbers))
 
 print("原始列表:", numbers)
@@ -2984,10 +2984,10 @@ print("偶数列表:", even_numbers)
 ```python
 from functools import reduce
 
-# 定义一个列表
+## 定义一个列表
 numbers = [1, 2, 3, 4, 5]
 
-# 使用 reduce() 将 Lambda 函数应用于列表中的元素，求列表中所有元素的和
+## 使用 reduce() 将 Lambda 函数应用于列表中的元素，求列表中所有元素的和
 sum_of_numbers = reduce(lambda x, y: x + y, numbers)
 
 print("原始列表:", numbers)
@@ -3007,31 +3007,31 @@ print("列表中所有元素的和:", sum_of_numbers)
 下面是一个简单的示例，演示了一个接受其他函数作为参数的函数：
 
 ```python
-# 定义一个高阶函数，接受一个函数和一个列表作为参数，
-# 并将该函数应用于列表中的每个元素，返回处理后的结果列表
+## 定义一个高阶函数，接受一个函数和一个列表作为参数，
+## 并将该函数应用于列表中的每个元素，返回处理后的结果列表
 def apply_function(func, lst):
     result = []
     for item in lst:
         result.append(func(item))
     return result
 
-# 定义一个函数，用于求一个数的平方
+## 定义一个函数，用于求一个数的平方
 def square(x):
     return x ** 2
 
-# 定义一个函数，用于求一个数的立方
+## 定义一个函数，用于求一个数的立方
 def cube(x):
     return x ** 3
 
-# 定义一个函数，用于求一个数的平方根
+## 定义一个函数，用于求一个数的平方根
 import math
 def square_root(x):
     return math.sqrt(x)
 
-# 创建一个列表
+## 创建一个列表
 numbers = [1, 2, 3, 4, 5]
 
-# 使用高阶函数 apply_function，将不同的函数应用于列表中的元素
+## 使用高阶函数 apply_function，将不同的函数应用于列表中的元素
 squared_numbers = apply_function(square, numbers)
 cubed_numbers = apply_function(cube, numbers)
 square_root_numbers = apply_function(square_root, numbers)

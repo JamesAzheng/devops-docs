@@ -2,7 +2,7 @@
 title: "DML"
 ---
 
-# INSERT INTO
+## INSERT INTO
 
 ## 语法一
 
@@ -88,7 +88,7 @@ VALUES (value1, value2, ..., valueN);
 
 
 
-# UPDATE
+## UPDATE
 
 `UPDATE` 是 SQL 中用于修改表中现有数据的语句。通过 `UPDATE` 语句，可以更新表中的一行或多行记录的列值。
 
@@ -156,7 +156,7 @@ WHERE condition;
 
 
 
-# DELETE
+## DELETE
 
 `DELETE` 是 SQL 中用于从表中删除数据的语句。通过 `DELETE` 语句，可以删除满足特定条件的一行或多行记录。
 
@@ -223,11 +223,11 @@ UPDATE reg SET del=1 WHERE id = 1 OR id = 2;
 
 
 
-# ---
+## ---
 
 
 
-# MERGE
+## MERGE
 
 在一条语句中执行插入、更新或删除操作，通常用于处理表之间的复杂关系。
 

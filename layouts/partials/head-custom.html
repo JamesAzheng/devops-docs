@@ -6,3 +6,7 @@
 {{- $hideTaxonomyJs := resources.Get "js/hide-taxonomy.js" | minify | fingerprint -}}
 <script src="{{ $hideTaxonomyJs.RelPermalink }}" integrity="{{ $hideTaxonomyJs.Data.Integrity }}" defer></script>
 
+{{- /* 引入自定义 JavaScript 以实现点击复制功能（修复浏览器兼容性和中文本地化） */ -}}
+{{- $clickToCopyJs := resources.Get "js/click-to-copy.js" | minify | fingerprint -}}
+<script src="{{ $clickToCopyJs.RelPermalink }}" integrity="{{ $clickToCopyJs.Data.Integrity }}" defer></script>
+

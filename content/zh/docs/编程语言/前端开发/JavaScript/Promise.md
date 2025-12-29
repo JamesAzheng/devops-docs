@@ -2,11 +2,11 @@
 title: "Promise"
 ---
 
-# Promise 概述
+## Promise 概述
 
 JavaScript 的 Promise 对象表示一个异步操作的最终完成（或失败）及其结果值。与传统的回调函数相比，Promise 提供了一种更简洁和更易于管理的方式来处理异步操作。
 
-# 创建一个 Promise
+## 创建一个 Promise
 
 你可以使用 `Promise` 构造函数来创建一个 Promise，它接受一个函数（执行器）作为参数。这个函数有两个参数：`resolve` 和 `reject`。
 
@@ -22,7 +22,7 @@ const myPromise = new Promise((resolve, reject) => {
 });
 ```
 
-# 处理 Promise
+## 处理 Promise
 
 创建 Promise 之后，可以使用 `.then()` 和 `.catch()` 方法来处理其最终的成功或失败。
 
@@ -36,7 +36,7 @@ myPromise
     });
 ```
 
-# 链式 Promise
+## 链式 Promise
 
 你可以在 `.then()` 回调中返回另一个 Promise，从而将多个异步操作串联在一起。
 
@@ -56,7 +56,7 @@ myPromise
     });
 ```
 
-# 使用 `Promise.all`
+## 使用 `Promise.all`
 
 `Promise.all` 允许你等待多个 Promise 完成。它接受一个 Promise 数组，并返回一个新的 Promise，当所有输入的 Promise 都已解决时，它将解决，或如果其中任何一个 Promise 被拒绝，它将拒绝。
 
@@ -72,7 +72,7 @@ Promise.all([promise1, promise2, promise3]).then((values) => {
 });
 ```
 
-# 使用 `Promise.race`
+## 使用 `Promise.race`
 
 `Promise.race` 返回一个 Promise，当数组中的任何一个 Promise 首先解决或拒绝时，它就会解决或拒绝。
 
@@ -90,7 +90,7 @@ Promise.race([promise1, promise2]).then((value) => {
 });
 ```
 
-# 使用 `async` 和 `await`
+## 使用 `async` 和 `await`
 
 `async` 和 `await` 是建立在 Promise 之上的语法糖，使异步代码看起来更像同步代码。
 
@@ -112,7 +112,7 @@ async function example() {
 example();
 ```
 
-# 总结
+## 总结
 
 - **创建 Promise：** 使用 `Promise` 构造函数和 `resolve` 与 `reject` 回调。
 - **处理 Promise：** 使用 `.then()` 处理成功，使用 `.catch()` 处理错误。
@@ -125,7 +125,7 @@ Promise 帮助编写更简洁和可维护的异步代码，减少了深度嵌套
 
 
 
-# setInterval
+## setInterval
 
 `setInterval` 是 JavaScript 中用于创建定时器的一种方法，可以按指定的时间间隔（以毫秒为单位）重复执行一个函数或代码片段。
 
@@ -309,7 +309,7 @@ fetchDataAtInterval(1000, 5)
 
 
 
-# setTimeout
+## setTimeout
 
 `setTimeout` 是 JavaScript 中用于设置一个定时器，以便在指定的时间延迟（以毫秒为单位）之后执行一个函数或代码片段的方法。与 `setInterval` 不同，`setTimeout` 只执行一次。
 
@@ -521,7 +521,7 @@ delayedGreeting('Alice', 3000).then(greeting => {
 
 
 
-# Promise.then
+## Promise.then
 
 `Promise.then()` 方法是 JavaScript 中处理异步操作的核心工具之一。它用于在一个 Promise 对象的异步操作完成（resolve）后，执行某个回调函数，并返回一个新的 Promise。`then` 方法允许我们通过链式调用来顺序处理异步任务。
 
@@ -683,7 +683,7 @@ asyncOperation1()
 
 通过合理使用 `then` 方法，能够更清晰、更顺序地管理异步操作，编写出更易于理解和维护的代码。
 
-# Promise.catch
+## Promise.catch
 
 `Promise.catch()` 方法是 JavaScript Promise 对象的一部分，用于处理 Promise 在被拒绝（rejected）时的情况。它的功能类似于 `then` 方法的第二个参数，但 `catch` 方法专门用于捕获和处理错误，通常放在 Promise 链的末尾。
 
@@ -821,7 +821,7 @@ asyncOperation1()
 
 
 
-# Promise.resolve
+## Promise.resolve
 
 `Promise.resolve()` 方法返回一个以给定值解析后的 Promise 对象。该方法对于将现有值包装成 Promise 对象，或者快速创建一个已经解析的 Promise 非常有用。
 
@@ -933,7 +933,7 @@ Promise.resolve("Initial value")
 
 `Promise.resolve` 是一个非常实用的方法，可以帮助我们简化异步操作，使代码更加一致和易于维护。
 
-# Promise.reject
+## Promise.reject
 
 `Promise.reject()` 方法返回一个带有拒绝原因的 Promise 对象。这个方法主要用于快速创建一个已拒绝的 Promise，便于在代码中处理错误情况。
 
@@ -1069,9 +1069,9 @@ getUserData(null).catch((error) => {
 
 `Promise.reject` 是一个非常有用的方法，可以帮助我们在处理异步操作时，快速创建和处理拒绝的 Promise，使代码更具可读性和维护性。
 
-# ---
+## ---
 
-# Promise 简单示例
+## Promise 简单示例
 
 ```js
 let p1 = new Promise( // 成功有成功的结果，失败有失败的理由
@@ -1108,4 +1108,4 @@ console.log(p1) // Promise { '成功了' }
 
 
 
-# Promise + setInterval + setTimeout
+## Promise + setInterval + setTimeout

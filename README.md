@@ -5,7 +5,7 @@
 
 
 ## 安装
-1. 将该项目放置到 /root 目录下
+1. 将该项目放置到 /root 目录下，进入该项目目录后，执行以下命令：`npm install -D postcss postcss-cli autoprefixer`
 
 2. 拷贝该 service 到 /etc/systemd/system/caddy-hugo.service
 

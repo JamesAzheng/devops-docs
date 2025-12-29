@@ -2,14 +2,14 @@
 title: "Python"
 ---
 
-# Python Hello World
+## Python Hello World
 
 ```python
 print('Hello World')
 ```
 
 
-# Python 解释器
+## Python 解释器
 
 Python解释器的主要功能是解释和执行Python代码。当Python代码被提交给解释器时，它首先会将代码转换为字节码格式，这是一种中间代码格式，可以更快地被解释器执行。转换后的字节码被存储在内存中，并且被Python解释器执行。
 
@@ -43,7 +43,7 @@ Python解释器的功能非常强大，它是Python语言的核心组件之一�
 
 
 
-# PEP 规范
+## PEP 规范
 
 PEP（Python Enhancement Proposal）是 Python 社区用于提出新特性、新功能和其他对 Python 编程语言的改进建议的标准化文档。PEP 旨在为 Python 开发者提供一个标准化的方法来贡献自己的想法和建议，以便更好地推进 Python 语言的发展。
 
@@ -72,7 +72,7 @@ PEP 规范对 Python 社区非常重要，它不仅提供了一种标准化的�
 
 
 
-# 对象
+## 对象
 
 ## 可迭代对象
 
@@ -159,7 +159,7 @@ print(Color.RED.value)   # 输出: 1
 
 
 
-# 魔术方法
+## 魔术方法
 
 "魔术方法"（也称为"特殊方法"或"双下划线方法"）是在Python中具有特殊名称和用途的一类方法。它们以双下划线开头和结尾，例如`__init__`、`__str__`、`__add__`等。这些方法不需要直接调用，而是由Python解释器在特定的情况下自动调用，用于执行一些常见的操作或实现特定的行为。
 
@@ -189,7 +189,7 @@ print(Color.RED.value)   # 输出: 1
 
 
 
-# python脚本运行方式
+## python脚本运行方式
 
 要使用Python中的`pathlib`模块和`argparse`模块来实现类似于`ls`命令的功能，你可以创建一个Python脚本，该脚本接受一个目录作为输入，并列出该目录中的所有文件和子目录。以下是一个示例实现：
 

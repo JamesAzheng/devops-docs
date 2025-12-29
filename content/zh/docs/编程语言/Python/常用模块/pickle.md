@@ -2,7 +2,7 @@
 title: "pickle"
 ---
 
-# pickle 概述
+## pickle 概述
 
 `pickle` 是 Python 中的一个模块，用于序列化和反序列化 Python 对象。它允许你将 Python 对象保存到磁盘或通过网络传输，然后在需要时将其还原为原始对象。
 
@@ -43,7 +43,7 @@ title: "pickle"
 
 
 
-# dump & load
+## dump & load
 
 `pickle.dump(obj, file, protocol=None, *, fix_imports=True)`
 
@@ -64,7 +64,7 @@ title: "pickle"
 ```python
 import pickle
 
-# 示例对象
+## 示例对象
 data = {
     "name": "Alice",
     "age": 30,
@@ -72,15 +72,15 @@ data = {
     "languages": ["Python", "JavaScript"]
 }
 
-# 使用 dump 函数将对象序列化并保存到文件
+## 使用 dump 函数将对象序列化并保存到文件
 with open('data.pkl', 'wb') as file:
     pickle.dump(data, file)
 
-# 使用 load 函数从文件中读取并反序列化对象
+## 使用 load 函数从文件中读取并反序列化对象
 with open('data.pkl', 'rb') as file:
     loaded_data = pickle.load(file)
 
-# 打印反序列化后的对象
+## 打印反序列化后的对象
 print(loaded_data)
 ```
 
@@ -98,7 +98,7 @@ print(loaded_data)
 
 
 
-# dumps & loads
+## dumps & loads
 
 `pickle.dumps(obj, protocol=None, *, fix_imports=True)`
 
@@ -119,7 +119,7 @@ print(loaded_data)
 ```python
 import pickle
 
-# 示例对象
+## 示例对象
 data = {
     "name": "Alice",
     "age": 30,
@@ -127,13 +127,13 @@ data = {
     "languages": ["Python", "JavaScript"]
 }
 
-# 使用 dumps 函数将对象序列化为字节串
+## 使用 dumps 函数将对象序列化为字节串
 serialized_data = pickle.dumps(data)
 
-# 使用 loads 函数从字节串中反序列化对象
+## 使用 loads 函数从字节串中反序列化对象
 loaded_data = pickle.loads(serialized_data)
 
-# 打印反序列化后的对象
+## 打印反序列化后的对象
 print(loaded_data)
 ```
 

@@ -2,7 +2,7 @@
 title: "msgpack"
 ---
 
-# msgpack 概述
+## msgpack 概述
 
 MessagePack 是一种二进制数据序列化格式，类似于 JSON，但更加紧凑和高效。它的设计目标是在不损失性能的前提下，提供比 JSON 更快的数据序列化和反序列化操作。MessagePack 可以在不同编程语言之间进行数据交换，因为它有多种语言的实现，使得不同平台上的应用程序可以轻松地序列化和反序列化 MessagePack 数据。
 
@@ -31,7 +31,7 @@ pip install msgpack
 ```python
 import msgpack
 
-# 创建一个 Python 字典
+## 创建一个 Python 字典
 data = {
     "name": "Alice",
     "age": 30,
@@ -39,16 +39,16 @@ data = {
     "scores": [95, 88, 75]
 }
 
-# 序列化为 MessagePack 格式
+## 序列化为 MessagePack 格式
 packed_data = msgpack.packb(data)
 
-# 打印 MessagePack 数据
+## 打印 MessagePack 数据
 print("Packed Data:", packed_data)
 
-# 反序列化回 Python 数据
+## 反序列化回 Python 数据
 unpacked_data = msgpack.unpackb(packed_data, raw=False)
 
-# 打印反序列化后的数据
+## 打印反序列化后的数据
 print("Unpacked Data:", unpacked_data)
 ```
 

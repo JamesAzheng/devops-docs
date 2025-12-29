@@ -2,13 +2,13 @@
 title: "os"
 ---
 
-# os 模块概述
+## os 模块概述
 
 `os` 模块是 Python 中的一个标准库模块，用于与操作系统进行交互，提供了许多用于文件和目录操作、环境变量管理、进程控制等功能的函数和方法。
 
 
 
-# os 模块常用函数和方法
+## os 模块常用函数和方法
 
 PS：“方法”通常指的是类中定义的函数，而“函数”则是指一般的独立代码块。
 
@@ -83,15 +83,15 @@ print(os.path.dirname(__file__))
 因此，`print(os.path.dirname(__file__))` 这行代码会输出当前脚本文件所在的目录名。
 
 ```py
-# pwd
+## pwd
 /root/python
 
-# cat ./test_os.py
+## cat ./test_os.py
 #!/usr/local/bin/python3
 import os
 print(os.path.dirname(__file__))
 
-# ./test_os.py
+## ./test_os.py
 /root/python/.
 ```
 
@@ -130,16 +130,16 @@ os.path.join(os.path.dirname(__file__), 'config.json')
 因此，`os.path.join(os.path.dirname(__file__), 'config.json')` 这行代码会将当前脚本文件所在的目录名与文件名 `config.json` 拼接起来，生成一个完整的文件路径。
 
 ```py
-# pwd
+## pwd
 /root/python
 
-# cat test_os.py 
+## cat test_os.py 
 #!/usr/local/bin/python3
 import os
 print(os.path.dirname(__file__))
 print(os.path.join(os.path.dirname(__file__), 'config.json'))
 
-# ./test_os.py
+## ./test_os.py
 /root/python/.
 /root/python/./config.json
 ```
@@ -249,7 +249,7 @@ os.environ['ENV_VARIABLE_NAME'] = 'new_value'
 
 
 
-# sched_setaffinity()
+## sched_setaffinity()
 
 在Python中，有一些库可以用来控制进程的CPU亲缘性绑定，比如`psutil`和`os.sched_setaffinity`。
 
@@ -261,7 +261,7 @@ import os
 def bind_process_to_cores(process_id, core_list):
     os.sched_setaffinity(process_id, core_list)
 
-# 示例：将进程绑定到CPU核心0和1
+## 示例：将进程绑定到CPU核心0和1
 process_id_to_bind = os.getpid()  # 获取当前进程ID
 cores_to_bind = [0, 1]           # 替换为你想要绑定的CPU核心列表
 

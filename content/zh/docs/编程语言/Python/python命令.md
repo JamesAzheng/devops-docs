@@ -2,7 +2,7 @@
 title: "python命令"
 ---
 
-# python 常用选项
+## python 常用选项
 
 ## -c
 
@@ -23,10 +23,10 @@ python -c "<Python code>"
 - 打印 "Hello, world!"
 
 ```bash
-# python3 -c "print('Hello, world!')"
+## python3 -c "print('Hello, world!')"
 -bash: !': event not found
 
-# python3 -c 'print("Hello, world!")'
+## python3 -c 'print("Hello, world!")'
 Hello, world!
 ```
 
@@ -70,7 +70,7 @@ python -m requests
 
 
 
-# python 交互式界面
+## python 交互式界面
 
 Python 的交互式界面（也称为解释器或 REPL - Read Eval Print Loop）是一个交互式环境，可以直接输入和执行 Python 代码。它允许你逐行输入代码并立即看到结果，是学习、测试和探索 Python 语言特性的好工具。以下是 Python 交互式界面的一些详解和常用方法：
 

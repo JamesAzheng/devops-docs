@@ -6,7 +6,7 @@ Babel 是一个广泛使用的 JavaScript 编译器，主要用于将现代的 J
 
 https://babel.dev
 
-# 安装 Babel
+## 安装 Babel
 
 要在项目中使用 Babel，你需要安装相关的 npm 包。以下是一个简单的步骤：
 
@@ -30,7 +30,7 @@ https://babel.dev
    npm install --save-dev @babel/preset-env
    ```
 
-# 配置 Babel
+## 配置 Babel
 
 在项目的根目录下创建一个 `.babelrc` 配置文件，或在 `package.json` 文件中添加 Babel 配置。
 
@@ -66,7 +66,7 @@ https://babel.dev
 }
 ```
 
-# 使用 Babel 编译代码
+## 使用 Babel 编译代码
 
 假设你的源代码在 `src` 目录，编译后的代码应输出到 `lib` 目录。你可以通过以下命令编译代码：
 
@@ -80,7 +80,7 @@ npx babel src --out-dir lib
 npm run build
 ```
 
-# 示例项目结构
+## 示例项目结构
 
 假设你的项目结构如下：
 
@@ -106,7 +106,7 @@ greet('World');
 
 运行 `npm run build` 后，Babel 会将代码编译为兼容的版本并输出到 `lib/index.js` 文件中。
 
-# 常见 Babel 插件
+## 常见 Babel 插件
 
 除了 `@babel/preset-env`，Babel 还有许多插件可以单独使用，下面是一些常见的插件：
 
@@ -132,7 +132,7 @@ npm install --save-dev @babel/plugin-transform-arrow-functions
 }
 ```
 
-# 结论
+## 结论
 
 通过 Babel，你可以使用最新的 JavaScript 特性，而不必担心代码在旧版本浏览器中的兼容性。配置 Babel 并不复杂，但它能显著提升你的开发体验和代码质量。
 
@@ -140,9 +140,9 @@ npm install --save-dev @babel/plugin-transform-arrow-functions
 
 
 
-# ---
+## ---
 
-# 官方使用教程
+## 官方使用教程
 
 https://babel.dev/docs/usage
 

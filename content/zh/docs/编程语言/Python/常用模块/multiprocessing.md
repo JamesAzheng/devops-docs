@@ -2,7 +2,7 @@
 title: "multiprocessing"
 ---
 
-# multiprocessing 模块概述
+## multiprocessing 模块概述
 
 `multiprocessing` 是 Python 中用于实现并行处理的模块，它允许在多个进程中执行代码，以充分利用多核处理器。
 
@@ -18,7 +18,7 @@ title: "multiprocessing"
 
 
 
-# Process()
+## Process()
 
 **Process（进程）：** `multiprocessing` 中的核心对象之一。通过创建 `Process` 对象，可以启动一个新的进程，执行指定的函数或代码块。
 
@@ -136,7 +136,7 @@ if __name__ == "__main__":
 
 
 
-# Queue()
+## Queue()
 
 队列，用于在多个进程之间传递数据和信息。`Queue` 可以安全地实现进程间通信（IPC）。
 
@@ -186,7 +186,7 @@ if __name__ == "__main__":
 
 
 
-# Pool()
+## Pool()
 
 进程池，通过 `Pool` 可以管理多个进程，可以用来批量创建子进程，并控制并发的数量。
 
@@ -225,7 +225,7 @@ if __name__ == "__main__":
 
 
 
-# Lock()
+## Lock()
 
 锁，在多进程共享资源时，为了避免竞争条件和数据混乱，`multiprocessing.Lock` 可以用来实现简单的进程同步。
 

@@ -2,7 +2,7 @@
 title: "math"
 ---
 
-# math
+## math
 
 `math` 是 Python 标准库中的一个模块，提供了许多数学函数和常量。要使用 `math` 模块，需要先导入它：
 

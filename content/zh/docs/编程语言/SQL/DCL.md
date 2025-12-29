@@ -3,7 +3,7 @@ title: "DCL"
 ---
 
 
-# GRANT
+## GRANT
 
 `GRANT` 是 SQL 中的数据控制语言（DCL）关键字之一，用于授予用户或用户组对数据库对象的特定权限。`GRANT` 语句的基本语法如下：
 
@@ -57,7 +57,7 @@ GRANT SELECT, INSERT ON employees TO user1;
 
 
 
-# REVOKE
+## REVOKE
 
 `REVOKE` 是 SQL 中的数据控制语言（DCL）关键字之一，用于回收用户或用户组对数据库对象的权限。`REVOKE` 语句的基本语法如下：
 
@@ -113,7 +113,7 @@ REVOKE SELECT, INSERT ON employees FROM user1;
 
 
 
-# DENY
+## DENY
 
 `DENY` 是 SQL 中的一些数据库管理系统（DBMS）中的数据控制语言（DCL）关键字之一，用于显式地拒绝用户或用户组对数据库对象的权限。
 
@@ -143,7 +143,7 @@ DENY SELECT ON employees TO user1;
 
 
 
-# COMMIT
+## COMMIT
 
 用于提交当前事务，将对数据库的更改永久保存。
 
@@ -176,7 +176,7 @@ COMMIT;
 
 
 
-# ROLLBACK
+## ROLLBACK
 
 用于回滚当前事务，取消对数据库的更改。
 
@@ -211,7 +211,7 @@ ROLLBACK;
 
 
 
-# SAVEPOINT
+## SAVEPOINT
 
 用于创建一个事务的保存点，使得在事务回滚时可以回到保存点。
 
@@ -252,7 +252,7 @@ COMMIT;
 
 
 
-# ROLLBACK TO SAVEPOINT
+## ROLLBACK TO SAVEPOINT
 
 用于将事务回滚到指定的保存点。
 
@@ -293,7 +293,7 @@ COMMIT;
 
 
 
-# SET TRANSACTION
+## SET TRANSACTION
 
 用于设置事务的特性，如隔离级别。
 

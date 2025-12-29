@@ -2,7 +2,7 @@
 title: "threading 模块"
 ---
 
-# Event()
+## Event()
 
 在 Python 的 `threading` 模块中，`Event` 是一个同步原语，用于在线程之间通信。**它提供了一种机制，使得一个线程可以等待另一个线程发出的信号**。`Event` 对象包含一个内部标志，这个标志可以通过 `set()` 方法设置为 `True`，并通过 `clear()` 方法清除（即设置为 `False`）。此外，线程可以调用 `wait()` 方法阻塞自己，直到这个内部标志被设置为 `True`。
 
@@ -19,7 +19,7 @@ title: "threading 模块"
 import threading
 import time
 
-# 创建一个 Event 对象
+## 创建一个 Event 对象
 event = threading.Event()
 
 def worker():
@@ -32,15 +32,15 @@ def setter():
     print("Setting the event.")
     event.set()  # 设置事件
 
-# 创建线程
+## 创建线程
 t1 = threading.Thread(target=worker)
 t2 = threading.Thread(target=setter)
 
-# 启动线程
+## 启动线程
 t1.start()
 t2.start()
 
-# 等待线程完成
+## 等待线程完成
 t1.join()
 t2.join()
 ```
@@ -59,20 +59,20 @@ t2.join()
 import threading
 import time
 
-# 创建一个事件对象
+## 创建一个事件对象
 event = threading.Event()
 
-# 定义一个函数作为线程的目标函数
+## 定义一个函数作为线程的目标函数
 def thread_function(name):
     print(f"线程 {name} 正在等待事件.")
     event.wait()  # 等待事件
     print(f"线程 {name} 收到事件通知.")
 
-# 创建两个线程
+## 创建两个线程
 thread1 = threading.Thread(target=thread_function, args=("1",))
 thread2 = threading.Thread(target=thread_function, args=("2",))
 
-# 启动两个线程
+## 启动两个线程
 thread1.start()
 thread2.start()
 
@@ -129,26 +129,26 @@ thread2.join()
 import threading
 import time
 
-# 创建一个事件
+## 创建一个事件
 event = threading.Event()
 
-# 定义一个函数，当事件被设置时将会执行
+## 定义一个函数，当事件被设置时将会执行
 def work():
     print("Thread is waiting for the event.")
     event.wait()
     print("Thread continues its operation.")
 
-# 创建一个线程并启动它
+## 创建一个线程并启动它
 thread = threading.Thread(target=work)
 thread.start()
 
-# 让主线程等待一段时间
+## 让主线程等待一段时间
 time.sleep(3)
 
-# 设置事件，使得线程可以继续执行
+## 设置事件，使得线程可以继续执行
 event.set()
 
-# 等待线程结束
+## 等待线程结束
 thread.join()
 ```
 
@@ -163,22 +163,22 @@ import threading
 from threading import Event
 import time
 
-# 在2秒后设置传入的事件对象
+## 在2秒后设置传入的事件对象
 def fn(e:Event):
     time.sleep(2)
     e.set()
 
-# 创建一个threading.Event对象e
+## 创建一个threading.Event对象e
 e = Event()
 
 print(e) # <threading.Event object at 0x0000020023436650>，打印事件对象。这将打印出事件对象的内存地址。
 
 print(e.is_set()) # False，打印事件对象的状态。在创建事件对象时，它的初始状态是未设置的，因此打印的结果为False。
 
-# 创建了一个新的线程，目标函数为fn，传入的参数为事件对象e。这个线程会在后台运行。
+## 创建了一个新的线程，目标函数为fn，传入的参数为事件对象e。这个线程会在后台运行。
 threading.Thread(target=fn, args=(e,)).start()
 
-# 等待事件的设置，最多等待5秒。在这里，由于新线程会在2秒后将事件对象设置为已设置，因此等待方法会在事件被设置后立即返回True。
+## 等待事件的设置，最多等待5秒。在这里，由于新线程会在2秒后将事件对象设置为已设置，因此等待方法会在事件被设置后立即返回True。
 print(e.wait(5)) # True
 ```
 
@@ -321,9 +321,9 @@ app.mainloop()
 
 总之，事件驱动编程是一种非常常见的编程模型，用于创建响应式、交互式的应用程序。不同的库和框架提供了不同的事件处理机制，但基本的概念是相似的：等待事件发生，然后执行相应的操作。
 
-# ---
+## ---
 
-# threading 模块概述
+## threading 模块概述
 
 `threading` 模块是 Python 中用于多线程编程的标准库模块之一。它提供了创建和管理线程的工具，使得在 Python 中实现并发编程变得更加容易。
 
@@ -391,15 +391,15 @@ def print_letters():
     for letter in 'abcde':
         print(f"Letter: {letter}")
 
-# 创建线程
+## 创建线程
 t1 = threading.Thread(target=print_numbers)
 t2 = threading.Thread(target=print_letters)
 
-# 启动线程
+## 启动线程
 t1.start()
 t2.start()
 
-# 等待线程完成
+## 等待线程完成
 t1.join()
 t2.join()
 
@@ -498,15 +498,15 @@ def print_letters():
     for letter in 'abcde':
         print(f"Letter: {letter}")
 
-# 创建线程对象
+## 创建线程对象
 thread1 = threading.Thread(target=print_numbers)
 thread2 = threading.Thread(target=print_letters)
 
-# 启动线程
+## 启动线程
 thread1.start()
 thread2.start()
 
-# 等待线程完成
+## 等待线程完成
 thread1.join()
 thread2.join()
 
@@ -579,21 +579,21 @@ threading.Thread(target=worker, name='w1', args=(lock,)).start()
 ```python
 import threading
 
-# 假设有一个名为worker的函数
+## 假设有一个名为worker的函数
 def worker(lock):
     # 做一些工作
     pass
 
 lock = threading.Lock()
-# 实例化线程对象
+## 实例化线程对象
 thread = threading.Thread(target=worker, name='w1', args=(lock,))
-# 启动线程
+## 启动线程
 thread.start()
 
-# 在这里您可以对线程对象进行操作或跟踪其状态
-# 例如，您可以调用thread.join()等方法来等待线程结束
+## 在这里您可以对线程对象进行操作或跟踪其状态
+## 例如，您可以调用thread.join()等方法来等待线程结束
 
-# 其他的代码
+## 其他的代码
 ```
 
 通过实例化线程对象，您可以在需要时跟踪线程的状态，并调用其方法。
@@ -734,15 +734,15 @@ def print_letters():
         print(f"Letter: {letter}")
         time.sleep(3)
 
-# 创建线程
+## 创建线程
 t1 = threading.Thread(target=print_numbers)
 t2 = threading.Thread(target=print_letters)
 
-# 启动线程
+## 启动线程
 t1.start()
 t2.start()
 
-# 等待线程完成
+## 等待线程完成
 t1.join()
 t2.join()
 
@@ -767,13 +767,13 @@ print("Both threads are done.")
 ### 运行结果
 
 ```python
-# ./test.py 
+## ./test.py 
 Number: 1
 Letter: a
 ...
 
 
-# pstree -p | grep test.py
+## pstree -p | grep test.py
            |-sshd(954)-+-sshd(1365)---bash(1449)---test.py(2404)-+-{test.py}(2405)
            |           |                                         `-{test.py}(2406)
 ```
@@ -800,11 +800,11 @@ def print_numbers():
         if i == 3:
             break # 通过break正常结束线程
 
-# 创建线程
+## 创建线程
 t1 = threading.Thread(target=print_numbers)
 
 
-# 启动线程
+## 启动线程
 t1.start()
 ```
 
@@ -830,11 +830,11 @@ def print_numbers():
         if i == 3:
             return 123 # 通过return的方式
 
-# 创建线程
+## 创建线程
 t1 = threading.Thread(target=print_numbers)
 
 
-# 启动线程
+## 启动线程
 t1.start()
 ```
 
@@ -862,11 +862,11 @@ def print_numbers():
         if i == 3:
             1 / 0 # 除零异常
 
-# 创建线程
+## 创建线程
 t1 = threading.Thread(target=print_numbers)
 
 
-# 启动线程
+## 启动线程
 t1.start()
 ```
 
@@ -894,11 +894,11 @@ def print_numbers():
         if i == 3:
             raise RuntimeError
 
-# 创建线程
+## 创建线程
 t1 = threading.Thread(target=print_numbers)
 
 
-# 启动线程
+## 启动线程
 t1.start()
 ```
 
@@ -960,12 +960,12 @@ def print_numbers():
         if i == 3:
             break
 
-# 创建线程
+## 创建线程
 t1 = threading.Thread(target=print_numbers)
 
 show_thread_info('out')
 
-# 启动线程
+## 启动线程
 t1.start()
 
 '''
@@ -1001,15 +1001,15 @@ class MyThread(threading.Thread):
         for i in range(5):
             print(f"Thread {self.name}: {i}")
 
-# 创建线程对象
+## 创建线程对象
 t1 = MyThread()
 t2 = MyThread()
 
-# 启动线程，会在新线程中执行 run() 方法
+## 启动线程，会在新线程中执行 run() 方法
 t1.start()
 t2.start()
 
-# 主线程继续执行自己的工作
+## 主线程继续执行自己的工作
 for i in range(5):
     print(f"Main Thread: {i}")
 ```
@@ -1358,11 +1358,11 @@ def process_data(data):
     print(f"Processed data: {result}")
 
 data = 5
-# 创建线程并传入数据
+## 创建线程并传入数据
 thread = threading.Thread(target=process_data, args=(data,))
 thread.start()
 
-# 主线程继续执行其他任务
+## 主线程继续执行其他任务
 print("Main thread continues to run.")
 ```
 
@@ -1458,7 +1458,7 @@ for i in range(10):
 ```python
 import threading
 
-# 创建threading.local对象：
+## 创建threading.local对象：
 local_data = threading.local()
 
 def my_thread_func(arg):
@@ -1466,7 +1466,7 @@ def my_thread_func(arg):
     local_data.x = arg
     print(f'Thread {arg}: {local_data.x}')
 
-# 在线程中使用threading.local对象：
+## 在线程中使用threading.local对象：
 thread1 = threading.Thread(target=my_thread_func, args=(1,))
 thread2 = threading.Thread(target=my_thread_func, args=(2,))
 
@@ -1587,22 +1587,22 @@ Python中的Thread-local对象（线程本地对象）是一种特殊类型的�
 ```python
 import threading
 
-# 创建Thread-local对象
+## 创建Thread-local对象
 local_data = threading.local()
 
-# 在线程中设置属性
+## 在线程中设置属性
 def thread_func(value):
     local_data.value = value
     print(f"Value set to {local_data.value} in {threading.current_thread().name}")
 
-# 创建多个线程
+## 创建多个线程
 threads = []
 for i in range(5):
     t = threading.Thread(target=thread_func, args=(i,))
     threads.append(t)
     t.start()
 
-# 等待所有线程完成
+## 等待所有线程完成
 for t in threads:
     t.join()
 ```
@@ -1619,7 +1619,7 @@ for t in threads:
 
 
 
-# threading.Timer
+## threading.Timer
 
 在Python中，`threading.Timer`类允许您创建一个定时器，该定时器在指定的时间间隔后执行一个函数。这在需要执行定时操作的应用程序中非常有用。下面是关于`threading.Timer`的详细说明：
 
@@ -1658,7 +1658,7 @@ import threading
 def hello():
     print("Hello, Timer!")
 
-# 创建一个延迟2秒后执行hello函数的定时器
+## 创建一个延迟2秒后执行hello函数的定时器
 t = threading.Timer(2.0, hello)
 t.start()  # 启动定时器
 ```
@@ -1677,13 +1677,13 @@ import threading
 def hello():
     print("Hello, Timer!")
 
-# 创建一个延迟2秒后执行hello函数的定时器
+## 创建一个延迟2秒后执行hello函数的定时器
 t = threading.Timer(2.0, hello)
 
-# 取消定时器
+## 取消定时器
 t.cancel()
 
-# 尝试启动定时器
+## 尝试启动定时器
 t.start()
 
 print('__main__')
@@ -1701,13 +1701,13 @@ import threading
 def hello():
     print("Hello, Timer!")
 
-# 创建一个延迟2秒后执行hello函数的定时器
+## 创建一个延迟2秒后执行hello函数的定时器
 t = threading.Timer(2.0, hello)
 
-# 取消定时器
+## 取消定时器
 t.cancel()
 
-# 重新创建一个延迟2秒后执行hello函数的定时器
+## 重新创建一个延迟2秒后执行hello函数的定时器
 t = threading.Timer(2.0, hello)
 
 t.start()
@@ -1721,7 +1721,7 @@ print('__main__')
 
 
 
-# threading.Lock
+## threading.Lock
 
 `threading.Lock` 最基本的锁类型，用于提供简单的互斥访问控制。它可以确保在任何时刻只有一个线程可以访问被保护的代码块，从而**防止多个线程同时修改相同的数据，导致不一致或不可预料的行为**。
 
@@ -1752,16 +1752,16 @@ import threading
 
 lock = threading.Lock()
 
-# 获取锁
+## 获取锁
 lock.acquire()
 
-# 打印锁的状态
+## 打印锁的状态
 print("Lock status:", lock.locked())  # True
 
-# 释放锁
+## 释放锁
 lock.release()
 
-# 打印锁的状态
+## 打印锁的状态
 print("Lock status:", lock.locked())  # False
 ```
 
@@ -1828,13 +1828,13 @@ print(y)
 ```python
 import threading
 
-# 创建锁
+## 创建锁
 lock = threading.Lock()
 
-# 共享资源
+## 共享资源
 shared_resource = 0
 
-# 线程函数
+## 线程函数
 def thread_function(lock, shared_resource):
     for _ in range(100000):
         # 获取锁
@@ -1846,19 +1846,19 @@ def thread_function(lock, shared_resource):
             # 释放锁
             lock.release()
 
-# 创建线程
+## 创建线程
 thread1 = threading.Thread(target=thread_function, args=(lock, shared_resource))
 thread2 = threading.Thread(target=thread_function, args=(lock, shared_resource))
 
-# 启动线程
+## 启动线程
 thread1.start()
 thread2.start()
 
-# 等待线程结束
+## 等待线程结束
 thread1.join()
 thread2.join()
 
-# 输出最终的共享资源值
+## 输出最终的共享资源值
 print("Shared Resource:", shared_resource)
 ```
 
@@ -2048,12 +2048,12 @@ for i in range(10):
 
 - 总体来说，使用锁可以有效地保护共享资源，确保多线程程序的安全性和一致性。在这个例子中，`with lock`语句确保了在每次访问和修改`caps`列表时都会获得锁，从而避免了多个线程同时修改共享资源的问题。
 
-# threading.RLock
+## threading.RLock
 
 `threading.RLock` 可重入锁，允许同一线程多次获得相同的锁。它可以防止单线程对共享资源的重复加锁造成的阻塞。
 
 
 
-# threading.Semaphore
+## threading.Semaphore
 
 `threading.Semaphore` 信号量，允许多个线程同时访问同一资源。可以控制同时访问某一资源的最大线程数。

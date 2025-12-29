@@ -2,7 +2,7 @@
 title: "DDL"
 ---
 
-# CREATE
+## CREATE
 
 `CREATE` 是 SQL 中用于创建数据库对象（如表、视图、索引等）的关键字。`CREATE` 语句允许用户定义和配置数据库中的各种对象。具体的 `CREATE` 语法和支持的选项可能因数据库管理系统而异。
 
@@ -67,7 +67,7 @@ title: "DDL"
 
 
 
-# ALTER
+## ALTER
 
 用于修改数据库对象的结构，如添加、修改或删除列。
 
@@ -138,7 +138,7 @@ title: "DDL"
 
 
 
-# DROP
+## DROP
 
 用于删除数据库对象，如表、索引等。
 
@@ -199,7 +199,7 @@ title: "DDL"
 
 
 
-# TRUNCATE
+## TRUNCATE
 
 用于删除表中的所有数据，但保留表的结构。
 
@@ -228,7 +228,7 @@ TRUNCATE TABLE employees;
 
 
 
-# COMMENT
+## COMMENT
 
 用于添加注释到数据库对象，如表或列。
 
@@ -287,7 +287,7 @@ COMMENT ON TABLE employees IS 'This table stores information about company emplo
 
 
 
-# RENAME
+## RENAME
 
 用于重命名数据库对象，如表名、列名等。
 
@@ -331,7 +331,7 @@ COMMENT ON TABLE employees IS 'This table stores information about company emplo
 
 
 
-# CREATE INDEX
+## CREATE INDEX
 
 用于在表上创建索引。
 
@@ -384,7 +384,7 @@ ON employees (last_name);
 
 
 
-# DROP INDEX
+## DROP INDEX
 
 用于删除表上的索引。
 

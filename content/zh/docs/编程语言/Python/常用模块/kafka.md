@@ -3,7 +3,7 @@ title: "kafka"
 ---
 
 
-# 概述
+## 概述
 
 `kafka-python` 是一个纯 Python 实现的 Kafka 客户端库，适用于对 Kafka 的简单操作和中小规模的消息处理需求。尽管其性能可能不如基于 `librdkafka` 的 `confluent-kafka-python`，但它仍然是一个功能全面且易于使用的选择。
 
@@ -24,16 +24,16 @@ pip install -i https://pypi.tuna.tsinghua.edu.cn/simple kafka-python
 ```python
 from kafka import KafkaProducer
 
-# 创建生产者实例
+## 创建生产者实例
 producer = KafkaProducer(bootstrap_servers='localhost:9092')  # 替换为你的 Kafka 服务器地址
 
-# 发送消息
+## 发送消息
 producer.send('my_topic', key=b'my_key', value=b'Hello, Kafka!')
 
-# 刷新网络缓冲区，使所有消息都被发送
+## 刷新网络缓冲区，使所有消息都被发送
 producer.flush()
 
-# 关闭生产者
+## 关闭生产者
 producer.close()
 ```
 
@@ -44,7 +44,7 @@ producer.close()
 ```python
 from kafka import KafkaConsumer
 
-# 创建消费者实例
+## 创建消费者实例
 consumer = KafkaConsumer(
     'my_topic',
     bootstrap_servers='localhost:9092',  # 替换为你的 Kafka 服务器地址
@@ -52,11 +52,11 @@ consumer = KafkaConsumer(
     auto_offset_reset='earliest'
 )
 
-# 消费消息
+## 消费消息
 for message in consumer:
     print(f"Received message: {message.value.decode('utf-8')}")
 
-# 关闭消费者
+## 关闭消费者
 consumer.close()
 ```
 
@@ -67,7 +67,7 @@ consumer.close()
 你可以将消息发送到特定的分区，或使用键控消息来确保具有相同键的消息发送到同一分区：
 
 ```python
-# 发送到特定分区
+## 发送到特定分区
 producer.send('my_topic', key=b'my_key', value=b'Hello, Kafka!', partition=0)
 ```
 
@@ -76,11 +76,11 @@ producer.send('my_topic', key=b'my_key', value=b'Hello, Kafka!', partition=0)
 `kafka-python` 支持异步发送消息，可以批量发送以提高性能：
 
 ```python
-# 批量发送消息
+## 批量发送消息
 for i in range(100):
     producer.send('my_topic', key=b'my_key', value=f'Hello, Kafka! {i}'.encode('utf-8'))
 
-# 刷新网络缓冲区，使所有消息都被发送
+## 刷新网络缓冲区，使所有消息都被发送
 producer.flush()
 ```
 
@@ -125,7 +125,7 @@ consumer = KafkaConsumer('my_topic', bootstrap_servers=['broker1:9092', 'broker2
 以下是一个完整的生产者和消费者示例，展示了如何使用 `kafka-python` 进行消息的生产和消费：
 
 ```python
-# 生产者
+## 生产者
 from kafka import KafkaProducer
 
 producer = KafkaProducer(bootstrap_servers='localhost:9092')
@@ -134,7 +134,7 @@ for i in range(10):
 producer.flush()
 producer.close()
 
-# 消费者
+## 消费者
 from kafka import KafkaConsumer
 
 consumer = KafkaConsumer(
@@ -152,7 +152,7 @@ consumer.close()
 
 
 
-# topic 常用操作
+## topic 常用操作
 
 ## 创建
 
@@ -160,10 +160,10 @@ consumer.close()
 from kafka.admin import KafkaAdminClient, NewTopic
 from kafka.errors import KafkaError
 
-# Kafka 服务器地址
+## Kafka 服务器地址
 bootstrap_servers = 'localhost:9092'
 
-# 创建 KafkaAdminClient 实例
+## 创建 KafkaAdminClient 实例
 admin_client = KafkaAdminClient(bootstrap_servers=bootstrap_servers)
 
 try:
@@ -193,10 +193,10 @@ finally:
 from kafka import KafkaAdminClient
 from kafka.errors import KafkaError
 
-# Kafka 服务器地址
+## Kafka 服务器地址
 bootstrap_servers = 'localhost:9092'
 
-# 创建 KafkaAdminClient 实例
+## 创建 KafkaAdminClient 实例
 admin_client = KafkaAdminClient(bootstrap_servers=bootstrap_servers)
 
 try:

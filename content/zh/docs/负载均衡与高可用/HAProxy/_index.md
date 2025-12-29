@@ -2,7 +2,7 @@
 title: "HAProxy"
 ---
 
-# HAproxy 概述
+## HAProxy 概述
 
 - haproxy是一款可以实现四、七层负载均衡的应用服务，由C语言编写，分为企业版和社区版
 
@@ -11,12 +11,12 @@ title: "HAProxy"
 - 社区版官网：https://www.haproxy.org/
 - Github：https://github.com/haproxy
 
-## 支持的功能
+### 支持的功能
 
 - 支持TCP 和 HTTP 反向代理
 - 支持动态程序的反向代理
 - 支持基于数据库的反向代理
-- SSL/TSL 服务器
+- SSL/TLS 服务器
 - 可以针对HTTP请求添加cookie，进行路由后端服务器
 - 可平衡负载至后端服务器，并支持持久连接
 - 支持所有主服务器故障切换至备用服务器
@@ -27,41 +27,31 @@ title: "HAProxy"
 - 支持基于pattern实现连接请求的访问控制
 - 通过特定的URI为授权用户提供详细的状态信息
 
-
-
-## 不支持的功能
+### 不支持的功能
 
 - 正向代理
 - 缓存代理
 - UDP协议
 
+## HAProxy 安装
 
+### CentOS
 
+#### CentOS 8
 
+##### yum安装
 
-
-
-# HAproxy 安装
-
-## Centos
-
-### centos8
-
-#### yum安装
-
-- centos8 yum安装提供的是 1.8版本
+- CentOS 8 yum安装提供的是 1.8版本
 
 ```bash
 dnf -y install haproxy
 ```
 
+### Ubuntu
 
+#### Ubuntu 20.04 
 
-## Ubuntu
-
-### Ubuntu20.04 
-
-#### apt安装
+##### apt安装
 
 - 官方包安装：https://haproxy.debian.net/
 
@@ -73,18 +63,18 @@ apt-get install haproxy=2.0.\*
 
 
 
-## 编译安装
+### 编译安装
 
 - **生产中常用的安装方式**
 - **下面以 Centos8.3 作为编译安装范例**
 
-### 解决lua环境
+#### 解决lua环境
 
 - haproxy编译安装依赖lua环境
 
 - lua官方网站：https://www.lua.org/
 
-#### 编译安装lua
+##### 编译安装lua
 
 ```bash
 #安装依赖包
@@ -99,20 +89,20 @@ apt-get install haproxy=2.0.\*
 [root@haproxy lua-5.4.3]# make all test
 ```
 
-### 下载源码包
+#### 下载源码包
 
 ```bash
 [root@haproxy ~]# cd /usr/local/src/
 [root@haproxy src]# wget https://www.haproxy.org/download/2.0/src/haproxy-2.0.25.tar.gz
 ```
 
-### 安装相关依赖包
+#### 安装相关依赖包
 
 ```bash
 [root@haproxy src]# dnf -y install gcc openssl-devel pcre-devel systemd-devel make
 ```
 
-### 开始编译安装
+#### 开始编译安装
 
 ```bash
 [root@haproxy src]# tar xf haproxy-2.0.25.tar.gz 
@@ -122,20 +112,22 @@ apt-get install haproxy=2.0.\*
 [root@haproxy haproxy-2.0.25]# cat INSTALL
 ...
 
-#执行以下命令开始编译安装
+#执行以下命令开始编译安装（启用OpenSSL、ZLIB、Lua、PCRE和Systemd支持）
 [root@haproxy haproxy-2.0.25]# make -j 2 TARGET=linux-glibc \
 USE_OPENSSL=1 USE_ZLIB=1 USE_LUA=1 USE_PCRE=1 USE_SYSTEMD=1 \
 LUA_INC=/apps/lua-5.4.3/src LUA_LIB=/apps/lua-5.4.3/src
+
+#安装到指定目录
 [root@haproxy haproxy-2.0.25]# make install PREFIX=/apps/haproxy
 ```
 
-### 验证安装
+#### 验证安装
 
 ```bash
 [root@haproxy ~]# /apps/haproxy/sbin/haproxy -vv
 ```
 
-### 后续配置
+#### 后续配置
 
 ```bash
 #给haproxy创建软连接，或者加入到PATH变量也可以 这里省略
@@ -256,23 +248,13 @@ listen stats
 http://10.0.0.8:5000/haproxy-status
 ```
 
-
-
-
-
-## docker安装
+### docker安装
 
 ...
 
+## HAProxy 配置说明
 
-
-
-
-
-
-# HAproxy 配置说明
-
-## 前言
+### 前言
 
 - **haproxy 的每个版本的变化都相对比较大，可能一个功能或一个参数在上一个版本还可以使用 但换其其他版本就不能用了，所以最权威的还是要看官方文档**
 
@@ -280,7 +262,7 @@ http://10.0.0.8:5000/haproxy-status
 
 - 官方帮助文档：https://www.haproxy.org/#docs
 
-## 配置分类
+### 配置分类
 
 **HAProxy 的配置文件 haproxy.cfg由两大部分组成，分别是global和proxies**
 
@@ -301,9 +283,7 @@ backend  #后端，相当于nginx中的upstream{}
 listen   #同时拥有前端和后端配置，配置简单，生产中推荐使用
 ```
 
-
-
-## global 配置段
+### global 配置段
 
 - 官方文档：http://cbonte.github.io/haproxy-dconv/2.0/configuration.html#3
 
@@ -333,9 +313,7 @@ global
     log 127.0.0.1 local2 info #定义全局的syslog服务器；日志服务器需要开启UDP协议，最多可以定义两个
 ```
 
-
-
-## Proxies 配置段
+### Proxies 配置段
 
 - 官方文档：http://cbonte.github.io/haproxy-dconv/2.0/configuration.html#4
 - **name字段建议只用数字字母_-**
@@ -469,9 +447,9 @@ server #定义后端的real server，必须指定IP和端口 除此之外还支�
        maxconn <maxconn> #当前后端server的最大并发连接数
 ```
 
-#### frontend+backend组合范例
+#### Frontend+Backend 组合范例
 
-##### 范例1
+##### 范例1：基本HTTP负载均衡配置
 
 ```bash
 frontend xiangzheng-web-80
@@ -486,7 +464,7 @@ backend xiangzheng-web-80-nodes
     server web2 10.0.0.48:80 check
 ```
 
-##### 范例2
+##### 范例2：业务网站访问入口配置
 
 ```bash
 #官网业务访问入口
@@ -502,9 +480,9 @@ backend xiangzheng-vip-80-nodes
     server web2 10.0.0.48:8080 check inter 3000 fall 3 rise 5
 ```
 
-##### 范例3
+##### 范例3：MySQL PXC集群负载均衡配置
 
-- MySQL pxc cluster
+- 配置MySQL PXC集群的TCP负载均衡
 
 ```
 frontend mysql-pxc-cluster
@@ -521,17 +499,13 @@ backend pxc-node
     server  10.0.0.102 10.0.0.102:3306 check
 ```
 
-
-
-
-
 ### listen
 
 - **将frontend和backend合并在一起配置**，相对于frontend和backend配置更加简洁
 - **生产中常用**
 - **Syntax：**listen <name> ...
 
-#### 范例1
+#### 范例1：网站业务访问入口与状态页配置
 
 ```bash
 [root@haproxy ~]# haproxy -v
@@ -557,19 +531,22 @@ listen stats
     stats auth haadmin:123456 #状态页验证密码
 ```
 
-#### 范例2
+#### 范例2：MySQL PXC集群负载均衡配置
 
-- MySQL pxc cluster
+- 使用listen指令配置MySQL PXC集群的TCP负载均衡
 
 ```bash
-#
+listen mysql-pxc-cluster
+    mode tcp
+    bind *:3306
+    option mysql-check
+    balance roundrobin
+    server 10.0.0.100 10.0.0.100:3306 check
+    server 10.0.0.101 10.0.0.101:3306 check
+    server 10.0.0.102 10.0.0.102:3306 check
 ```
 
-
-
-
-
-## 定义子配置文件
+### 定义子配置文件
 
 - **注意：子配置文件必须以 cfg 为后缀 并且 非.开头的非隐藏文件**
 
@@ -600,9 +577,7 @@ ExecStart=/usr/sbin/haproxy -Ws -f $CONFIG -f $CONFIG2 -p $PIDFILE $OPTIONS
 [root@haproxy ~]# systemctl restart haproxy.service 
 ```
 
-
-
-# HAproxy 检查配置文件语法
+### HAProxy 检查配置文件语法
 
 ```bash
 [root@haproxy-master ~]# haproxy -c -f /apps/haproxy/etc/haproxy.cfg
@@ -614,7 +589,7 @@ Configuration file is valid #配置文件是有效的
 
 
 
-# HAproxy 多进程和多线程
+### HAProxy 多进程和多线程
 
 - haproxy支持一个进程带多个线程的模式，也支持多个work进程的模式
 
@@ -626,7 +601,7 @@ Configuration file is valid #配置文件是有效的
 
 
 
-# HAproxy 多socket
+### HAProxy 多socket
 
 - 定义多个socket可以实现对单一进程的控制...
 
@@ -669,7 +644,7 @@ srw------- 1 root root 0 Feb 21 21:25 haproxy2.sock
 
 
 
-# HAproxy 开启日志记录
+## HAproxy 开启日志记录
 
 - haproxy本身不记录客户端的访问日志，此外为减少服务器负载，**一般生产中haproxy不记录日志**
 - 也可以配置 haproxy+syslog 将日志记录到指定文件中
@@ -702,11 +677,11 @@ systemctl enable --now rsyslog
 
 
 
-# HAproxy 初步实现
+## HAproxy 初步实现
 
 - **下面采用子配置文件结合listen配置段实现**
 
-## 环境准备
+### 环境准备
 
 - **说明：**
 - 仅主机网络：单独的一个网络环境
@@ -720,7 +695,7 @@ systemctl enable --now rsyslog
 | 10.0.0.38/NAT        | NULL                 | nginx   | web1.xiangzheng.vip    |
 | 10.0.0.48/NAT        | NULL                 | nginx   | web2.xiangzheng.vip    |
 
-## 验证环境
+### 验证环境
 
 ```bash
 [root@client ~]# curl 10.0.0.38
@@ -746,7 +721,7 @@ web2.xiangzheng.vip
 
 
 
-## 实现基本http调度
+### 实现基本http调度
 
 ### 配置
 
@@ -775,7 +750,7 @@ web2.xiangzheng.vip page
 
 
 
-## 开启地址透传
+### 开启地址透传
 
 ### 配置
 
@@ -807,7 +782,7 @@ web2.xiangzheng.vip page
 
 
 
-## 开启状态检测
+### 开启状态检测
 
 - haproxy默认没有开启对后端服务器状态检测功能，这样会导致后端服务器down掉后haproxy还会继续调度，并且未开启检测时在haproxy状态页会显示灰色not checked，开启检测后如果服务器正常会显示绿色active UP
 - **测试发现不开启状态检测也会实现故障自动转移？？！**
@@ -838,6 +813,570 @@ listen xiangzheng_vip_80
 ...
 
 
+
+
+
+
+
+
+
+
+
+## 调度算法
+
+- HAproxy 通过 balance 来定义使用的负载均衡算法，该参数可以配置在 defaults、listen、backend 段中
+- HAproxy 的调度算法分为静态和动态调度算法，但是有些算法可以根据参数在静态和动态算法中相互转换
+- 官方文档：http://cbonte.github.io/haproxy-dconv/2.0/configuration.html#4.2-balance
+
+
+
+### 静态算法
+
+- 按照实现定义的规则进行轮询公平调度，**不关心后端服务器的当前负载、连接数和响应速度等**
+- **socat命令在静态算法中只支持动态上线和下线(0%和100%)，不支持动态权重调整及后端服务器慢启动**
+- 动态调整权重只能使用reload将haproxy重新加载
+
+## static-rr 静态加权轮询
+
+- 基于权重轮询调度，对后端主机数量没有限制，相当于LVS中的wrr
+- 支持修改配置文件权重项后重启haproxy使其生效
+
+### 范例：使用static-rr调度
+
+```bash
+#haproxy
+[root@haproxy ~]# vim /apps/haproxy/etc/conf.d/xiangzheng.vip.cfg
+listen xiangzheng_vip_80
+    mode http
+    bind 192.168.0.200:80
+    balance static-rr #定义
+    server web1 10.0.0.38:80 check
+    server web2 10.0.0.48:80 check
+
+------------------------------------------------------------------------------
+
+#client
+#测试 默认不加权重比例1:1
+[root@client ~]# while true ;do curl 192.168.0.200;sleep 0.5 ;done
+web1.xiangzheng.vip page
+web1.xiangzheng.vip page
+web2.xiangzheng.vip page
+web2.xiangzheng.vip page
+```
+
+### 范例：重新加载haproxy实现权重修改
+
+```bash
+#haproxy
+#定义
+[root@haproxy ~]# vim /apps/haproxy/etc/conf.d/xiangzheng.vip.cfg
+listen xiangzheng_vip_80
+    mode http
+    bind 192.168.0.200:80
+    balance static-rr
+    server web1 10.0.0.38:80 check weight 1
+    server web2 10.0.0.48:80 check weight 3
+#重新加载service
+[root@haproxy ~]# systemctl reload haproxy.service 
+
+------------------------------------------------------------------------------
+
+#client
+#测试 比例1:3
+[root@client ~]# while true ;do curl 192.168.0.200;sleep 0.5 ;done
+web1.xiangzheng.vip page
+web1.xiangzheng.vip page
+web2.xiangzheng.vip page
+web2.xiangzheng.vip page
+web2.xiangzheng.vip page
+web2.xiangzheng.vip page
+web2.xiangzheng.vip page
+web2.xiangzheng.vip page
+```
+
+### 范例：使用socat动态上下线
+
+```bash
+#修改权重前 比例1:3
+[root@client ~]# while true ;do curl 192.168.0.200;sleep 0.5 ;done
+web1.xiangzheng.vip page
+web1.xiangzheng.vip page
+web2.xiangzheng.vip page
+web2.xiangzheng.vip page
+web2.xiangzheng.vip page
+web2.xiangzheng.vip page
+web2.xiangzheng.vip page
+web2.xiangzheng.vip page
+[root@haproxy ~]# vim /apps/haproxy/etc/conf.d/xiangzheng.vip.cfg
+listen xiangzheng_vip_80
+    mode http
+    bind 192.168.0.200:80
+    balance static-rr
+    server web1 10.0.0.38:80 check weight 1 #1
+    server web2 10.0.0.48:80 check weight 3 #3
+
+#socat修改权重，不支持运行时利用socat进行权重的动态调整(只支持0%和100% 不支持其他值)
+[root@haproxy ~]# echo "set weight xiangzheng_vip_80/web2 1" | socat stdio /apps/haproxy/run/haproxy.sock
+Backend is using a static LB algorithm and only accepts weights '0%' and '100%'.
+
+#socat修改权重为0，即下线
+[root@haproxy ~]# echo "set weight xiangzheng_vip_80/web2 0" | socat stdio /apps/haproxy/run/haproxy.sock
+
+#0表示下线，那么就只能调度到web1上面了
+[root@client ~]# while true ;do curl 192.168.0.200;sleep 0.5 ;done
+web1.xiangzheng.vip page
+web1.xiangzheng.vip page
+web1.xiangzheng.vip page
+
+#socat修改权重为100%，即恢复上线
+[root@haproxy ~]# echo "set weight xiangzheng_vip_80/web2 100%" | socat stdio /apps/haproxy/run/haproxy.sock
+
+#恢复上线
+[root@client ~]# while true ;do curl 192.168.0.200;sleep 0.5 ;done
+web1.xiangzheng.vip page
+web2.xiangzheng.vip page
+web2.xiangzheng.vip page
+web2.xiangzheng.vip page
+```
+
+## first
+
+- 根据服务器在列表中的位置，自上而下进行调度，但是其只会当第一台服务器的连接数达到设定的阈值时才会将请求分发给下一台server，因此会忽略server的权重，**生产中使用较少**
+- 并且不设置阈值的话那就表示请求只会分发给第一台server
+
+### 范例：使用first调度
+
+```bash
+[root@haproxy ~]# vim /apps/haproxy/etc/conf.d/xiangzheng.vip.cfg
+listen xiangzheng_vip_80
+    mode http
+    bind 192.168.0.200:80
+    balance first #定义
+    server web1 10.0.0.38:80 check 
+    server web2 10.0.0.48:80 check
+    
+#测试
+[root@client ~]# while true ;do curl 192.168.0.200;sleep 0.5 ;done
+web1.xiangzheng.vip page
+web1.xiangzheng.vip page
+web1.xiangzheng.vip page
+web1.xiangzheng.vip page
+```
+
+
+
+### 动态算法
+
+- 基于后端服务器的状态进行动态调度，且**权重可以在haproxy运行时动态调整 无需重启或重新加载**，**支持socat对haproxy进行动态权重调整**
+
+### roundrobin 动态加权轮询
+
+- roundrobin 是基于权重的轮询动态调度算法，也是**默认调度算法，也是生产中最常用的调度算法**
+- 此调度算法还支持慢启动(新加的服务器会逐渐增加转发次数)
+- 但是每个后端backend中最多只支持4095个real server 但这通常也不是问题
+
+### 范例：使用roundrobin调度
+
+```bash
+#haproxy
+[root@haproxy ~]# vim /apps/haproxy/etc/conf.d/xiangzheng.vip.cfg
+listen xiangzheng_vip_80
+    mode http
+    bind 192.168.0.200:80
+    balance roundrobin #定义
+    server web1 10.0.0.38:80 check
+    server web2 10.0.0.48:80 check
+
+------------------------------------------------------------------------------
+
+#client
+#测试 默认不加权重比例1:1
+[root@client ~]# while true ;do curl 192.168.0.200;sleep 0.5 ;done
+web1.xiangzheng.vip page
+web2.xiangzheng.vip page
+```
+
+### 范例：重新加载haproxy实现权重修改
+
+```bash
+#haproxy
+#定义
+[root@haproxy ~]# vim /apps/haproxy/etc/conf.d/xiangzheng.vip.cfg
+listen xiangzheng_vip_80
+    mode http
+    bind 192.168.0.200:80
+    balance static-rr
+    server web1 10.0.0.38:80 check weight 1
+    server web2 10.0.0.48:80 check weight 3
+#重新加载service
+[root@haproxy ~]# systemctl reload haproxy.service 
+
+------------------------------------------------------------------------------
+
+#client
+#测试 比例1:3
+[root@client ~]# while true ;do curl 192.168.0.200;sleep 0.5 ;done
+web1.xiangzheng.vip page
+web2.xiangzheng.vip page
+web2.xiangzheng.vip page
+web2.xiangzheng.vip page
+```
+
+### 范例：使用socat实现动态权重修改
+
+```bash
+#修改权重前 比例1:3
+[root@client ~]# while true ;do curl 192.168.0.200;sleep 0.5 ;done
+web1.xiangzheng.vip page
+web2.xiangzheng.vip page
+web2.xiangzheng.vip page
+web2.xiangzheng.vip page
+[root@haproxy ~]# vim /apps/haproxy/etc/conf.d/xiangzheng.vip.cfg
+listen xiangzheng_vip_80
+    mode http
+    bind 192.168.0.200:80
+    balance roundrobin
+    server web1 10.0.0.38:80 check weight 1 #1
+    server web2 10.0.0.48:80 check weight 3 #3
+
+#socat修改权重为1
+[root@haproxy ~]# echo "set weight xiangzheng_vip_80/web2 1" | socat stdio /apps/haproxy/run/haproxy.sock
+
+
+#修改权重前 比例1:1
+[root@client ~]# while true ;do curl 192.168.0.200;sleep 0.5 ;done
+web1.xiangzheng.vip page
+web2.xiangzheng.vip page
+```
+
+
+
+### leastconn 加权最少连接
+
+- 将客户端新发起的连接 调度到连接数最少的后端real server
+- 支持权重动态调整和慢启动
+- 比较适合长连接的场景使用，如：MySQL等场景
+
+```bash
+listen xiangzheng_vip_80
+    mode http
+    bind 192.168.0.200:80
+    balance roundrobin #定义
+    server web1 10.0.0.38:80 check
+    server web2 10.0.0.48:80 check
+```
+
+
+
+#### random
+
+- 1.9版本新增加的动态调度算法，其基于随机数作为一致性hash的key
+- random负载均衡对于大型IDC机房或经常添加或删除服务器非常有用
+- 支持权重动态调整
+
+### 范例：使用random调度
+
+```bash
+listen xiangzheng_vip_80
+    mode http
+    bind 192.168.0.200:80
+    balance random #定义
+    server web1 10.0.0.38:80 check
+    server web2 10.0.0.48:80 check
+```
+
+
+
+
+
+### 其他算法
+
+- 其他算法即可作为静态算法，又可以通常选项成为动态算法
+
+### source 源地址hash
+
+- **生产中使用较少，因为目前用户主要是通过SNAT的方式进行上网 即多个用户使用同一个公网IP，这样会导致同一个局域网中的多个用户同时访问时出现问题**
+
+- 基于用户源地址做hash运算 并将请求转发给real server，后续同一个源地址请求将被分发至同一个real server
+- 此方式当后端服务器数量发生变化时，会导致很多用户的请求被分发到新的服务器
+- 默认为静态方式，但是可以通过hash-type支持的选项更改
+- **这个算法一般是在不插入Cookie的TCP模式下使用，也可给拒绝会话Cookie的客户提供最好的会话粘性，适用于session会话保持但不支持cookie和缓存的场景**
+- 源地址有两种转发客户端请求到后端服务器的服务器选取计算方式，分别是取模法和一致性hash
+- 源地址hash有两种计算方式 分别是 取模法和一致性hash：
+
+### map-base 取模法
+
+- **对source地址进行hash计算，再基于服务器总权重取模**，最终结果决定将此请求转发至对应的后端服务器
+- **不支持动态调整权重，只支持动态上下线**
+- hash-type 指定的默认值为此算法，可以进行修改
+
+```ABAP
+取模运算就是计算两个数相除后的余数: 10%7=3 7%3=1
+
+map-based算法 基于权重取模：hash(source_ip)%所有后端服务器的权重相加之合
+```
+
+#### 范例：使用map-base调度
+
+```bash
+listen xiangzheng_vip_80
+    mode http
+    bind 192.168.0.200:80
+    balance source #定义
+    hash-type map-base #选择计算方式
+    server web1 10.0.0.38:80 check
+    server web2 10.0.0.48:80 check
+```
+
+### consistent 一致性hash
+
+- 当服务器的总权重发生变化时，对调度结果的影响是局部的 不会引起大的变动
+- **支持动态调整权重 和 慢启动**
+
+#### 算法：
+
+```ABAP
+1：key1=hash(source_ip)%(2^32) [0---4294967295]
+2：keyA=hash(后端服务器虚拟ip)%(2^32)
+3：将key1和keyA都放在hash环上，将用户请求调度到离key1最近的keyA对应的后端服务器
+```
+
+#### bash环偏斜问题：
+
+```ABAP
+增加虚拟服务器IP数量，比如：一个后端服务器根据权重为1生成1000个虚拟IP，再hash。而后端服务器权重为2则生成2000的虚拟IP，再bash，最终在hash环上生成3000个节点，从而解决hash环偏斜的问题
+```
+
+#### 范例：使用consistent调度
+
+```bash
+listen xiangzheng_vip_80
+    mode http
+    bind 192.168.0.200:80
+    balance source #定义
+    hash-type consistent #选择计算方式
+    server web1 10.0.0.38:80 check
+    server web2 10.0.0.48:80 check
+```
+
+
+
+### uri
+
+- 基于对用户请求的uri左半部分或整个uri做hash，再将hash结果对总权重进行取模后，根据最终结果将请求转发到后端指定的服务器
+- 适用于后端是缓存服务器的场景
+- 默认是静态算法，也可以通过hash-type指定map-based和consistent，来定义使用取模法还是一致性hash
+
+### uri说明：
+
+```bash
+https://blog.csdn.net/122030128?utm_medium #整个URL
+
+/122030128?utm_medium #整个URI
+
+/122030128 #左半部分URI
+```
+
+### uri取模法配置范例
+
+```bash
+listen xiangzheng_vip_80
+    mode http
+    bind 192.168.0.200:80
+    balance uri #定义uri调度法，不定义则默认使用uri取模法
+    server web1 10.0.0.38:80 check
+    server web2 10.0.0.48:80 check
+```
+
+### uri取一致性hash配置范例
+
+```bash
+listen xiangzheng_vip_80
+    mode http
+    bind 192.168.0.200:80
+    balance uri #定义uri调度法
+    hash-type consistent #定义一致性bash计算方式
+    server web1 10.0.0.38:80 check
+    server web2 10.0.0.48:80 check
+```
+
+### 范例：使用uri取模法调度
+
+```bash
+#haproxy定义
+[root@haproxy ~]# vim /apps/haproxy/etc/conf.d/xiangzheng.vip.cfg
+listen xiangzheng_vip_80
+    mode http
+    bind 192.168.0.200:80
+    balance uri #定义uri调度法，不定义则默认使用uri取模法
+    server web1 10.0.0.38:80 check
+    server web2 10.0.0.48:80 check
+    
+----------------------------------------------------------------------------
+
+#client测试，访问相同的uri则调度到相同的real server
+[root@client ~]#curl 192.168.0.200/test1.html
+web1.xiangzheng.vip page
+[root@client ~]#curl 192.168.0.200/test2.html
+web2.xiangzheng.vip page
+```
+
+
+
+### url_param
+
+- 对用户请求的uri中的params部分中的一个参数key对应的value值做hash计算，并由服务器总权重相除以后派发至某挑出来的服务器
+- 通常用于追踪用户，以确保来自同一个用户的请求始终发往同一个real server，如果无key 则按roundrobin算法
+
+### url_param说明
+
+```bash
+#假设：
+https://www.xiangzheng.vip/app/post.php?key=value
+
+#则：
+host = "www.xiangzheng.vip"
+uri_param = "key=value"
+```
+
+### url取模法配置范例
+
+```bash
+listen xiangzheng_vip_80
+    mode http
+    bind 192.168.0.200:80
+    balance url_param userid #定义url_param调度法，userid为key，不定义则默认使用uri取模法
+    server web1 10.0.0.38:80 check
+    server web2 10.0.0.48:80 check
+```
+
+### url取一致性hash配置范例
+
+```bash
+listen xiangzheng_vip_80
+    mode http
+    bind 192.168.0.200:80
+    balance url_param userid #定义url_param调度法，userid为key
+    hash-type consistent #定义一致性bash计算方式
+    server web1 10.0.0.38:80 check
+    server web2 10.0.0.48:80 check
+```
+
+### 测试访问：
+
+```bash
+[root@client ~]# curl 192.168.0.200/index.html?userid=<NAME_ID>
+[root@client ~]# curl 192.168.0.200/index.html?userid=<NAME_ID>&typeid=<TYPE_ID>
+```
+
+
+
+### hdr
+
+- 针对用户每个http头部(header)请求中的指定信息做hash，此处由name指定的http首部将会被取出并做hash计算，然后由服务器总权重取模以后派发至某挑出的服务器，如果无有效值，则会使用默认的轮询调度
+
+### hdr取模法配置范例
+
+```bash
+listen xiangzheng_vip_80
+    mode http
+    bind 192.168.0.200:80
+    balance hdr(User-Agent) #定义hdr调度法，并将User-Agent做哈希运算
+    #balance hdr(host)
+    server web1 10.0.0.38:80 check
+    server web2 10.0.0.48:80 check
+```
+
+### hdr取一致性hash配置范例
+
+```bash
+listen xiangzheng_vip_80
+    mode http
+    bind 192.168.0.200:80
+    balance hdr(User-Agent) #定义hdr调度法，并将User-Agent做哈希运算
+    hash-type consistent #定义一致性bash计算方式
+    server web1 10.0.0.38:80 check
+    server web2 10.0.0.48:80 check
+```
+
+### 测试访问：
+
+- 不同的请求报文头部会返回不同的页面
+
+```bash
+[root@client ~]# curl -V 192.168.0.200/index.html
+[root@client ~]# curl -VA 'Firefox' 192.168.0.200/index.html
+[root@client ~]# curl -VA 'Chrome' 192.168.0.200/index.html
+```
+
+
+
+### rdp-cookie
+
+- rdp-cookie可以对远程windows桌面进行调度，使用cookie保持回话，默认是静态，也可以通过hash-type指定map-base和consistent，来定义使用取模法还是一致性hash
+- 只能使用tcp协议
+
+### hdr取模法配置范例
+
+```bash
+listen xiangzheng_vip_80
+    mode tcp #使用tcp协议
+    bind 192.168.0.200:80
+    balance rdp-cookie #定义rdp-cookie调度法
+    server web1 10.0.0.38:80 check
+    server web2 10.0.0.48:80 check
+```
+
+### hdr取一致性hash配置范例
+
+```bash
+listen xiangzheng_vip_80
+    mode tcp #使用tcp协议
+    bind 192.168.0.200:80
+    balance rdp-cookie #定义rdp-cookie调度法
+    hash-type consistent #定义一致性bash计算方式
+    server web1 10.0.0.38:80 check
+    server web2 10.0.0.48:80 check
+```
+
+
+
+## 调度算法总结
+
+```bash
+#静态
+static-rr  ---> tcp/http
+first      ---> tcp/http
+
+#动态
+roundrobin ---> tcp/http
+leastconn  ---> tcp/http
+random     ---> tcp/http
+
+#以下静态和动态取决于hash_type是否consistent
+source     ---> tcp/http
+uri        ---> http
+uri_param  ---> http
+hdr        ---> http
+rdp-cookie ---> tcp
+```
+
+
+
+## 各调度算法使用场景
+
+```bash
+static-rr  ---> #做了session共享的web集群
+first      ---> #较少使用
+roundrobin ---> #做了session共享的web集群，默认算法，常用
+leastconn  ---> #数据库
+random     ---> #对于大型IDC机房或经常添加或删除服务器非常有用
+source     ---> #基于客户端公网IP的会话保持
+uri        ---> #缓存服务器，CDN服务商百度、阿里、腾讯等
+uri_param  ---> #可以实现session保持
+hdr        ---> #基于客户端的响应报文头部类型转发
+rdp-cookie ---> #基于Windows主机 很少使用
+```
 
 
 

@@ -2,7 +2,7 @@
 title: "Flask"
 ---
 
-# Flask 概述
+## Flask 概述
 
 Flask 是另一个流行的 Python Web 框架，用于构建 Web 应用程序和 RESTful API。与 Django 相比，Flask 更加轻量级和灵活，它的设计理念是尽可能简单，并让开发者有更大的自由度。
 
