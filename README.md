@@ -15,10 +15,10 @@
   After=network.target
   
   [Service]
-  WorkingDirectory=/root/llinux.cn
+  WorkingDirectory=/root/devops-docsza 
   TimeoutStartSec=300
   ExecStartPre=/usr/local/bin/hugo
-  ExecStart=/usr/local/bin/caddy run --config /root/llinux.cn/Caddyfile
+  ExecStart=/usr/local/bin/caddy run --config /root/devops-docs/Caddyfile
   Restart=on-failure
   
   [Install]

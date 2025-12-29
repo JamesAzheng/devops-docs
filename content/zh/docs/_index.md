@@ -9,29 +9,29 @@ title: 文档首页
 本网站整理了我在运维实践中的技术笔记和经验总结，涵盖了 DevOps/SRE 领域的各个方面。以下是文档的主要分类：
 
 ### 🐳 容器与编排
-- **[Kubernetes](/docs/kubernetes/)** - K8s 集群管理、Helm、Ingress、Service 等核心组件与实践
+- **[Kubernetes](/docs/kubernetes/)** - K8s 集群管理、Pod、Service、Ingress、RBAC、CRD 等核心组件与实践
 - **[容器](/docs/容器/)** - Docker、Containerd、Cgroup 等容器技术
 
 ### 🔄 CI/CD 与自动化
 - **[CI/CD](/docs/cicd/)** - Jenkins、GitLab CI、SonarQube、Git 等持续集成与持续部署
 - **[GitOps](/docs/gitops/)** - GitOps 实践与工具
-- **[自动化工具](/docs/自动化工具/)** - Ansible 等自动化运维工具
 
 ### 📊 监控与可观测性
-- **[监控与告警](/docs/监控与告警/)** - Prometheus、Grafana、Zabbix、PromQL 等监控解决方案
-- **[日志采集](/docs/日志采集/)** - Vector、Loki、ELK、Fluentd、Filebeat 等日志收集与分析
+- **[监控与告警](/docs/监控与告警/)** - Prometheus、Grafana、Zabbix、Alertmanager 等监控解决方案
+- **[日志采集](/docs/日志采集/)** - Vector、Loki、ELK Stack、Fluentd、Filebeat 等日志收集与分析
 
 ### 🌐 网络与服务
-- **[HTTP](/docs/http/)** - Web 服务器、证书管理（cert-manager）等
-- **[负载均衡与高可用](/docs/负载均衡与高可用/)** - HAProxy、Keepalived、LVS 等
-- **[基础服务](/docs/基础服务/)** - DNS、DHCP、Nexus 等基础服务
+- **[HTTP](/docs/http/)** - Nginx、Apache、Tomcat、CA 证书管理等 Web 技术
+- **[负载均衡与高可用](/docs/负载均衡与高可用/)** - HAProxy、Keepalived、LVS 等负载均衡技术
+- **[基础服务](/docs/基础服务/)** - DNS、DHCP、FTP、SAMBA、NTP、Nexus、SSH 等基础服务
 
 ### 💾 存储与数据
-- **[存储](/docs/存储/)** - Ceph、NFS、MinIO 等存储解决方案
-- **[数据库](/docs/数据库/)** - MySQL、PostgreSQL、Redis、MongoDB、Elasticsearch、InfluxDB 等
+- **[存储](/docs/存储/)** - Ceph、NFS 等存储解决方案
+- **[关系型与非关系型数据库](/docs/关系型与非关系型数据库/)** - 各类数据库技术与实践
 
 ### 🔐 安全与审计
-- **[安全与审计](/docs/安全与审计/)** - OpenVPN、JumpServer 等安全工具
+- **[VPN](/docs/vpn/)** - OpenVPN 等 VPN 技术
+- **[堡垒机](/docs/堡垒机/)** - JumpServer 等堡垒机技术
 
 ### 🖥️ 基础设施
 - **[Linux](/docs/linux/)** - 系统管理、网络管理、磁盘管理、内存管理、Systemd 等
@@ -42,9 +42,14 @@ title: 文档首页
 ### 📨 消息与大数据
 - **[消息队列](/docs/消息队列/)** - Kafka、RabbitMQ 等消息中间件
 - **[大数据](/docs/大数据/)** - Hive 等大数据技术
+- **[注册中心](/docs/注册中心/)** - ZooKeeper 等注册中心技术
 
-### 💻 开发语言
+### 💻 编程语言
 - **[Python](/docs/python/)** - Python 编程、Flask、FastAPI、SQLAlchemy 等
+- **[编程语言](/docs/编程语言/)** - Go、Java、C、SQL、前端开发等多语言技术
+
+### 📖 面试与学习
+- **[面试宝典](/docs/面试宝典/)** - 常见面试题汇总与解答
 
 ## 🎯 文档特点
 
