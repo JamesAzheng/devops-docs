@@ -107,9 +107,7 @@ backend http_back
 
 ### MASTER 节点
 
-编辑 `/etc/keepalived/keepalived.conf`:
-
-```sh
+```sh {filename="/etc/keepalived/keepalived.conf"}
 global_defs {
     router_id prod-bj-lb0
     enable_script_security
@@ -164,9 +162,7 @@ vrrp_instance PUBLIC_VIP {
 
 ### BACKUP 节点
 
-编辑 `/etc/keepalived/keepalived.conf`:
-
-```sh
+```sh {filename="/etc/keepalived/keepalived.conf"}
 global_defs {
     router_id prod-bj-lb1 # 不同的id
     enable_script_security

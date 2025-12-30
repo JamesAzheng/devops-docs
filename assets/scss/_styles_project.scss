@@ -206,3 +206,48 @@ https://www.docsy.dev/docs/content/lookandfeel/#project-style-files
 // .td-sidebar section:nth-child(n+3) {
 //   display: none !important;
 // }
+
+// Code block file path display styles
+.code-sample {
+  position: relative;
+  border-radius: 0.375rem;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+.code-sample > .copy-code-icon {
+  cursor: default;
+  display: flex;
+  gap: 1rem;
+  justify-content: left;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  font-size: 1rem;
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.code-sample > .copy-code-icon code {
+  color: var(--bs-primary);
+  background-color: transparent;
+  padding: 0;
+  font-weight: 500;
+}
+
+.includecode {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.includecode .highlight {
+  margin-top: 0;
+  margin-bottom: 0;
+  border-radius: 0;
+}
+
+// Dark mode adjustments
+[data-bs-theme="dark"] .code-sample > .copy-code-icon {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}

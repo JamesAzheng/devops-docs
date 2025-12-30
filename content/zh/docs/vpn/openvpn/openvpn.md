@@ -69,7 +69,7 @@ title: "OpenVPN"
 
 ### 安装
 
-```bash
+```bash filename="openvpn/server-install.sh"
 #centos安装
 yum -y install openvpn
 

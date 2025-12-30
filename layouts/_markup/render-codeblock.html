@@ -1,0 +1,17 @@
+{{ $codelang := .Type }}
+{{ $file := .Attributes.filename }}
+
+<div class="highlight code-sample">
+  {{ with $file }}
+  <div class="copy-code-icon">
+    <code>{{ $file }}</code>
+    {{- $copyTitle := T "copy_sample_to_clipboard" (dict "filename" $file) -}}
+    {{- with resources.Get "images/copycode.svg" -}}
+    <img src="{{  .RelPermalink }}" class="icon-copycode" onclick="copyCode('{{ $file | anchorize }}')" title="{{ $copyTitle }}"></img>
+    {{- end -}}
+  </div>
+  {{ end }}
+  <div class="includecode" {{ with $file }}id="{{ $file | anchorize }}"{{ end }}>
+    {{ highlight .Inner $codelang "" }}
+  </div>
+</div>
