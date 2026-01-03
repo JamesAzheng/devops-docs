@@ -2,6 +2,10 @@
 title: "HAProxy"
 ---
 
+
+
+
+## --- 
 ## HAProxy 概述
 
 - haproxy是一款可以实现四、七层负载均衡的应用服务，由C语言编写，分为企业版和社区版
@@ -168,15 +172,15 @@ global
 
     log         127.0.0.1 local2
 
-    chroot      /apps/haproxy/
-    pidfile     /apps/haproxy/run/haproxy.pid
+    chroot      /var/lib/haproxy/
+    pidfile     /var/lib/haproxy/run/haproxy.pid
     maxconn     4000
     user        haproxy
     group       haproxy
     daemon
 
     # turn on stats unix socket
-    stats socket /apps/haproxy/run/stats
+    stats socket /var/lib/haproxy/run/stats
 
     # utilize system-wide crypto-policies
     ssl-default-bind-ciphers PROFILE=SYSTEM
@@ -248,19 +252,8 @@ listen stats
 http://10.0.0.8:5000/haproxy-status
 ```
 
-### docker安装
 
-...
 
-## HAProxy 配置说明
-
-### 前言
-
-- **haproxy 的每个版本的变化都相对比较大，可能一个功能或一个参数在上一个版本还可以使用 但换其其他版本就不能用了，所以最权威的还是要看官方文档**
-
-- GitHub官方帮助文档：http://cbonte.github.io/haproxy-dconv/
-
-- 官方帮助文档：https://www.haproxy.org/#docs
 
 ### 配置分类
 
@@ -288,30 +281,29 @@ listen   #同时拥有前端和后端配置，配置简单，生产中推荐使�
 - 官方文档：http://cbonte.github.io/haproxy-dconv/2.0/configuration.html#3
 
 ```bash
-[root@haproxy ~]# haproxy -v
-HA-Proxy version 2.0.25-6986403 2021/09/07 - https://haproxy.org/
-[root@haproxy ~]# cat /apps/haproxy/etc/haproxy.cfg
 global
-    pidfile     /var/run/haproxy.pid #指定pid文件路径
-    chroot /apps/haproxy #锁定haproxy的运行目录，更加安全
-    daemon #以守护进程方式运行（后台执行），在docker中运行时注意不要添加此行（否则开启即关闭）
-    stats socket /var/lib/haproxy/haproxy.sock mode 600 level admin #socket文件（socket文件可以实现本机与本机之间应用程序的通信）
-    user  haproxy #运行haproxy的用户身份
-    group haproxy #运行haproxy的组身份  
-    nbproc 4 #开启的 haproxy work 进程数，默认进程数是一个，通常设置成和系统的cpu核心数相同即可
-    cpu-map 1 0 #绑定 haproxy worker 进程至指定cpu，将第1个work进程绑定至0号cpu
-    cpu-map 2 1 #绑定 haproxy worker 进程至指定cpu，将第1个work进程绑定至0号cpu
-    cpu-map 3 2 #绑定 haproxy worker 进程至指定cpu，将第1个work进程绑定至0号cpu
-    cpu-map 4 3 #绑定 haproxy worker 进程至指定cpu，将第1个work进程绑定至0号cpu    
-    #ps axo pid,cmd,psr 命令可以查看进程与cpu核心的绑定关系
-    #循环方式检测是否一直在绑定：
-    #while true ;do ps axo pid,cmd,psr|grep [h]aproxy;sleep 0.1  ;done
-    maxconn 100000 #每个haproxy进程的最大并发连接数（haproxy的并发连接数比nginx强，但是比不上LVS）
-    maxsslconn n #每个haproxy进程 ssl最大连接数，用于haproxy配置了证书的场景下
-    maxsslrate n #每个进程每秒创建的最大连接数，用于haproxy配置了证书的场景下
-    spread-checks n #后端server状态check随机提前或延迟百分比时间，建议2-5(20%-50%)之间，默认0
-    log 127.0.0.1 local2 info #定义全局的syslog服务器；日志服务器需要开启UDP协议，最多可以定义两个
+    pidfile     /var/lib/haproxy/run/haproxy.pid # 指定pid文件路径
+    chroot /var/lib/haproxy # 锁定haproxy的运行目录，更加安全
+    daemon # 以守护进程方式运行（后台执行），在docker中运行时注意不要添加此行（否则开启即关闭）
+    stats socket /run/haproxy/admin.sock mode 660 level admin # socket文件（socket文件可以实现本机与本机之间应用程序的通信）
+    stats timeout 30s # 设置HAProxy统计信息页面（stats page）的连接超时时间。当用户通过stats socket 或web界面访问HAProxy统计信息时，该配置定义了连接的超时时间。如果连接在30秒内没有活动，HAProxy将自动关闭连接，释放资源
+    user  haproxy # 运行haproxy的用户身份
+    group haproxy # 运行haproxy的组身份
+    nbproc 4 # 开启的 haproxy work 进程数，默认进程数是一个，通常设置成和系统的cpu核心数相同即可
+    # CPU 亲缘性绑定，将haproxy的worker进程绑定到指定的CPU核心上，以提高性能和响应时间。
+    # 可以使用 ps axo pid,cmd,psr 命令查看进程与cpu核心的绑定关系
+    # 循环方式检测是否一直在绑定：while true ;do ps axo pid,cmd,psr|grep [h]aproxy;sleep 0.1  ;done
+    cpu-map 1 0 # 绑定 haproxy worker 进程至指定cpu，将第1个work进程绑定至0号cpu
+    cpu-map 2 1 # 绑定 haproxy worker 进程至指定cpu，将第2个work进程绑定至1号cpu
+    cpu-map 3 2 # 绑定 haproxy worker 进程至指定cpu，将第3个work进程绑定至2号cpu
+    cpu-map 4 3 # 绑定 haproxy worker 进程至指定cpu，将第4个work进程绑定至3号cpu        
+    maxconn 100000 # 每个haproxy进程的最大并发连接数（haproxy的并发连接数比nginx强，但是比不上LVS）
+    maxsslconn n # 每个haproxy进程 ssl最大连接数，用于haproxy配置了证书的场景下
+    maxsslrate n # 每个haproxy进程每秒创建的最大连接数，用于haproxy配置了证书的场景下
+    spread-checks n # 后端server状态check随机提前或延迟百分比时间，建议2-5(20%-50%)之间，默认0
+    log 127.0.0.1 local2 info # 定义全局的syslog服务器；日志服务器需要开启UDP协议，最多可以定义两个
 ```
+
 
 ### Proxies 配置段
 
@@ -576,17 +568,6 @@ ExecStart=/usr/sbin/haproxy -Ws -f $CONFIG -f $CONFIG2 -p $PIDFILE $OPTIONS
 [root@haproxy ~]# systemctl daemon-reload 
 [root@haproxy ~]# systemctl restart haproxy.service 
 ```
-
-### HAProxy 检查配置文件语法
-
-```bash
-[root@haproxy-master ~]# haproxy -c -f /apps/haproxy/etc/haproxy.cfg
-Configuration file is valid #配置文件是有效的
-
-#-c 只检查配置文件并退出
-#-f 指定配置文件或目录
-```
-
 
 
 ### HAProxy 多进程和多线程

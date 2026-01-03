@@ -40,7 +40,12 @@ weight: 11
 
 
 
+## 不同主机快速传输镜像
 
+```sh
+# 在存在镜像的主机执行：
+docker save 镜像A 镜像B 镜像X | ssh root@目标IP 'docker load'
+```
 
 # 导出镜像
 
@@ -315,11 +320,7 @@ hello-world             977B
 
 
 
-# 不同主机快速传输镜像
 
-```sh
-ssh root@目标IP 'docker save IMAGE' | docker load
-```
 
 
 

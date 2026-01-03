@@ -89,6 +89,10 @@ markup:
     noClasses: false
     # Uncomment if you want your chosen highlight style used for code blocks without a specified language
     # guessSyntax: true
+  tableOfContents:
+    startLevel: 2
+    endLevel: 4
+    ordered: false
 
 # Everything below this are Site Params
 

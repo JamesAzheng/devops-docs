@@ -64,3 +64,101 @@ title: 文档首页
 ---
 
 *希望这些文档能帮助你在 DevOps/SRE 的道路上少走弯路，共同成长！* 🎉
+
+
+
+
+
+## 一级标题
+
+### 二级标题
+
+#### 三级标题
+
+```sh {filename="/etc/profile"}
+# /etc/profile: system-wide .profile file for the Bourne shell (sh(1))
+# and Bourne compatible shells (bash(1), ksh(1), ash(1), ...).
+
+if [ "${PS1-}" ]; then
+  if [ "${BASH-}" ] && [ "$BASH" != "/bin/sh" ]; then
+    # The file bash.bashrc already sets the default PS1.
+    # PS1='\h:\w\$ '
+    if [ -f /etc/bash.bashrc ]; then
+      . /etc/bash.bashrc
+    fi
+  else
+    if [ "$(id -u)" -eq 0 ]; then
+      PS1='# '
+    else
+      PS1='$ '
+    fi
+  fi
+fi
+
+if [ -d /etc/profile.d ]; then
+  for i in /etc/profile.d/*.sh; do
+    if [ -r $i ]; then
+      . $i
+    fi
+  done
+  unset i
+fi
+```
+
+
+{{< tabpane text=true persist=lang >}}
+{{< tab header="Configuration file:" disabled=true />}}
+{{% tab header="hugo.toml" lang="toml" %}}
+
+```toml
+[params]
+[params.ui]
+showLightDarkModeMenu = true
+```
+
+{{% /tab %}} {{% tab header="hugo.yaml" lang="yaml" %}}
+
+```yaml
+params:
+  ui:
+    showLightDarkModeMenu: true
+```
+
+{{% /tab %}} {{% tab header="hugo.json" lang="json" %}}
+
+```json
+{
+  "params": {
+    "ui": {
+      "showLightDarkModeMenu": true
+    }
+  }
+}
+```
+
+{{% /tab %}} {{< /tabpane >}}
+
+{{% alert title="<i class='fa-solid fa-exclamation-triangle pe-1'></i> 注意事项" color=warning %}}
+具体内容。
+{{% /alert %}}
+
+{{% alert title="<i class='fa-solid fa-check-circle pe-1'></i> 操作成功" color="success" %}}
+恭喜！您已成功完成配置，现在可以进行下一步操作。
+{{% /alert %}}
+
+{{% alert title="<i class='fa-solid fa-info-circle pe-1'></i> 提示信息" color="info" %}}
+这是一个补充说明。
+{{% /alert %}}
+
+{{% alert title="<i class='fa-solid fa-ban pe-1'></i> 严重错误" color="danger" %}}
+请勿在生产环境中执行此命令，否则可能会导致不可逆的数据丢失！
+{{% /alert %}}
+
+{{% alert title="<i class='fa-solid fa-lightbulb pe-1'></i> 实用技巧" color="primary" %}}
+你可以通过修改 config.toml 文件来全局设置默认的项目颜色。
+{{% /alert %}}
+
+
+<strong style="color: red;">这段文字是红色加粗的</strong>
+
+<span style="color: red;">这段文字是红色的</span>
