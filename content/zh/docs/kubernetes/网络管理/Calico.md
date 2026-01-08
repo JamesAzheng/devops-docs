@@ -874,7 +874,7 @@ spec:
     spec:
       containers:
       - name: demoapp
-        image: 172.16.0.120:30002/bjhit-middleware/logger-processor@sha256:1c973d59cec3915f8c50c86f102a4d9890855a4f576bcac5bec716e6b5597839
+        image: 172.16.0.120:30002/example-middleware/logger-processor@sha256:1c973d59cec3915f8c50c86f102a4d9890855a4f576bcac5bec716e6b5597839
         env:
         - name: NTP_SERVER1
           value: "172.16.0.125"
@@ -1011,7 +1011,7 @@ spec:
     spec:
       containers:
       - name: demoapp
-        image: 172.16.0.120:30002/bjhit-middleware/logger-processor@sha256:1c973d59cec3915f8c50c86f102a4d9890855a4f576bcac5bec716e6b5597839
+        image: 172.16.0.120:30002/example-middleware/logger-processor@sha256:1c973d59cec3915f8c50c86f102a4d9890855a4f576bcac5bec716e6b5597839
         env:
         - name: NTP_SERVER1
           value: "172.16.0.125"
@@ -1127,7 +1127,7 @@ spec:
     spec:
       containers:
       - name: demoapp
-        image: 172.16.0.120:30002/bjhit-middleware/logger-processor@sha256:1c973d59cec3915f8c50c86f102a4d9890855a4f576bcac5bec716e6b5597839
+        image: 172.16.0.120:30002/example-middleware/logger-processor@sha256:1c973d59cec3915f8c50c86f102a4d9890855a4f576bcac5bec716e6b5597839
         env:
         - name: NTP_SERVER1
           value: "172.16.0.125"
@@ -1247,7 +1247,7 @@ spec:
     spec:
       containers:
       - name: demoapp-america
-        image: 172.16.0.120:30002/bjhit-middleware/logger-processor@sha256:1c973d59cec3915f8c50c86f102a4d9890855a4f576bcac5bec716e6b5597839
+        image: 172.16.0.120:30002/example-middleware/logger-processor@sha256:1c973d59cec3915f8c50c86f102a4d9890855a4f576bcac5bec716e6b5597839
         env:
         - name: NTP_SERVER1
           value: "172.16.0.125"
@@ -1280,7 +1280,7 @@ spec:
     spec:
       containers:
       - name: demoapp-test
-        image: 172.16.0.120:30002/bjhit-middleware/logger-processor@sha256:1c973d59cec3915f8c50c86f102a4d9890855a4f576bcac5bec716e6b5597839
+        image: 172.16.0.120:30002/example-middleware/logger-processor@sha256:1c973d59cec3915f8c50c86f102a4d9890855a4f576bcac5bec716e6b5597839
         env:
         - name: NTP_SERVER1
           value: "172.16.0.125"

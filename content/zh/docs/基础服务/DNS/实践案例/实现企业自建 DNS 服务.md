@@ -80,9 +80,9 @@ statistics-channels {
 #### 2. 配置本地 zone
 ```bind {filename="/etc/bind/named.conf.local"}
 // 内网正向解析
-zone "internal.bjhit.com" {
+zone "internal.example.com" {
     type master;  // 类型为主节点
-    file "/etc/bind/zones/db.internal.bjhit.com";   // 区文件路径（自己创建目录）
+    file "/etc/bind/zones/db.internal.example.com";   // 区文件路径（自己创建目录）
     allow-transfer { 172.16.0.225; }; // 只允许指定 Slave 传输
     also-notify { 172.16.0.225; };    // 变更时主动通知 Slave
     notify yes;                       // 启用 notify
@@ -101,17 +101,17 @@ zone "internal.bjhit.com" {
 
 创建`/etc/bind/zones`目录后，编辑：
 
-```bind {filename="/etc/bind/zones/db.internal.bjhit.com"}
+```bind {filename="/etc/bind/zones/db.internal.example.com"}
 $TTL    86400
-@       IN      SOA     ns1.internal.bjhit.com. admin.internal.bjhit.com. (
+@       IN      SOA     ns1.internal.example.com. admin.internal.example.com. (
                      2025122201         ; Serial（每次修改+1）
                      3600               ; Refresh
                      1800               ; Retry
                      604800             ; Expire
                      86400 )            ; Minimum TTL
 
-@       IN      NS      ns1.internal.bjhit.com.
-@       IN      NS      ns2.internal.bjhit.com.
+@       IN      NS      ns1.internal.example.com.
+@       IN      NS      ns2.internal.example.com.
 
 ns1     IN      A       172.16.0.223
 ns2     IN      A       172.16.0.225
@@ -137,18 +137,18 @@ named-checkconf
 systemctl reload bind9
 
 # 测试内网 DNS 解析
-root@local-server:~# nslookup app1.bj.internal.bjhit.com 172.16.0.223
+root@local-server:~# nslookup app1.bj.internal.example.com 172.16.0.223
 Server:		172.16.0.223
 Address:	172.16.0.223#53
 
-Name:	app1.bj.internal.bjhit.com
+Name:	app1.bj.internal.example.com
 Address: 172.16.0.1
 
-root@local-server:~# nslookup mysql.bj.internal.bjhit.com 172.16.0.223
+root@local-server:~# nslookup mysql.bj.internal.example.com 172.16.0.223
 Server:		172.16.0.223
 Address:	172.16.0.223#53
 
-Name:	mysql.bj.internal.bjhit.com
+Name:	mysql.bj.internal.example.com
 Address: 172.16.0.103
 
 
@@ -189,9 +189,9 @@ Address: 113.108.81.189
 
 #### 2. 配置本地 zone
 ```bind {filename="/etc/bind/named.conf.local"}
-zone "internal.bjhit.com" {
+zone "internal.example.com" {
     type slave; // 类型为从节点
-    file "/var/cache/bind/db.internal.bjhit.com";   // Slave 自动写入这里（AppArmor 允许）
+    file "/var/cache/bind/db.internal.example.com";   // Slave 自动写入这里（AppArmor 允许）
     masters { 172.16.0.223; };                      // Master IP
     allow-notify { 172.16.0.223; };                 // 只接受 Master notify
 };
@@ -213,29 +213,29 @@ named-checkconf
 systemctl reload bind9
 
 # 查看同步的 zone 文件
-root@bj-dns-slave:~# named-compilezone -f raw -F text -o - internal.bjhit.com /var/cache/bind/db.internal.bjhit.com
-zone internal.bjhit.com/IN: loaded serial 2025122201
-internal.bjhit.com.			      86400 IN SOA	ns1.internal.bjhit.com. admin.internal.bjhit.com. 2025122201 3600 1800 604800 86400
-internal.bjhit.com.			      86400 IN NS	ns1.internal.bjhit.com.
-internal.bjhit.com.			      86400 IN NS	ns2.internal.bjhit.com.
-app1.bj.internal.bjhit.com.		      86400 IN A	172.16.0.1
-app2.bj.internal.bjhit.com.		      86400 IN A	172.16.0.2
-app3.bj.internal.bjhit.com.		      86400 IN A	172.16.0.3
-gitlab.bj.internal.bjhit.com.		      86400 IN A	172.16.0.100
-grafana.bj.internal.bjhit.com.		      86400 IN A	172.16.0.102
-harbor.bj.internal.bjhit.com.		      86400 IN A	172.16.0.101
-jenkins.bj.internal.bjhit.com.		      86400 IN A	172.16.0.104
-mysql.bj.internal.bjhit.com.		      86400 IN A	172.16.0.103
-ns1.internal.bjhit.com.			      86400 IN A	172.16.0.223
-ns2.internal.bjhit.com.			      86400 IN A	172.16.0.225
+root@bj-dns-slave:~# named-compilezone -f raw -F text -o - internal.example.com /var/cache/bind/db.internal.example.com
+zone internal.example.com/IN: loaded serial 2025122201
+internal.example.com.			      86400 IN SOA	ns1.internal.example.com. admin.internal.example.com. 2025122201 3600 1800 604800 86400
+internal.example.com.			      86400 IN NS	ns1.internal.example.com.
+internal.example.com.			      86400 IN NS	ns2.internal.example.com.
+app1.bj.internal.example.com.		      86400 IN A	172.16.0.1
+app2.bj.internal.example.com.		      86400 IN A	172.16.0.2
+app3.bj.internal.example.com.		      86400 IN A	172.16.0.3
+gitlab.bj.internal.example.com.		      86400 IN A	172.16.0.100
+grafana.bj.internal.example.com.		      86400 IN A	172.16.0.102
+harbor.bj.internal.example.com.		      86400 IN A	172.16.0.101
+jenkins.bj.internal.example.com.		      86400 IN A	172.16.0.104
+mysql.bj.internal.example.com.		      86400 IN A	172.16.0.103
+ns1.internal.example.com.			      86400 IN A	172.16.0.223
+ns2.internal.example.com.			      86400 IN A	172.16.0.225
 OK
 
-# 验证 DNS 主从同步状态，修改主节点 /etc/bind/zones/db.internal.bjhit.com 文件中的任意域名指向，以及Serial编号后，重载配置文件后在从节点测试：
-root@local-server:~# nslookup grafana.bj.internal.bjhit.com 172.16.0.225
+# 验证 DNS 主从同步状态，修改主节点 /etc/bind/zones/db.internal.example.com 文件中的任意域名指向，以及Serial编号后，重载配置文件后在从节点测试：
+root@local-server:~# nslookup grafana.bj.internal.example.com 172.16.0.225
 Server:		172.16.0.225
 Address:	172.16.0.225#53
 
-Name:	grafana.bj.internal.bjhit.com
+Name:	grafana.bj.internal.example.com
 Address: 172.16.0.222
 ```
 
@@ -289,7 +289,7 @@ virtual_server 172.16.0.100 53 {
         weight 1 # 权重，默认值为 1
         # 健康检查
         DNS_CHECK {
-            name gitlab.bj.internal.bjhit.com # 检查的域名
+            name gitlab.bj.internal.example.com # 检查的域名
             retry 3 # 重试次数
             delay_before_retry 3 # 每次重试间隔时间
         }
@@ -299,7 +299,7 @@ virtual_server 172.16.0.100 53 {
     real_server 172.16.0.225 53 {
         weight 1
         DNS_CHECK {
-            name gitlab.bj.internal.bjhit.com
+            name gitlab.bj.internal.example.com
             retry 3
             delay_before_retry 3
         }
@@ -333,8 +333,8 @@ virtual_server 172.16.0.100 53 {
 ### 4. 测试
 ```sh
 # 从客户端通过 VIP 测试解析是否正常
-dig grafana.bj.internal.bjhit.com @172.16.0.100
-dig grafana.bj.internal.bjhit.com @172.16.0.100 +tcp
+dig grafana.bj.internal.example.com @172.16.0.100
+dig grafana.bj.internal.example.com @172.16.0.100 +tcp
 ```
 
 
@@ -349,8 +349,8 @@ dig grafana.bj.internal.bjhit.com @172.16.0.100 +tcp
 - ```sh
   # journalctl -u named -f
   ...
-  Dec 23 04:02:35 bj-dns-master named[2564]: client @0x7f8e680900a8 172.16.128.2#62971 (ns1.internal.bjhit.com): query 'ns1.internal.bjhit.com/A/IN' denied
-  Dec 23 04:02:42 bj-dns-master named[2564]: client @0x7f8e640089a8 172.16.128.2#62972 (ns2.internal.bjhit.com): query 'ns2.internal.bjhit.com/A/IN' denied
+  Dec 23 04:02:35 bj-dns-master named[2564]: client @0x7f8e680900a8 172.16.128.2#62971 (ns1.internal.example.com): query 'ns1.internal.example.com/A/IN' denied
+  Dec 23 04:02:42 bj-dns-master named[2564]: client @0x7f8e640089a8 172.16.128.2#62972 (ns2.internal.example.com): query 'ns2.internal.example.com/A/IN' denied
   ```
 原因：
 - `172.16.128.2` 不在子网 `172.16.0.0/18` 中，导致查询请求被拒绝。
@@ -386,8 +386,18 @@ dig grafana.bj.internal.bjhit.com @172.16.0.100 +tcp
 {{< /collapse >}}
 
 
+## 八、压力测试
+```sh
+# 生成 10000 条查询记录
+for i in {1..10000}; do echo "grafana.bj.internal.example.com A" > queryfile.txt; done
 
-## 八、纳入监控体系
+# 测试 100 个并发查询，每个查询持续 60 秒
+dnsperf -s 172.16.0.100 -d queryfile.txt -c 100 -l 60
+```
+
+
+
+## 九、纳入监控体系
 ### 监控
 
 **1. 部署 BIND Exporter：**
@@ -438,13 +448,13 @@ root@k8s-master-1:~# curl -s http://172.16.0.223:9119/metrics  | grep zone_name
 bind_zone_serial{view="_default",zone_name="0.in-addr.arpa"} 1
 bind_zone_serial{view="_default",zone_name="127.in-addr.arpa"} 1
 bind_zone_serial{view="_default",zone_name="255.in-addr.arpa"} 1
-bind_zone_serial{view="_default",zone_name="internal.bjhit.com"} 2.026010301e+09
+bind_zone_serial{view="_default",zone_name="internal.example.com"} 2.026010301e+09
 bind_zone_serial{view="_default",zone_name="localhost"} 2
 root@k8s-master-1:~# curl -s http://172.16.0.225:9119/metrics  | grep zone_name
 bind_zone_serial{view="_default",zone_name="0.in-addr.arpa"} 1
 bind_zone_serial{view="_default",zone_name="127.in-addr.arpa"} 1
 bind_zone_serial{view="_default",zone_name="255.in-addr.arpa"} 1
-bind_zone_serial{view="_default",zone_name="internal.bjhit.com"} 2.026010301e+09
+bind_zone_serial{view="_default",zone_name="internal.example.com"} 2.026010301e+09
 bind_zone_serial{view="_default",zone_name="localhost"} 2
 ```
 
@@ -480,27 +490,20 @@ kubectl delete pod -n monitoring prometheus-server-7968f8d597-mbg2g
 ```
 
 ### 展示
-1. **复制**下方的完整 JSON 代码。
-2. 在 Grafana 中，点击左侧菜单 Dashboards -> Import。
-3. 将代码粘贴到 Import via panel json 文本框中。
-4. 点击 Load。
-5. 如果提示 ID 冲突，需修改 Uid。
-
-```json
-xxx
-```
+- 该面板地址：[github](https://github.com/example/dns-monitoring-dashboard)
+![](/docs/基础服务/dns/实践案例/主从DNS监控面板.png)
 
 ### 告警
 ...
 
-## 九、运维阶段
+## 十、运维阶段
 ### 更新 DNS 记录
 在 BIND 主从架构中，更新域名记录只需要在 **主服务器 (Master, 172.16.0.223)** 上操作，从服务器会自动同步。
 
 **1. 登录到主服务器 (`172.16.0.223`)，修改区域文件：**
-```bind {filename="/etc/bind/zones/db.internal.bjhit.com"}
+```bind {filename="/etc/bind/zones/db.internal.example.com"}
 $TTL    86400
-@       IN      SOA     ns1.internal.bjhit.com. admin.internal.bjhit.com. (
+@       IN      SOA     ns1.internal.example.com. admin.internal.example.com. (
                      2026010301         ; Serial（每次修改+1）建议格式：YYYYMMDDnn (年月日+序号)
                      3600               ; Refresh
                      1800               ; Retry
@@ -526,15 +529,15 @@ systemctl reload bind9
 **3. 测试域名解析结果：**
 ```sh
 # 从客户端通过 DNS Master 测试解析是否正常
-dig harbor.bj.internal.bjhit.com @172.16.0.223
-dig harbor.bj.internal.bjhit.com @172.16.0.223 +tcp
+dig harbor.bj.internal.example.com @172.16.0.223
+dig harbor.bj.internal.example.com @172.16.0.223 +tcp
 
 # 从客户端通过 DNS Slave 测试解析是否正常
-dig harbor.bj.internal.bjhit.com @172.16.0.225
-dig harbor.bj.internal.bjhit.com @172.16.0.225 +tcp
+dig harbor.bj.internal.example.com @172.16.0.225
+dig harbor.bj.internal.example.com @172.16.0.225 +tcp
 
 # 从客户端通过 VIP 测试解析是否正常
-dig harbor.bj.internal.bjhit.com @172.16.0.100
-dig harbor.bj.internal.bjhit.com @172.16.0.100 +tcp
+dig harbor.bj.internal.example.com @172.16.0.100
+dig harbor.bj.internal.example.com @172.16.0.100 +tcp
 ```
 

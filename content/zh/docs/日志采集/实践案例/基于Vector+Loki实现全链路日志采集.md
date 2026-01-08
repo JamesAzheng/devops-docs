@@ -1,23 +1,23 @@
 ---
-title: "基于 Vector + Loki 实现全链路日志采集"
+title: "基于Vector+Loki实现全链路日志采集"
 ---
 
-# 环境概述
+## X、环境概述
 拓扑图
 
-## 应用版本
+### 应用版本
 | 服务   | CHART VERSION | APP VERSION            |
 | ------ | ------------- | ---------------------- |
 | vector | 0.35.3        | 0.40.2-distroless-libc |
 | loki   | 6.25.1        | 3.3.2                  |
 
 
-# 部署 Loki
+## X、部署 Loki
 - https://grafana.com/docs/loki/latest/setup/install/helm/install-scalable/
-## 先决条件
+### 先决条件
 - 准备对象存储
 
-## 导出 loki values 文件
+### 导出 loki values 文件
 ```sh
 helm repo add grafana https://grafana.github.io/helm-charts
 
@@ -28,7 +28,7 @@ helm pull grafana/loki --version 6.25.1
 helm show values grafana/loki --version 6.25.1 > values-loki-6.25.1.yaml
 ```
 
-## 准备 htpasswd Secret
+### 准备 htpasswd Secret
 - 用于为 Loki gateway（NGINX 反向代理）启用 Basic Authentication，以保护 Loki 的写入/查询接口，防止任何人随意推送日志。
 ```sh
 apt install apache2-utils
@@ -42,7 +42,7 @@ kubectl create secret generic loki-gateway-auth \
   -n monitoring
 ```
 
-## 修改 values 文件
+### 修改 values 文件
 - 核心修改内容：
 ```yaml
 ...
@@ -79,7 +79,7 @@ gateway:
 ...
 ```
 
-## 部署
+### 部署
 - 修改完 values 文件后，部署：
 ```sh
 helm upgrade --install loki ./loki-6.25.1.tgz \
@@ -89,7 +89,7 @@ helm upgrade --install loki ./loki-6.25.1.tgz \
   -f values-loki-6.25.1.yaml --debug
 ```
 
-## 验证部署结果
+### 验证部署结果
 - 以下请求仅限于为设置验证常见，如 Basic Authentication，需在curl命令中指定用户名和密码。
 ```sh
 # 确认所有 Pod 处于 Running 状态
@@ -127,9 +127,9 @@ curl -G -s -H "X-Scope-OrgID: Prod" \
 
 ---
 
-# 采集 K8s 日志
+## X、采集 K8s 日志
 - 采集并推送 K8s Pod 中容器的日志
-## 创建 Basic Authentication Secret
+### 创建 Basic Authentication Secret
 - 用于 Vector 向 loki-gateway 发送日志，账号密码需与 loki-gateway 的 .htpasswd 文件一致
 ```sh
 kubectl create secret generic vector-loki-auth \
@@ -137,7 +137,7 @@ kubectl create secret generic vector-loki-auth \
   --from-literal=password="P@ssw0rd" \
   -n monitoring
 ```
-## 导出 vector values 文件
+### 导出 vector values 文件
 
 ```sh
 helm repo add vector https://helm.vector.dev
@@ -149,7 +149,7 @@ helm pull vector/vector --version 0.35.3
 helm show values vector/vector --version 0.35.3 > values-vector-0.35.3.yaml
 ```
 
-## 修改 values 文件
+### 修改 values 文件
 - 核心修改内容：
 ```yaml
 ...
@@ -301,7 +301,7 @@ customConfig:
 ```
 
 
-## 部署
+### 部署
 - 修改完 values 文件后，部署：
 ```sh
 helm upgrade --install vector ./vector-0.35.3.tgz \
@@ -311,7 +311,7 @@ helm upgrade --install vector ./vector-0.35.3.tgz \
   -f values-vector-0.35.3.yaml
 ```
 
-## 验证
+### 验证
 ```sh
 # 查询有哪些 label
 curl -G -s -H "X-Scope-OrgID: Prod" \
@@ -330,11 +330,11 @@ curl -G -s "http://$(kubectl get svc -n monitoring | grep loki-gateway | awk '{p
 
 
 
-# 采集 docker-compose 日志
+## X、采集 docker-compose 日志
 - 采集并推送 docker-compose 运行的容器日志
 - https://vector.dev/docs/reference/configuration/sources/docker_logs
 - 租户 ID 同样使用 Prod，这样可以在一个 Grafana 面板中通过不同 job 来筛选不同环境的日志。
-## 安装 vector
+### 安装 vector
 ```sh
 # 下载并解压安装包
 mkdir -p vector && \
@@ -359,21 +359,21 @@ usermod -aG docker vector
 # 启动
 systemctl enable --now vector.service
 ```
-## 修改配置文件
+### 修改配置文件
 - config/vector.yaml
 - Vector 的 docker_logs source 通过 Docker API 直接采集容器 stdout/stderr 日志（默认 json-file 或 local logging driver），自动添加丰富元数据（如 container_id、container_name、image_name、label、stream 等），便于后续过滤、解析和路由。
 ```yaml
 ...
 ```
-## 运行并验证
+### 运行并验证
 
 
-# 采集文件系统日志
+## X、采集文件系统日志
 
 ---
 
-# 遇到的坑
-## Grafana 中添加 Loki 数据源时报错
+## X、遇到的坑
+### Grafana 中添加 Loki 数据源时报错
 点击 Save & test 后报错`Unable to connect with Loki. Please check the server logs for more details.`
 
 **解决方案：**
@@ -393,7 +393,7 @@ systemctl enable --now vector.service
 
 ---
 
-## 通过 Helm 更新 Vector 配置文件时报错
+### 通过 Helm 更新 Vector 配置文件时报错
 配置文件与报错内容：
 ```yaml
 # cat values-vector-0.35.3.yaml
@@ -444,14 +444,14 @@ sinks:
 
 ---
 
-## Vector 向 loki-gateway（loki-write） 写日志时报 401
+### Vector 向 loki-gateway（loki-write） 写日志时报 401
 - 当 loki 处于多租户模式下时，需要在 Vector 配置文件中指定 tenant_id；
 - 该配置相当于在 grafana 添加数据源时定义的`X-Scope-OrgID` Header 与 Value。
 - 参考链接：https://vector.dev/docs/reference/configuration/sinks/loki/#tenant_id
 
 ---
 
-## loki-gateway 无法解析域名
+### loki-gateway 无法解析域名
 loki-gateway 关键日志片段（could not be resolved）：
 ```log
 [error] 13#13: *91364 loki-read.monitoring.svc.cluster.local could not be resolved (110: Operation timed out), client: r: , request: "GET /loki/api/v1/tail?query=%7Bstream%3D%22stdout%22%2Cpod%3D%22loki-canary-4ffch%22%7D+ HTTP/1.1", host: ring.svc.cluster.local.:80"
@@ -505,7 +505,7 @@ global:
 
 ---
 
-## loki-backend 频繁崩溃
+### loki-backend 频繁崩溃
 核心日志片段：
 ```sh
 # kubectl logs -n monitoring loki-backend-0 loki | grep -i error | tail

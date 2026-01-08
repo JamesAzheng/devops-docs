@@ -409,7 +409,7 @@ helm get [SUBCOMMAND] [RELEASE] [flags]
 ```sh
 # helm ls -n darknet-target
 NAME        	NAMESPACE     	REVISION	UPDATED                                	STATUS  	CHART       	APP VERSION
-harbor-bjhit	darknet-target	1       	2023-03-24 02:58:00.553612058 +0000 UTC	deployed	harbor-1.9.3	2.5.3      
+harbor-example	darknet-target	1       	2023-03-24 02:58:00.553612058 +0000 UTC	deployed	harbor-1.9.3	2.5.3      
 
 
 # helm ls -n harbor
@@ -421,7 +421,7 @@ harbor	harbor   	2       	2023-07-07 16:57:36.41910434 +0800 CST	deployed	harbor
 
 ```sh
 # 未记录部署时的参数
-# helm get values -n darknet-target  harbor-bjhit
+# helm get values -n darknet-target  harbor-example
 USER-SUPPLIED VALUES:
 caSecretName: ""
 chartmuseum:
@@ -450,7 +450,7 @@ externalURL: http://172.16.0.120
 
 
 # 对比差异（问题就出在这里，需要加上30003端口才行！）
-# helm get values -n darknet-target  harbor-bjhit | grep externalURL
+# helm get values -n darknet-target  harbor-example | grep externalURL
 externalURL: http://172.16.0.120:30002
 ```
 

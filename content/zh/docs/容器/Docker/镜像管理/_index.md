@@ -45,6 +45,10 @@ weight: 11
 ```sh
 # 在存在镜像的主机执行：
 docker save 镜像A 镜像B 镜像X | ssh root@目标IP 'docker load'
+
+
+# 方法二，在存在镜像的主机执行：
+docker images | grep -E 镜像名称 | awk '{print $1":"$2}' | xargs docker save | ssh -C root@目标IP "docker load"
 ```
 
 # 导出镜像

@@ -192,7 +192,7 @@ spec:
           - name: shared-data
             mountPath: /opt
       - name: logger-processor
-        image: 172.16.0.120:30002/bjhit-middleware/logger-processor@sha256:4d9c407e0966d849fb5301f73990a9927058fed45cb4b7a126b09b298b5326ec
+        image: 172.16.0.120:30002/example-middleware/logger-processor@sha256:4d9c407e0966d849fb5301f73990a9927058fed45cb4b7a126b09b298b5326ec
         imagePullPolicy: IfNotPresent
         command:
           - /bin/bash
@@ -261,7 +261,7 @@ spec:
           - name: hsdir-sniper-log
             mountPath: /root/hsdir_sniper/logfile/ # 
       - name: logger-processor
-        image: 172.16.0.120:30002/bjhit-middleware/logger-processor@sha256:4d9c407e0966d849fb5301f73990a9927058fed45cb4b7a126b09b298b5326ec
+        image: 172.16.0.120:30002/example-middleware/logger-processor@sha256:4d9c407e0966d849fb5301f73990a9927058fed45cb4b7a126b09b298b5326ec
         imagePullPolicy: IfNotPresent
         command:
           - /bin/bash

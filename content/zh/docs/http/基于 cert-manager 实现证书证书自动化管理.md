@@ -220,10 +220,10 @@ spec:
     kind: ClusterIssuer
 
   # 写入证书 Subject 字段中的内容
-  commonName: bjhit-dev-k8s-root-ca
+  commonName: example-dev-k8s-root-ca
   subject:
     organizations:
-      - BJHIT
+      - example
 ```
 
 **03-root-ca-ClusterIssuer.yaml**
@@ -245,61 +245,28 @@ kubectl apply -f .
 ```
 
 #### 用自建根 CA 签发应用证书
-**apps/backend/certificate-backend-api.yaml**
-```yaml
+
+```yaml {filename="/root/k8s/manifests/harbor/certificate-harbor.yaml"}
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: backend-api-cert
-  namespace: backend # 签发到应用所属的 namespace
+  name: harbor-cert # secret 名称
+  namespace: harbor # 签发到应用所属的 namespace
 spec:
-  secretName: backend-api-tls # Pod 通过该 Secret 挂载证书
-
+  secretName: harbor-tls # Pod 通过该 Secret 挂载证书
   duration: 2160h # 90 天
   renewBefore: 360h # 15 天
-
   privateKey:
     algorithm: RSA
     size: 2048
-
   issuerRef:
     name: root-ca
     kind: ClusterIssuer
-
   dnsNames:
-    - backend-api.backend.svc.cluster.local
-    - backend-api.backend.svc
-
-  commonName: backend-api.backend.svc.cluster.local
+    - harbor.bj.internal.example.com
+  commonName: harbor.bj.internal.example.com
 ```
 
-**k8s/manifests/grafana/certificate-grafana.yaml**
-```yaml
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: grafana-cert
-  namespace: monitoring 
-spec:
-  secretName: grafana-tls # Pod 通过该 Secret 挂载证书
-
-  duration: 2160h # 90 天
-  renewBefore: 360h # 15 天
-
-  privateKey:
-    algorithm: RSA
-    size: 2048
-
-  issuerRef:
-    name: root-ca
-    kind: ClusterIssuer
-
-  dnsNames:
-    - grafana.monitoring.svc.cluster.local
-    - grafana.monitoring.svc
-
-  commonName: backend-api.backend.svc.cluster.local
-```
 
 ### 应用中引用证书
 

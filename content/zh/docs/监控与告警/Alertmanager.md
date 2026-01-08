@@ -2,6 +2,14 @@
 title: "Alertmanager"
 ---
 
+
+## 告警数据流
+- **Prometheus** ：采集数据 -> **计算规则 (Rules)** -> 发现异常 -> **产生告警** -> 发送给 Alertmanager。
+- **Alertmanager** ：接收告警 -> 分组/去重 -> **发送通知** (发邮件、钉钉等)。
+
+
+
+
 # Alertmanager 概述
 
 - Alertmanager 除了可以接受 Prometheus 的报警信息外，也支持接收来自其它工具的告警；

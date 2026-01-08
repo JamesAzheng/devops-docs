@@ -771,7 +771,7 @@ metadata:
 spec:
   containers:
   - name: middleware
-    image: 172.16.0.120:30002/bjhit-middleware/middleware:v1
+    image: 172.16.0.120:30002/example-middleware/middleware:v1
     command:
       - tail
     args:
@@ -808,7 +808,7 @@ metadata:
 spec:
   containers:
   - name: middleware
-    image: 172.16.0.120:30002/bjhit-middleware/middleware:v1
+    image: 172.16.0.120:30002/example-middleware/middleware:v1
     command:
       - tail
     args:
@@ -868,7 +868,7 @@ metadata:
 spec:
   containers:
   - name: middleware
-    image: 172.16.0.120:30002/bjhit-middleware/middleware:v1
+    image: 172.16.0.120:30002/example-middleware/middleware:v1
     command:
       - tail
     args:
