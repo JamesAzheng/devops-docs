@@ -91,7 +91,8 @@ markup:
     # guessSyntax: true
   tableOfContents:
     startLevel: 2
-    endLevel: 4
+    endLevel: 5
+    # endLevel: 4
     ordered: false
 
 # Everything below this are Site Params
